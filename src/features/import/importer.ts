@@ -54,7 +54,21 @@ async function importOne(file: File): Promise<ImportOutcome> {
   let parsed: ParsedBook;
   if (format === "epub") parsed = await parseEpub(new Uint8Array(buffer), file.name);
   else if (format === "mobi") parsed = parseMobi(buffer, file.name);
-  else parsed = emptyBook(titleFromFilename(file.name)); // PDF: metadados e capa chegam com o leitor
+  else {
+    parsed = emptyBook(titleFromFilename(file.name));
+    try {
+      const { pdfMetadata } = await import("../pdf/pdf");
+      const meta = await pdfMetadata(buffer);
+      // Títulos de PDF costumam vir vazios ou como "Microsoft Word - arquivo.docx"
+      if (meta.title && !/^(untitled|sem título|microsoft word)/i.test(meta.title)) parsed.title = meta.title;
+      parsed.authors = meta.authors;
+      parsed.pageCount = meta.pageCount;
+      parsed.year = meta.year;
+      parsed.cover = meta.cover;
+    } catch {
+      // PDF protegido ou corrompido: fica com o nome do arquivo
+    }
+  }
 
   const cover = parsed.cover ? await processCover(parsed.cover) : null;
   const fileId = uuid();

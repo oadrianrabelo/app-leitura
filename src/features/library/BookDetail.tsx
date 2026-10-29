@@ -11,6 +11,9 @@ import { ReadingSheet, type ReadingDraft } from "./ReadingSheet";
 import { Stars } from "./Stars";
 import { formatDate, ordinal } from "./dates";
 import { useLibraryUi } from "./state";
+import { useReaderUi } from "../reader/state";
+import { db } from "../../db/db";
+import { usePosition } from "../../db/reading";
 import "./BookDetail.css";
 
 const FORMAT_LABEL: Record<Book["format"], string> = { epub: "EPUB", pdf: "PDF", mobi: "MOBI", fisico: "Livro físico" };
@@ -47,6 +50,7 @@ function ReadingCard({ reading, index, onEdit }: { reading: Reading; index: numb
 
 function DetailBody({ book, readings }: { book: Book; readings: Reading[] }) {
   const closeBook = useLibraryUi((s) => s.closeBook);
+  const position = usePosition(book.id);
   const [draft, setDraft] = useState<ReadingDraft | null>(null);
   const [editing, setEditing] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -64,6 +68,17 @@ function DetailBody({ book, readings }: { book: Book; readings: Reading[] }) {
   const active = readings.find((r) => r.state === "lendo");
   const physical = book.format === "fisico";
   const medium: Reading["medium"] = physical ? "fisico" : "digital";
+  const readable = !physical && !!book.fileId;
+  const openReader = () => {
+    closeBook();
+    setTimeout(() => useReaderUi.getState().open(book.id), 240);
+  };
+  // Releitura começa do início, com uma leitura nova
+  const rereadInApp = async () => {
+    await db.positions.delete(book.id);
+    await addReading(book.id, { state: "lendo", medium: "digital" });
+    openReader();
+  };
   const newReading = (preset: ReadingDraft["preset"]) => setDraft({ bookId: book.id, title: book.title, preset: { medium, ...preset } });
 
   const meta = [
@@ -102,30 +117,45 @@ function DetailBody({ book, readings }: { book: Book; readings: Reading[] }) {
       </div>
 
       <div className="detail-actions">
+        {readable && (
+          <Button size="lg" onClick={() => (book.status === "lido" && !active ? rereadInApp() : openReader())}>
+            <Icon name={book.status === "lido" && !active ? "reread" : "read"} size={18} />
+            {active && position
+              ? `Continuar lendo · ${Math.round(position.fraction * 100)}%`
+              : book.status === "lido"
+                ? "Ler de novo"
+                : "Começar a ler"}
+          </Button>
+        )}
         {active ? (
           <>
-            <Button size="lg" onClick={() => setDraft({ bookId: book.id, title: book.title, reading: { ...active, state: "concluida" } })}>
-              <Icon name="check" size={18} /> Terminei
-            </Button>
-            <Button size="lg" variant="secondary" onClick={() => setDraft({ bookId: book.id, title: book.title, reading: active })}>
-              Editar leitura
+            {!readable && (
+              <Button size="lg" onClick={() => setDraft({ bookId: book.id, title: book.title, reading: { ...active, state: "concluida" } })}>
+                <Icon name="check" size={18} /> Terminei
+              </Button>
+            )}
+            <Button size="lg" variant="secondary" onClick={() => setDraft({ bookId: book.id, title: book.title, reading: readable ? { ...active, state: "concluida" } : active })}>
+              {readable ? "Marcar como terminado" : "Editar leitura"}
             </Button>
           </>
         ) : book.status === "lido" ? (
-          <Button size="lg" onClick={() => addReading(book.id, { state: "lendo", medium })}>
-            <Icon name="reread" size={18} /> Ler de novo
-          </Button>
+          !readable && (
+            <Button size="lg" onClick={() => addReading(book.id, { state: "lendo", medium })}>
+              <Icon name="reread" size={18} /> Ler de novo
+            </Button>
+          )
         ) : (
           <>
-            <Button size="lg" onClick={() => addReading(book.id, { state: "lendo", medium })}>
-              <Icon name="book" size={18} /> Comecei a ler
-            </Button>
+            {!readable && (
+              <Button size="lg" onClick={() => addReading(book.id, { state: "lendo", medium })}>
+                <Icon name="book" size={18} /> Comecei a ler
+              </Button>
+            )}
             <Button size="lg" variant="secondary" onClick={() => newReading({ state: "concluida" })}>
               Já li este livro
             </Button>
           </>
         )}
-        {!physical && <p className="detail-reader-soon">O leitor do Sépia chega na próxima fase. Por enquanto, a leitura é registrada aqui.</p>}
       </div>
 
       <section className="detail-section">

@@ -69,3 +69,39 @@ export interface Cover {
   blob: Blob;
   updatedAt: number;
 }
+
+/** Onde a leitura parou em cada livro (um registro por livro). */
+export interface Position {
+  bookId: string;
+  /** EPUB CFI (EPUB/MOBI) ou "page:N" (PDF) */
+  location: string;
+  fraction: number;
+  updatedAt: number;
+}
+
+export interface Bookmark extends Synced {
+  bookId: string;
+  location: string;
+  fraction: number;
+  /** Começo do texto da página marcada */
+  excerpt: string;
+  chapter: string | null;
+  /** Estilo do marcador (os colecionáveis da fase 4) */
+  style: string;
+}
+
+/** Um período contínuo de leitura. Alimenta páginas por dia, sequência e conquistas. */
+export interface Session extends Synced {
+  bookId: string;
+  readingId: string | null;
+  startedAt: number;
+  endedAt: number;
+  /** Dia local "AAAA-MM-DD" em que a sessão começou */
+  day: string;
+  /** Páginas avançadas (unidades de ~1.500 caracteres no EPUB, páginas no PDF) */
+  pages: number;
+  /** Tempo ativo em segundos (pausas longas não contam) */
+  seconds: number;
+  startFraction: number;
+  endFraction: number;
+}

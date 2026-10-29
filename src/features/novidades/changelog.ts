@@ -8,6 +8,38 @@ export interface ChangelogEntry {
 /** Mais recente primeiro. Cada release adiciona uma entrada aqui. */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.3.0",
+    date: "2026-10-29",
+    title: "Hora de ler",
+    highlights: [
+      {
+        icon: "read",
+        title: "O leitor do Sépia",
+        text: "EPUB, MOBI e PDF, com a fonte original do livro, toque nas bordas para virar e o livro sempre reabrindo onde você parou.",
+      },
+      {
+        icon: "palette",
+        title: "Seis papéis e sete fontes",
+        text: "Papel, Sépia, Sálvia, Cinza, Noite e Breu. Tamanho, espaçamento, margens e páginas ou rolagem contínua.",
+      },
+      {
+        icon: "moon",
+        title: "Feito para os seus olhos",
+        text: "Luz quente à noite, escurecer além do brilho mínimo e um lembrete gentil de pausa a cada 20 minutos.",
+      },
+      {
+        icon: "bookmark",
+        title: "Marcadores",
+        text: "Toque no canto da página para marcá-la, como dobrar a ponta de uma folha.",
+      },
+      {
+        icon: "flame",
+        title: "Seu ritmo de verdade",
+        text: "Páginas lidas hoje e a sequência de dias, agora contadas enquanto você lê.",
+      },
+    ],
+  },
+  {
     version: "0.2.0",
     date: "2026-10-29",
     title: "Sua biblioteca chegou",

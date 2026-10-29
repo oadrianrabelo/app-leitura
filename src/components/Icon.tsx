@@ -33,6 +33,9 @@ import {
   RotateCcw,
   BookMarked,
   Calendar,
+  List,
+  Type,
+  BookOpenText,
   type LucideProps,
 } from "lucide-react";
 
@@ -71,6 +74,9 @@ const ICONS = {
   reread: RotateCcw,
   bookmarked: BookMarked,
   calendar: Calendar,
+  list: List,
+  type: Type,
+  read: BookOpenText,
 } as const;
 
 export type IconName = keyof typeof ICONS;

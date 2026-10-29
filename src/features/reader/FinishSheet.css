@@ -1,0 +1,62 @@
+.finish {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.finish-hero {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 170px;
+  width: 100%;
+}
+
+.finish-spark {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: var(--gold);
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+}
+
+.finish-eyebrow {
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--accent);
+  font-size: var(--text-lg);
+}
+
+.finish-title {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 560;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin-top: var(--space-1);
+}
+
+.finish-facts {
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+  margin-top: var(--space-2);
+}
+
+.finish-rating {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-6);
+  color: var(--ink-soft);
+}
+
+.finish .field {
+  width: 100%;
+  text-align: left;
+}
+
+.finish .reading-form-actions {
+  width: 100%;
+}

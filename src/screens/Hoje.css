@@ -151,3 +151,29 @@
   flex-shrink: 0;
   margin-left: auto;
 }
+
+.current-progress {
+  margin-top: var(--space-3);
+  width: 100%;
+}
+
+.current-progress-bar {
+  height: 4px;
+  border-radius: 4px;
+  background: var(--bg-sunken);
+  overflow: hidden;
+}
+
+.current-progress-bar span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  transform-origin: left;
+}
+
+.current-progress-label {
+  display: block;
+  font-size: var(--text-xs);
+  color: var(--ink-faint);
+  margin-top: var(--space-1);
+}

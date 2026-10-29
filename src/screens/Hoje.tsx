@@ -7,6 +7,9 @@ import { useBooks } from "../db/hooks";
 import { useLibraryStats } from "../db/stats";
 import { BookCover } from "../features/library/BookCover";
 import { useLibraryUi } from "../features/library/state";
+import { useReaderUi } from "../features/reader/state";
+import { useRhythm } from "../db/reading";
+import { useReadings } from "../db/hooks";
 import "./Hoje.css";
 
 function greeting(date: Date) {
@@ -24,13 +27,17 @@ export function Hoje({ onOpenLibrary }: { onOpenLibrary: () => void }) {
   const books = useBooks();
   const stats = useLibraryStats();
   const openBook = useLibraryUi((s) => s.openBook);
+  const openReader = useReaderUi((s) => s.open);
+  const rhythm = useRhythm();
+  const readings = useReadings();
+  const progressOf = (bookId: string) => readings?.find((r) => r.bookId === bookId && r.state === "lendo")?.progress ?? 0;
 
   const current = useMemo(() => (books ?? []).filter((b) => b.status === "lendo"), [books]);
 
   const tiles: { icon: IconName; value: number; label: string }[] = [
     { icon: "bookmark", value: stats?.booksRead ?? 0, label: (stats?.booksRead ?? 0) === 1 ? "livro lido na vida" : "livros lidos na vida" },
-    { icon: "target", value: stats?.finishedThisYear ?? 0, label: `em ${now.getFullYear()}` },
-    { icon: "flame", value: 0, label: "dias seguidos" },
+    { icon: "target", value: rhythm?.pagesToday ?? 0, label: (rhythm?.pagesToday ?? 0) === 1 ? "página hoje" : "páginas hoje" },
+    { icon: "flame", value: rhythm?.streak ?? 0, label: (rhythm?.streak ?? 0) === 1 ? "dia seguido" : "dias seguidos" },
   ];
 
   return (
@@ -41,7 +48,7 @@ export function Hoje({ onOpenLibrary }: { onOpenLibrary: () => void }) {
             <motion.button
               key={book.id}
               className="current-card is-book"
-              onClick={() => openBook(book.id)}
+              onClick={() => (book.format !== "fisico" && book.fileId ? openReader(book.id) : openBook(book.id))}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
@@ -51,11 +58,18 @@ export function Hoje({ onOpenLibrary }: { onOpenLibrary: () => void }) {
                 <p className="current-eyebrow">Lendo agora</p>
                 <h2 className="current-title">{book.title}</h2>
                 <p className="current-author">{book.authors.join(", ")}</p>
-                {book.pageCount && (
-                  <p className="current-text">
-                    {book.pageCountEstimated ? "≈ " : ""}
-                    {book.pageCount} páginas
-                  </p>
+                {book.format !== "fisico" && book.fileId ? (
+                  <div className="current-progress">
+                    <div className="current-progress-bar">
+                      <span style={{ transform: `scaleX(${progressOf(book.id)})` }} />
+                    </div>
+                    <span className="current-progress-label">
+                      {Math.round(progressOf(book.id) * 100)}%
+                      {book.pageCount ? ` · faltam ≈ ${Math.max(0, Math.round(book.pageCount * (1 - progressOf(book.id))))} páginas` : ""}
+                    </span>
+                  </div>
+                ) : (
+                  book.pageCount && <p className="current-text">{book.pageCount} páginas</p>
                 )}
               </div>
               <Icon name="chevron" size={18} className="current-chevron" />
@@ -106,8 +120,12 @@ export function Hoje({ onOpenLibrary }: { onOpenLibrary: () => void }) {
           ))}
         </div>
         <p className="stats-note">
-          A sequência de dias começa a contar quando o leitor chegar. E aqui ela é gentil: dias de descanso
-          não apagam o que você construiu.
+          {rhythm?.readToday
+            ? rhythm.minutesToday >= 1
+              ? `Hoje já foram ${rhythm.minutesToday} min de leitura. `
+              : "Você já leu hoje. "
+            : "Algumas páginas hoje mantêm a sequência viva. "}
+          Ela é gentil: um dia de descanso na semana não apaga o que você construiu.
         </p>
       </Section>
     </Page>
