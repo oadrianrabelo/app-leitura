@@ -1,0 +1,22 @@
+.stars {
+  display: inline-flex;
+  gap: 2px;
+  color: var(--hairline-strong);
+}
+
+.stars .is-on {
+  color: var(--gold);
+}
+
+.stars.is-editable {
+  gap: 6px;
+}
+
+.stars.is-editable button {
+  padding: 2px;
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.stars.is-editable button:active {
+  transform: scale(0.85);
+}

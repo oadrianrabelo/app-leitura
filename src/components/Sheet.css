@@ -24,8 +24,22 @@
   border-radius: var(--radius-xl) var(--radius-xl) 0 0;
   box-shadow: var(--shadow-lg);
   padding-bottom: var(--safe-bottom);
-  touch-action: none;
   will-change: transform;
+}
+
+.sheet.is-tall {
+  height: calc(100% - var(--safe-top) - 24px);
+}
+
+.sheet.is-tall .sheet-content {
+  flex: 1;
+}
+
+.sheet-handle {
+  flex-shrink: 0;
+  padding: 6px 0 10px;
+  cursor: grab;
+  touch-action: none;
 }
 
 .sheet-grabber {
@@ -33,8 +47,7 @@
   height: 5px;
   border-radius: var(--radius-full);
   background: var(--hairline-strong);
-  margin: 8px auto 4px;
-  flex-shrink: 0;
+  margin: 0 auto;
 }
 
 .sheet-content {
@@ -51,5 +64,10 @@
   .sheet {
     border-radius: var(--radius-xl);
     padding-bottom: 0;
+  }
+
+  .sheet.is-tall {
+    height: min(820px, calc(100% - 64px));
+    max-width: 640px;
   }
 }

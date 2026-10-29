@@ -1,7 +1,12 @@
+import { useMemo } from "react";
 import { motion } from "motion/react";
 import { Page, Section } from "../components/Page";
-import { Icon } from "../components/Icon";
+import { Icon, type IconName } from "../components/Icon";
 import { Button } from "../components/Button";
+import { useBooks } from "../db/hooks";
+import { useLibraryStats } from "../db/stats";
+import { BookCover } from "../features/library/BookCover";
+import { useLibraryUi } from "../features/library/state";
 import "./Hoje.css";
 
 function greeting(date: Date) {
@@ -14,47 +19,81 @@ function greeting(date: Date) {
 
 const weekday = new Intl.DateTimeFormat("pt-BR", { weekday: "long", day: "numeric", month: "long" });
 
-const STATS = [
-  { icon: "flame", value: "0", label: "dias seguidos" },
-  { icon: "target", value: "0", label: "páginas hoje" },
-  { icon: "bookmark", value: "0", label: `livros em ${new Date().getFullYear()}` },
-] as const;
-
 export function Hoje({ onOpenLibrary }: { onOpenLibrary: () => void }) {
   const now = new Date();
+  const books = useBooks();
+  const stats = useLibraryStats();
+  const openBook = useLibraryUi((s) => s.openBook);
+
+  const current = useMemo(() => (books ?? []).filter((b) => b.status === "lendo"), [books]);
+
+  const tiles: { icon: IconName; value: number; label: string }[] = [
+    { icon: "bookmark", value: stats?.booksRead ?? 0, label: (stats?.booksRead ?? 0) === 1 ? "livro lido na vida" : "livros lidos na vida" },
+    { icon: "target", value: stats?.finishedThisYear ?? 0, label: `em ${now.getFullYear()}` },
+    { icon: "flame", value: 0, label: "dias seguidos" },
+  ];
 
   return (
     <Page eyebrow={weekday.format(now)} title={greeting(now)}>
-      <motion.div
-        className="current-card"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      >
-        <div className="current-cover" aria-hidden>
-          <span />
-          <span />
-          <span />
+      {current.length > 0 ? (
+        <div className="current-list">
+          {current.map((book, i) => (
+            <motion.button
+              key={book.id}
+              className="current-card is-book"
+              onClick={() => openBook(book.id)}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <BookCover book={book} width={84} />
+              <div className="current-body">
+                <p className="current-eyebrow">Lendo agora</p>
+                <h2 className="current-title">{book.title}</h2>
+                <p className="current-author">{book.authors.join(", ")}</p>
+                {book.pageCount && (
+                  <p className="current-text">
+                    {book.pageCountEstimated ? "≈ " : ""}
+                    {book.pageCount} páginas
+                  </p>
+                )}
+              </div>
+              <Icon name="chevron" size={18} className="current-chevron" />
+            </motion.button>
+          ))}
         </div>
-        <div className="current-body">
-          <p className="current-eyebrow">Lendo agora</p>
-          <h2 className="current-title">Nenhum livro aberto ainda</h2>
-          <p className="current-text">
-            Quando você começar uma leitura, ela aparece aqui com as páginas que faltam e o tempo
-            estimado até o fim.
-          </p>
-          <Button variant="secondary" onClick={onOpenLibrary}>
-            <Icon name="library" size={16} />
-            Ir para a biblioteca
-          </Button>
-        </div>
-      </motion.div>
+      ) : (
+        <motion.div
+          className="current-card"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <div className="current-cover" aria-hidden>
+            <span />
+            <span />
+            <span />
+          </div>
+          <div className="current-body">
+            <p className="current-eyebrow">Lendo agora</p>
+            <h2 className="current-title">Nenhum livro aberto</h2>
+            <p className="current-text">
+              Escolha um livro na biblioteca e toque em “Comecei a ler”. Ele aparece aqui para você voltar
+              rapidinho.
+            </p>
+            <Button variant="secondary" onClick={onOpenLibrary}>
+              <Icon name="library" size={16} />
+              Ir para a biblioteca
+            </Button>
+          </div>
+        </motion.div>
+      )}
 
       <Section title="Seu ritmo">
         <div className="stats">
-          {STATS.map((s, i) => (
+          {tiles.map((s, i) => (
             <motion.div
-              key={s.label}
+              key={s.icon}
               className="stat"
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
@@ -67,8 +106,8 @@ export function Hoje({ onOpenLibrary }: { onOpenLibrary: () => void }) {
           ))}
         </div>
         <p className="stats-note">
-          Sua sequência começa na primeira página. E aqui ela é gentil: dias de descanso não apagam
-          o que você construiu.
+          A sequência de dias começa a contar quando o leitor chegar. E aqui ela é gentil: dias de descanso
+          não apagam o que você construiu.
         </p>
       </Section>
     </Page>

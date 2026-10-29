@@ -8,6 +8,33 @@ export interface ChangelogEntry {
 /** Mais recente primeiro. Cada release adiciona uma entrada aqui. */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.2.0",
+    date: "2026-10-29",
+    title: "Sua biblioteca chegou",
+    highlights: [
+      {
+        icon: "library",
+        title: "Uma estante de verdade",
+        text: "Seus livros em pé nas prateleiras, com busca, filtros e o selo de quantas vezes cada um foi lido.",
+      },
+      {
+        icon: "upload",
+        title: "Importe seus livros digitais",
+        text: "EPUB, MOBI e PDF, vários de uma vez. Capa, autor e páginas saem do próprio arquivo.",
+      },
+      {
+        icon: "barcode",
+        title: "Livros físicos também",
+        text: "Escaneie o código de barras, busque pelo título ou cadastre à mão.",
+      },
+      {
+        icon: "reread",
+        title: "Cada leitura conta",
+        text: "Registre releituras, leituras antigas, notas e o que ficou de cada livro em você.",
+      },
+    ],
+  },
+  {
     version: "0.1.0",
     date: "2026-10-29",
     title: "Bem-vinda ao Sépia",

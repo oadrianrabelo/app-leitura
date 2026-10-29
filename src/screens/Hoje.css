@@ -118,3 +118,36 @@
   font-size: var(--text-sm);
   color: var(--ink-faint);
 }
+
+.current-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.current-card.is-book {
+  width: 100%;
+  text-align: left;
+  align-items: center;
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.current-card.is-book:active {
+  transform: scale(0.985);
+}
+
+.current-author {
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+  margin-top: 2px;
+}
+
+.current-card.is-book .current-text {
+  margin: var(--space-2) 0 0;
+}
+
+.current-chevron {
+  color: var(--ink-faint);
+  flex-shrink: 0;
+  margin-left: auto;
+}

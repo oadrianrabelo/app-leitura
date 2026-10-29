@@ -1,0 +1,83 @@
+.shelf-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.shelf-row {
+  padding: 0 14px;
+}
+
+.shelf-row-books {
+  display: flex;
+  align-items: flex-end;
+  position: relative;
+  z-index: 1;
+}
+
+.shelf-book {
+  position: relative;
+  display: block;
+  transition: transform 160ms var(--ease-out);
+  transform-origin: bottom center;
+}
+
+.shelf-book:active {
+  transform: scale(0.96);
+}
+
+@media (hover: hover) {
+  .shelf-book:hover {
+    transform: translateY(-4px);
+  }
+}
+
+/* Tábua da prateleira, com borda frontal e sombra que o livro projeta */
+.shelf-row-board {
+  height: 12px;
+  margin: 0 -14px;
+  border-radius: 2px 2px 4px 4px;
+  background: linear-gradient(180deg, var(--bg-elevated) 0%, var(--bg-sunken) 100%);
+  border: 0.5px solid var(--hairline-strong);
+  box-shadow:
+    0 8px 14px -8px rgba(60, 40, 15, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  position: relative;
+}
+
+[data-theme="noite"] .shelf-row-board {
+  box-shadow: 0 8px 14px -8px rgba(0, 0, 0, 0.7);
+}
+
+.shelf-ribbon {
+  position: absolute;
+  top: -3px;
+  right: 6px;
+  width: 11px;
+  height: 26px;
+  background: linear-gradient(90deg, #b9622f, #d98045, #b9622f);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 78%, 0 100%);
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
+}
+
+.shelf-times,
+.shelf-check {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: var(--radius-full);
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff8ee;
+  background: rgba(40, 28, 16, 0.72);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.shelf-check {
+  background: rgba(164, 84, 43, 0.92);
+}

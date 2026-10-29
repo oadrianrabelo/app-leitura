@@ -130,42 +130,6 @@ label.row:active {
   }
 }
 
-/* Interruptor */
-.switch {
-  appearance: none;
-  -webkit-appearance: none;
-  width: 46px;
-  height: 28px;
-  border-radius: 999px;
-  background: var(--hairline-strong);
-  position: relative;
-  margin: 0;
-  cursor: pointer;
-  transition: background-color var(--dur-base) var(--ease-out);
-  flex-shrink: 0;
-}
-
-.switch::after {
-  content: "";
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--bg-elevated);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  transition: transform var(--dur-base) var(--ease-out);
-}
-
-.switch:checked {
-  background: var(--accent);
-}
-
-.switch:checked::after {
-  transform: translateX(18px);
-}
-
 .settings-signature {
   text-align: center;
   font-family: var(--font-display);

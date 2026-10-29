@@ -7,6 +7,10 @@ import { Conquistas } from "./screens/Conquistas";
 import { Ajustes } from "./screens/Ajustes";
 import { UpdateSheet } from "./features/updates/UpdateSheet";
 import { NovidadesSheet } from "./features/novidades/NovidadesSheet";
+import { ImportSheet } from "./features/import/ImportSheet";
+import { AddSheet } from "./features/library/AddSheet";
+import { BookDetail } from "./features/library/BookDetail";
+import { PhysicalSheet } from "./features/physical/PhysicalSheet";
 import { useUpdates } from "./features/updates/updates";
 import { useApplyTheme } from "./lib/theme";
 import { useSettings } from "./lib/settings";
@@ -75,6 +79,10 @@ export default function App() {
           </TabPanel>
         </main>
         <TabBar active={tab} onChange={changeTab} />
+        <BookDetail />
+        <AddSheet />
+        <ImportSheet />
+        <PhysicalSheet />
         <UpdateSheet />
         <NovidadesSheet />
       </div>
