@@ -1,6 +1,7 @@
 import { AnimatePresence, motion, useDragControls, type PanInfo } from "motion/react";
 import { useEffect, type ReactNode } from "react";
 import { createPortal } from "react-dom";
+import { useBackLayer } from "../lib/backStack";
 import "./Sheet.css";
 
 interface SheetProps {
@@ -12,15 +13,19 @@ interface SheetProps {
   tall?: boolean;
   /** Impede fechar arrastando ou tocando fora (ex.: durante uma importação) */
   locked?: boolean;
+  /** Não escurece o fundo e ocupa só a parte de baixo: dá para ver o que muda atrás */
+  seeThrough?: boolean;
 }
 
 /**
  * Folha que sobe de baixo no celular e vira um cartão centralizado em telas largas.
  * Fecha arrastando a alça para baixo, tocando fora ou com Esc.
  */
-export function Sheet({ open, onClose, children, label, tall = false, locked = false }: SheetProps) {
+export function Sheet({ open, onClose, children, label, tall = false, locked = false, seeThrough = false }: SheetProps) {
   // Arrastar só pela alça: assim a rolagem do conteúdo nunca puxa a folha junto.
   const drag = useDragControls();
+  // "Voltar" do Android fecha a folha (exceto quando ela está travada)
+  useBackLayer(open && !locked, onClose);
   useEffect(() => {
     if (!open || locked) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -37,7 +42,7 @@ export function Sheet({ open, onClose, children, label, tall = false, locked = f
       {open && (
         <div className="sheet-root">
           <motion.div
-            className="sheet-scrim"
+            className={`sheet-scrim${seeThrough ? " is-clear" : ""}`}
             onClick={locked ? undefined : onClose}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -45,7 +50,7 @@ export function Sheet({ open, onClose, children, label, tall = false, locked = f
             transition={{ duration: 0.24 }}
           />
           <motion.div
-            className={`sheet${tall ? " is-tall" : ""}`}
+            className={`sheet${tall ? " is-tall" : ""}${seeThrough ? " is-peek" : ""}`}
             role="dialog"
             aria-modal="true"
             aria-label={label}

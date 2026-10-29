@@ -1,4 +1,4 @@
-import type { Book, Bookmark, Position, Reading, Session } from "../../db/types";
+import type { Book, Bookmark, Position, Reading, Session, Visit } from "../../db/types";
 
 export const SNAPSHOT_VERSION = 1;
 
@@ -12,6 +12,8 @@ export interface Snapshot {
   bookmarks: Bookmark[];
   sessions: Session[];
   positions: Position[];
+  /** Opcional: snapshots de versões antigas não têm */
+  visits?: Visit[];
 }
 
 interface Stamped {
@@ -41,8 +43,9 @@ export function hasNewerLocal<T extends Stamped>(local: T[], remote: T[], key: (
 
 export const byId = (r: { id: string }) => r.id;
 export const byBook = (r: { bookId: string }) => r.bookId;
+export const byDay = (r: { day: string }) => r.day;
 
 export function emptySnapshot(device: string): Snapshot {
-  return { version: SNAPSHOT_VERSION, exportedAt: 0, device, books: [], readings: [], bookmarks: [], sessions: [], positions: [] };
+  return { version: SNAPSHOT_VERSION, exportedAt: 0, device, books: [], readings: [], bookmarks: [], sessions: [], positions: [], visits: [] };
 }
 

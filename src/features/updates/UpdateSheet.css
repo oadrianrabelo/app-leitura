@@ -12,7 +12,7 @@
   place-items: center;
   border-radius: 16px;
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-text);
   margin-bottom: var(--space-4);
 }
 
@@ -71,7 +71,7 @@
 }
 
 .update-error {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .update-progress {

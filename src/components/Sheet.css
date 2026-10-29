@@ -31,6 +31,15 @@
   height: calc(100% - var(--safe-top) - 24px);
 }
 
+.sheet-scrim.is-clear {
+  background: transparent;
+}
+
+.sheet.is-peek {
+  max-height: min(58%, 560px);
+  box-shadow: 0 -10px 40px -10px rgba(0, 0, 0, 0.35);
+}
+
 .sheet.is-tall .sheet-content {
   flex: 1;
 }

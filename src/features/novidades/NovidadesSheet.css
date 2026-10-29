@@ -1,6 +1,6 @@
 .novidades-eyebrow {
   font-size: var(--text-sm);
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 560;
 }
 
@@ -49,7 +49,7 @@
   display: grid;
   place-items: center;
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .novidades-older {

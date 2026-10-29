@@ -145,7 +145,7 @@ button.library-action:active {
 
 button.library-action .library-action-icon {
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .round-button {
@@ -251,7 +251,7 @@ button.library-action .library-action-icon {
 }
 
 .sort-option.is-active {
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 600;
 }
 

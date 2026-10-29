@@ -51,8 +51,37 @@
   --sidebar-width: 248px;
 }
 
-/* Papel — claro, levemente creme */
+/*
+ * Temas do app. O acento é lilás em todos: claro para botões e realces
+ * (--accent, com texto escuro --accent-ink por cima) e mais profundo onde é
+ * texto (--accent-text), para continuar legível.
+ */
+
+/* Lavanda — o padrão: branco levemente lilás */
 :root,
+[data-theme="lavanda"] {
+  color-scheme: light;
+  --bg: #f4f1f8;
+  --bg-elevated: #fdfcff;
+  --bg-sunken: #ebe6f2;
+  --surface-glass: #fdfcff;
+  --ink: #2a2433;
+  --ink-soft: #5c5468;
+  --ink-faint: #8e869a;
+  --hairline: rgba(60, 40, 90, 0.11);
+  --hairline-strong: rgba(60, 40, 90, 0.19);
+  --accent: #b9a3ec;
+  --accent-text: #6e53ae;
+  --accent-soft: rgba(150, 120, 214, 0.15);
+  --accent-ink: #261b3b;
+  --gold: #b88a2e;
+  --shadow-sm: 0 1px 2px rgba(40, 25, 70, 0.06), 0 1px 1px rgba(40, 25, 70, 0.04);
+  --shadow-md: 0 6px 20px -6px rgba(40, 25, 70, 0.16), 0 2px 6px rgba(40, 25, 70, 0.05);
+  --shadow-lg: 0 24px 60px -18px rgba(40, 25, 70, 0.32);
+  --scrim: rgba(30, 20, 45, 0.3);
+}
+
+/* Papel — creme, como página de livro */
 [data-theme="papel"] {
   color-scheme: light;
   --bg: #f4ede1;
@@ -64,14 +93,38 @@
   --ink-faint: #8f8371;
   --hairline: rgba(60, 45, 25, 0.12);
   --hairline-strong: rgba(60, 45, 25, 0.2);
-  --accent: #a4542b;
-  --accent-soft: rgba(164, 84, 43, 0.12);
-  --accent-ink: #fbf5ec;
+  --accent: #b7a0e8;
+  --accent-text: #6c51a8;
+  --accent-soft: rgba(150, 120, 210, 0.16);
+  --accent-ink: #261b3b;
   --gold: #b88a2e;
   --shadow-sm: 0 1px 2px rgba(60, 40, 15, 0.06), 0 1px 1px rgba(60, 40, 15, 0.04);
   --shadow-md: 0 6px 20px -6px rgba(60, 40, 15, 0.18), 0 2px 6px rgba(60, 40, 15, 0.06);
   --shadow-lg: 0 24px 60px -18px rgba(60, 40, 15, 0.35);
   --scrim: rgba(40, 30, 18, 0.32);
+}
+
+/* Rosé — rosado bem suave */
+[data-theme="rose"] {
+  color-scheme: light;
+  --bg: #f6eff0;
+  --bg-elevated: #fffbfb;
+  --bg-sunken: #eee3e5;
+  --surface-glass: #fffbfb;
+  --ink: #302528;
+  --ink-soft: #66555a;
+  --ink-faint: #9a878c;
+  --hairline: rgba(90, 40, 55, 0.11);
+  --hairline-strong: rgba(90, 40, 55, 0.19);
+  --accent: #bfa3e6;
+  --accent-text: #74539f;
+  --accent-soft: rgba(160, 120, 205, 0.15);
+  --accent-ink: #281c38;
+  --gold: #b88a2e;
+  --shadow-sm: 0 1px 2px rgba(70, 30, 40, 0.06);
+  --shadow-md: 0 6px 20px -6px rgba(70, 30, 40, 0.16), 0 2px 6px rgba(70, 30, 40, 0.05);
+  --shadow-lg: 0 24px 60px -18px rgba(70, 30, 40, 0.32);
+  --scrim: rgba(45, 25, 30, 0.3);
 }
 
 /* Sépia — mais quente, para o fim de tarde */
@@ -86,9 +139,10 @@
   --ink-faint: #957a58;
   --hairline: rgba(80, 52, 20, 0.14);
   --hairline-strong: rgba(80, 52, 20, 0.24);
-  --accent: #9a4a22;
-  --accent-soft: rgba(154, 74, 34, 0.13);
-  --accent-ink: #f8eedd;
+  --accent: #b39adf;
+  --accent-text: #634a9a;
+  --accent-soft: rgba(130, 100, 190, 0.17);
+  --accent-ink: #251a38;
   --gold: #a87a22;
   --shadow-sm: 0 1px 2px rgba(70, 40, 10, 0.08);
   --shadow-md: 0 6px 20px -6px rgba(70, 40, 10, 0.22), 0 2px 6px rgba(70, 40, 10, 0.08);
@@ -96,7 +150,7 @@
   --scrim: rgba(50, 32, 12, 0.34);
 }
 
-/* Noite — grafite quente com texto âmbar suave, nunca preto puro */
+/* Noite — grafite quente, nunca preto puro */
 [data-theme="noite"] {
   color-scheme: dark;
   --bg: #1b1815;
@@ -108,12 +162,36 @@
   --ink-faint: #7f7262;
   --hairline: rgba(230, 210, 180, 0.09);
   --hairline-strong: rgba(230, 210, 180, 0.16);
-  --accent: #d98d5f;
-  --accent-soft: rgba(217, 141, 95, 0.14);
-  --accent-ink: #1b1815;
+  --accent: #bba6ee;
+  --accent-text: #c8b7f3;
+  --accent-soft: rgba(187, 166, 238, 0.14);
+  --accent-ink: #1c1626;
   --gold: #d4ab5a;
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 8px 24px -8px rgba(0, 0, 0, 0.55);
   --shadow-lg: 0 24px 60px -16px rgba(0, 0, 0, 0.7);
   --scrim: rgba(0, 0, 0, 0.5);
+}
+
+/* Ameixa — escuro com fundo arroxeado */
+[data-theme="ameixa"] {
+  color-scheme: dark;
+  --bg: #1a1620;
+  --bg-elevated: #241f2c;
+  --bg-sunken: #141118;
+  --surface-glass: #241f2c;
+  --ink: #ebe5f3;
+  --ink-soft: #b9aecb;
+  --ink-faint: #7e738f;
+  --hairline: rgba(220, 200, 250, 0.09);
+  --hairline-strong: rgba(220, 200, 250, 0.16);
+  --accent: #c2adf2;
+  --accent-text: #cdbcf5;
+  --accent-soft: rgba(194, 173, 242, 0.14);
+  --accent-ink: #1d1528;
+  --gold: #d9b45f;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 8px 24px -8px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 24px 60px -16px rgba(0, 0, 0, 0.7);
+  --scrim: rgba(5, 0, 12, 0.5);
 }

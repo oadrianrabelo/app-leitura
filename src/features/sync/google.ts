@@ -105,8 +105,10 @@ export async function getAccessToken(interactive: boolean): Promise<string> {
       save({ accessToken, expiresAt: Date.now() + 50 * 60 * 1000 });
       return accessToken;
     } catch (e) {
-      const msg = String(e);
-      throw new AuthError(/consent-required|cancel/i.test(msg) ? "Conecte sua conta Google para sincronizar." : msg, /consent-required/.test(msg));
+      const msg = String(e).replace(/^Error:\s*/, "");
+      // Silencioso e sem consentimento ainda: só pede para conectar. Qualquer outro caso mostra o motivo real.
+      if (/consent-required|Autorização necessária/i.test(msg)) throw new AuthError("Conecte sua conta Google para sincronizar.", true);
+      throw new AuthError(msg);
     }
   }
 

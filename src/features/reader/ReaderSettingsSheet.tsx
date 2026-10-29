@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import { Sheet } from "../../components/Sheet";
 import { fontFaces } from "./fonts";
 import { FONTS, PAPERS, useReaderSettings, type Animation, type ReaderSettings } from "./settings";
+import { Pill } from "./Pill";
+import { Icon } from "../../components/Icon";
 import "./ReaderSettingsSheet.css";
 
 // As fontes de leitura também aparecem no painel, cada uma escrita nela mesma
@@ -34,6 +36,9 @@ function Segmented<T extends string | number | null>({
   );
 }
 
+const MARGINS: ReaderSettings["margin"][] = ["estreita", "normal", "larga"];
+const SPACINGS: ReaderSettings["lineHeight"][] = [null, 1.4, 1.65, 1.9];
+
 const ANIMATIONS: { id: Animation; label: string }[] = [
   { id: "deslizar", label: "Deslizar" },
   { id: "folhear", label: "Folhear" },
@@ -50,7 +55,7 @@ export function ReaderSettingsSheet({ open, onClose, isPdf }: { open: boolean; o
   }, [open]);
 
   return (
-    <Sheet open={open} onClose={onClose} label="Aparência do livro">
+    <Sheet open={open} onClose={onClose} label="Aparência do livro" seeThrough>
       <div className="rs">
         <section className="rs-section">
           <h3>Papel</h3>
@@ -70,32 +75,48 @@ export function ReaderSettingsSheet({ open, onClose, isPdf }: { open: boolean; o
           </div>
         </section>
 
+        <section className="rs-section">
+          <div className="rs-pills">
+            {!isPdf && (
+              <>
+                <Pill
+                  label="Tamanho"
+                  icon={<span style={{ fontSize: 17 }}>Aa</span>}
+                  value={(s.fontSize - 70) / 130}
+                  onChange={(v) => set({ fontSize: Math.round((70 + v * 130) / 5) * 5 })}
+                />
+                <Pill
+                  label="Margens"
+                  icon={<Icon name="margins" size={18} />}
+                  steps={3}
+                  value={MARGINS.indexOf(s.margin) / 2}
+                  onChange={(v) => set({ margin: MARGINS[Math.round(v * 2)] })}
+                />
+                <Pill
+                  label="Espaçamento"
+                  icon={<Icon name="spacing" size={18} />}
+                  steps={4}
+                  value={SPACINGS.indexOf(s.lineHeight) / 3}
+                  onChange={(v) => set({ lineHeight: SPACINGS[Math.round(v * 3)] })}
+                />
+              </>
+            )}
+            <Pill
+              label="Brilho"
+              icon={<Icon name="sun" size={18} />}
+              value={1 - s.dim / 0.6}
+              onChange={(v) => set({ dim: Math.round((1 - v) * 0.6 * 100) / 100 })}
+            />
+          </div>
+          {!isPdf && (
+            <p className="rs-hint rs-pill-hint">
+              Espaçamento no mínimo usa o do próprio livro. Brilho abaixo do máximo escurece além do mínimo do celular.
+            </p>
+          )}
+        </section>
+
         {!isPdf && (
           <>
-            <section className="rs-section">
-              <h3>Tamanho do texto</h3>
-              <div className="rs-size">
-                <button onClick={() => set({ fontSize: Math.max(70, s.fontSize - 10) })} aria-label="Diminuir texto">
-                  <span style={{ fontSize: 14 }}>A</span>
-                </button>
-                <div className="rs-size-track">
-                  <input
-                    type="range"
-                    min={70}
-                    max={200}
-                    step={5}
-                    value={s.fontSize}
-                    onChange={(e) => set({ fontSize: Number(e.target.value) })}
-                    aria-label="Tamanho do texto"
-                    style={{ ["--fill" as string]: `${((s.fontSize - 70) / 130) * 100}%` }}
-                  />
-                </div>
-                <button onClick={() => set({ fontSize: Math.min(200, s.fontSize + 10) })} aria-label="Aumentar texto">
-                  <span style={{ fontSize: 22 }}>A</span>
-                </button>
-              </div>
-            </section>
-
             <section className="rs-section">
               <h3>Fonte</h3>
               <div className="rs-fonts">
@@ -111,33 +132,6 @@ export function ReaderSettingsSheet({ open, onClose, isPdf }: { open: boolean; o
                   </button>
                 ))}
               </div>
-            </section>
-
-            <section className="rs-section">
-              <h3>Espaço entre linhas</h3>
-              <Segmented
-                value={s.lineHeight}
-                onChange={(v) => set({ lineHeight: v })}
-                options={[
-                  { id: null, label: "Do livro" },
-                  { id: 1.4, label: "Justo" },
-                  { id: 1.65, label: "Médio" },
-                  { id: 1.9, label: "Amplo" },
-                ]}
-              />
-            </section>
-
-            <section className="rs-section">
-              <h3>Margens</h3>
-              <Segmented
-                value={s.margin}
-                onChange={(v) => set({ margin: v })}
-                options={[
-                  { id: "estreita", label: "Estreitas" },
-                  { id: "normal", label: "Normais" },
-                  { id: "larga", label: "Largas" },
-                ]}
-              />
             </section>
 
             <section className="rs-section rs-toggles">
@@ -199,19 +193,7 @@ export function ReaderSettingsSheet({ open, onClose, isPdf }: { open: boolean; o
                 />
               </div>
             )}
-            <div className="rs-slider">
-              <span>Escurecer a tela</span>
-              <input
-                type="range"
-                min={0}
-                max={0.6}
-                step={0.05}
-                value={s.dim}
-                onChange={(e) => set({ dim: Number(e.target.value) })}
-                style={{ ["--fill" as string]: `${(s.dim / 0.6) * 100}%` }}
-              />
-            </div>
-            <p className="rs-hint">Para ler no escuro, abaixo do brilho mínimo do celular.</p>
+
           </div>
         </section>
 

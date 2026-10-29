@@ -12,6 +12,8 @@ import app.tauri.plugin.Plugin
 import com.google.android.gms.auth.api.identity.AuthorizationRequest
 import com.google.android.gms.auth.api.identity.AuthorizationResult
 import com.google.android.gms.auth.api.identity.Identity
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.CommonStatusCodes
 import com.google.android.gms.common.api.Scope
 
 /**
@@ -47,21 +49,32 @@ class GoogleAuthPlugin(private val activity: Activity) : Plugin(activity) {
           resolveWith(invoke, result)
         }
       }
-      .addOnFailureListener { e -> invoke.reject(e.message ?: "Falha ao autorizar com o Google") }
+      .addOnFailureListener { e ->
+        if (e is ApiException) invoke.reject(describe(e), "google-${e.statusCode}")
+        else invoke.reject(e.message ?: "Falha ao autorizar com o Google")
+      }
   }
 
   @ActivityCallback
   fun onAuthorized(invoke: Invoke, result: ActivityResult) {
-    if (result.resultCode != Activity.RESULT_OK) {
-      invoke.reject("Login cancelado", "cancelled")
-      return
-    }
+    // Mesmo quando volta "cancelado", o Intent costuma trazer o motivo real
     try {
       val auth = Identity.getAuthorizationClient(activity).getAuthorizationResultFromIntent(result.data)
       resolveWith(invoke, auth)
+    } catch (e: ApiException) {
+      invoke.reject(describe(e), "google-${e.statusCode}")
     } catch (e: Exception) {
-      invoke.reject(e.message ?: "Falha ao autorizar com o Google")
+      if (result.resultCode != Activity.RESULT_OK) invoke.reject("Login cancelado", "cancelled")
+      else invoke.reject(e.message ?: "Falha ao autorizar com o Google")
     }
+  }
+
+  private fun describe(e: ApiException): String = when (e.statusCode) {
+    CommonStatusCodes.DEVELOPER_ERROR ->
+      "O Google não reconheceu o app (código 10). Confira no Google Cloud o cliente Android: pacote app.sepia.leitura e a impressão digital SHA-1."
+    CommonStatusCodes.CANCELED, 12501 -> "Login cancelado"
+    CommonStatusCodes.NETWORK_ERROR -> "Sem conexão com a internet"
+    else -> "O Google recusou o login (código ${e.statusCode}): ${e.message ?: ""}"
   }
 
   private fun resolveWith(invoke: Invoke, result: AuthorizationResult) {

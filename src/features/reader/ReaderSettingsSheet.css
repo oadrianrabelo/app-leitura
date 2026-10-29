@@ -60,7 +60,7 @@
 }
 
 .rs-paper.is-active .rs-paper-label {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .rs-size {
@@ -131,7 +131,7 @@
 }
 
 .rs-font.is-active {
-  border-color: var(--accent);
+  border-color: var(--accent-text);
   background: var(--accent-soft);
 }
 
@@ -210,4 +210,86 @@
   margin: var(--space-6) auto 0;
   font-size: var(--text-sm);
   color: var(--ink-faint);
+}
+
+/* Pílulas: Tamanho, Margens, Espaçamento, Brilho */
+.rs-pills {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-3);
+  justify-items: center;
+}
+
+.pill-control {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.pill {
+  position: relative;
+  width: 62px;
+  height: 128px;
+  border-radius: 31px;
+  background: var(--bg-sunken);
+  overflow: hidden;
+  touch-action: none;
+  cursor: ns-resize;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.pill:focus-visible {
+  outline: 2px solid var(--accent-text);
+  outline-offset: 2px;
+}
+
+.pill-fill {
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  transform-origin: bottom;
+  transition: transform 140ms var(--ease-out);
+}
+
+.pill-dots {
+  position: absolute;
+  top: 16px;
+  bottom: 42px;
+  left: 50%;
+  translate: -50% 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.pill-dots i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--ink);
+  opacity: 0.25;
+}
+
+.pill-icon {
+  position: relative;
+  margin-bottom: 12px;
+  color: var(--accent-ink);
+  display: grid;
+  place-items: center;
+  font-family: var(--font-reading);
+  font-weight: 600;
+}
+
+.pill-label {
+  font-size: var(--text-xs);
+  font-weight: 560;
+  color: var(--ink-soft);
+}
+
+.rs-pill-hint {
+  margin-top: var(--space-3);
+  text-align: center;
 }

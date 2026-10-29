@@ -16,8 +16,11 @@ import { useUpdates } from "./features/updates/updates";
 import { useApplyTheme } from "./lib/theme";
 import { useSettings } from "./lib/settings";
 import { startAutoSync } from "./features/sync/sync";
+import { recordVisit } from "./db/week";
 
 startAutoSync();
+recordVisit();
+document.addEventListener("visibilitychange", () => document.visibilityState === "visible" && recordVisit());
 import "./App.css";
 
 /**

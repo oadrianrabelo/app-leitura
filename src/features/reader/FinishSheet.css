@@ -24,7 +24,7 @@
 .finish-eyebrow {
   font-family: var(--font-display);
   font-style: italic;
-  color: var(--accent);
+  color: var(--accent-text);
   font-size: var(--text-lg);
 }
 

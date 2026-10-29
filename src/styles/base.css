@@ -33,7 +33,8 @@ body {
   background-size: 160px 160px;
 }
 
-[data-theme="noite"] body {
+[data-theme="noite"] body,
+[data-theme="ameixa"] body {
   background-blend-mode: soft-light;
 }
 

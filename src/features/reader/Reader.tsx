@@ -24,6 +24,7 @@ import { FinishSheet } from "./FinishSheet";
 import { SessionTracker } from "./session";
 import { resolvePaper, useReaderSettings } from "./settings";
 import { useReaderUi } from "./state";
+import { useBackLayer } from "../../lib/backStack";
 import type { LocationInfo, ReaderEngine, TapZone } from "./engine";
 import { compareLocations } from "./locations";
 import "./Reader.css";
@@ -74,6 +75,7 @@ function ReaderBody({ book }: { book: Book }) {
   const tracker = useRef<SessionTracker | null>(null);
   const finishShown = useRef(false);
   const saveTimer = useRef<number | undefined>(undefined);
+  const latestFraction = useRef<number | null>(null);
 
   useWakeLock(true);
 
@@ -117,6 +119,24 @@ function ReaderBody({ book }: { book: Book }) {
     };
   }, [book.id, book.fileId]);
 
+  // Progresso da leitura (que a estante e a tela Hoje mostram) não precisa ir
+  // ao banco a cada página: gravar sempre fazia essas telas, montadas por trás,
+  // redesenharem a cada virada.
+  useEffect(() => {
+    if (!loaded) return;
+    const flush = () => {
+      if (latestFraction.current !== null) setReadingProgress(loaded.readingId, latestFraction.current);
+    };
+    const timer = window.setInterval(flush, 30_000);
+    const onHide = () => document.visibilityState === "hidden" && flush();
+    document.addEventListener("visibilitychange", onHide);
+    return () => {
+      window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", onHide);
+      flush();
+    };
+  }, [loaded]);
+
   // Salva a sessão quando o app vai para segundo plano
   useEffect(() => {
     const onHide = () => document.visibilityState === "hidden" && tracker.current?.flush();
@@ -129,16 +149,14 @@ function ReaderBody({ book }: { book: Book }) {
       setLoc(info);
       tracker.current?.onPage(info.page, info.fraction);
       window.clearTimeout(saveTimer.current);
-      saveTimer.current = window.setTimeout(() => {
-        savePosition(book.id, info.resume, info.fraction);
-        if (loaded) setReadingProgress(loaded.readingId, info.fraction);
-      }, 500);
+      saveTimer.current = window.setTimeout(() => savePosition(book.id, info.resume, info.fraction), 500);
+      latestFraction.current = info.fraction;
       if (info.atEnd && !finishShown.current) {
         finishShown.current = true;
         setTimeout(() => setFinishOpen(true), 400);
       }
     },
-    [book.id, loaded],
+    [book.id],
   );
 
   const turn = useCallback(
@@ -348,7 +366,9 @@ function ReaderBody({ book }: { book: Book }) {
 
 export function Reader() {
   const bookId = useReaderUi((s) => s.bookId);
+  const close = useReaderUi((s) => s.close);
   const book = useBook(bookId);
+  useBackLayer(!!bookId, close);
   return (
     <AnimatePresence>
       {bookId && book && (

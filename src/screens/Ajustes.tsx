@@ -11,14 +11,17 @@ import { SyncSection } from "../features/sync/SyncSection";
 import "./Ajustes.css";
 
 const THEMES: { id: ThemeChoice; label: string; icon: IconName; swatch: [string, string] }[] = [
-  { id: "sistema", label: "Automático", icon: "monitor", swatch: ["#f4ede1", "#1b1815"] },
+  { id: "sistema", label: "Automático", icon: "monitor", swatch: ["#f4f1f8", "#1a1620"] },
+  { id: "lavanda", label: "Lavanda", icon: "sun", swatch: ["#f4f1f8", "#6e53ae"] },
   { id: "papel", label: "Papel", icon: "sun", swatch: ["#f4ede1", "#2a241d"] },
+  { id: "rose", label: "Rosé", icon: "sun", swatch: ["#f6eff0", "#74539f"] },
   { id: "sepia", label: "Sépia", icon: "coffee", swatch: ["#eadbc0", "#3b2c1c"] },
   { id: "noite", label: "Noite", icon: "moon", swatch: ["#1b1815", "#e6d9c3"] },
+  { id: "ameixa", label: "Ameixa", icon: "moon", swatch: ["#1a1620", "#cdbcf5"] },
 ];
 
 export function Ajustes() {
-  const { theme, setTheme, autoCheckUpdates, setAutoCheckUpdates } = useSettings();
+  const { theme, setTheme, autoCheckUpdates, setAutoCheckUpdates, name, setName } = useSettings();
   const { status, check, info, openSheet } = useUpdates();
   const showNovidades = useNovidades((s) => s.show);
   const [version, setVersion] = useState(BUILD_VERSION);
@@ -36,6 +39,25 @@ export function Ajustes() {
 
   return (
     <Page eyebrow="Do seu jeito" title="Ajustes">
+      <Section title="Você">
+        <div className="group">
+          <label className="row">
+            <span className="row-icon">
+              <Icon name="heart" size={18} />
+            </span>
+            <span className="row-label">Seu nome</span>
+            <input
+              className="row-input"
+              type="text"
+              placeholder="Como te chamamos"
+              defaultValue={name ?? ""}
+              onBlur={(e) => setName(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && (e.target as HTMLInputElement).blur()}
+            />
+          </label>
+        </div>
+      </Section>
+
       <Section title="Aparência">
         <div className="themes" role="radiogroup" aria-label="Tema">
           {THEMES.map((t) => {

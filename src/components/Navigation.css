@@ -27,7 +27,7 @@
 }
 
 .tabbar-item.is-active {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .tabbar-pill {
@@ -112,7 +112,7 @@
   }
 
   .sidebar-item.is-active {
-    color: var(--accent);
+    color: var(--accent-text);
   }
 
   .sidebar-item > svg,

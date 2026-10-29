@@ -10,7 +10,46 @@ import { useLibraryUi } from "../features/library/state";
 import { useReaderUi } from "../features/reader/state";
 import { useRhythm } from "../db/reading";
 import { useReadings } from "../db/hooks";
+import { WeekRow } from "../components/WeekRow";
+import { useSettings } from "../lib/settings";
+import { useState } from "react";
 import "./Hoje.css";
+
+/** Uma frase pessoal embaixo da saudação, conforme a hora e o que está lendo. */
+function whisper(date: Date, reading: string | null, readToday: boolean): string {
+  const h = date.getHours();
+  if (readToday) return h >= 21 ? "Já leu hoje. Que tal só mais um capítulo antes de dormir?" : "Que bom te ver de novo por aqui.";
+  if (reading) {
+    if (h < 12) return `${reading} está te esperando. Umas páginas com o café?`;
+    if (h < 18) return `Uma pausa no dia para ${reading}?`;
+    return `${reading} está te esperando para uma leitura calma.`;
+  }
+  if (h < 12) return "Que tal começar o dia com um livro?";
+  if (h < 18) return "Um bom momento para escolher a próxima leitura.";
+  return "A noite pede uma boa história.";
+}
+
+function NamePrompt() {
+  const setName = useSettings((s) => s.setName);
+  const [value, setValue] = useState("");
+  return (
+    <form
+      className="name-prompt"
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (value.trim()) setName(value);
+      }}
+    >
+      <label htmlFor="name-input">Como você gosta de ser chamada?</label>
+      <div className="name-prompt-row">
+        <input id="name-input" type="text" autoComplete="given-name" placeholder="Seu nome" value={value} onChange={(e) => setValue(e.target.value)} />
+        <Button type="submit" disabled={!value.trim()}>
+          Pronto
+        </Button>
+      </div>
+    </form>
+  );
+}
 
 function greeting(date: Date) {
   const h = date.getHours();
@@ -24,6 +63,7 @@ const weekday = new Intl.DateTimeFormat("pt-BR", { weekday: "long", day: "numeri
 
 export function Hoje({ onOpenLibrary }: { onOpenLibrary: () => void }) {
   const now = new Date();
+  const name = useSettings((s) => s.name);
   const books = useBooks();
   const stats = useLibraryStats();
   const openBook = useLibraryUi((s) => s.openBook);
@@ -41,7 +81,9 @@ export function Hoje({ onOpenLibrary }: { onOpenLibrary: () => void }) {
   ];
 
   return (
-    <Page eyebrow={weekday.format(now)} title={greeting(now)}>
+    <Page eyebrow={weekday.format(now)} title={name ? `${greeting(now)}, ${name}` : greeting(now)}>
+      <p className="whisper">{whisper(now, current[0]?.title ?? null, rhythm?.readToday ?? false)}</p>
+      {!name && <NamePrompt />}
       {current.length > 0 ? (
         <div className="current-list">
           {current.map((book, i) => (
@@ -102,6 +144,10 @@ export function Hoje({ onOpenLibrary }: { onOpenLibrary: () => void }) {
           </div>
         </motion.div>
       )}
+
+      <Section>
+        <WeekRow />
+      </Section>
 
       <Section title="Seu ritmo">
         <div className="stats">

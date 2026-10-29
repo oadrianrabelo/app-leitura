@@ -90,7 +90,7 @@
 }
 
 .import-bulk button {
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 600;
   padding: 4px 8px;
   border-radius: var(--radius-sm);

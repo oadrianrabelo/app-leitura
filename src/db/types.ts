@@ -105,3 +105,10 @@ export interface Session extends Synced {
   startFraction: number;
   endFraction: number;
 }
+
+/** Dias em que o app foi aberto (o "acesso diário" da semana). */
+export interface Visit {
+  /** "AAAA-MM-DD" */
+  day: string;
+  updatedAt: number;
+}

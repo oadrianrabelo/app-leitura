@@ -8,6 +8,38 @@ export interface ChangelogEntry {
 /** Mais recente primeiro. Cada release adiciona uma entrada aqui. */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.5.0",
+    date: "2026-10-29",
+    title: "Do seu jeito",
+    highlights: [
+      {
+        icon: "palette",
+        title: "Tudo em lilás",
+        text: "Um novo visual em todos os temas, com dois temas novos: Lavanda e Ameixa. E mais papéis para ler: Lavanda, Rosé, Névoa, Ameixa e Oliva.",
+      },
+      {
+        icon: "heart",
+        title: "Feito para você",
+        text: "O Sépia agora te chama pelo nome e acompanha a sua semana: cada dia em que você passou por aqui ou leu.",
+      },
+      {
+        icon: "type",
+        title: "Ajuste vendo o livro",
+        text: "O painel de aparência deixa a página à vista e ganhou controles de tamanho, margens, espaçamento e brilho.",
+      },
+      {
+        icon: "book",
+        title: "Texto bem arrumado",
+        text: "Livros que quebravam palavras no meio ou tinham buracos no lugar de letras agora aparecem certinhos.",
+      },
+      {
+        icon: "back",
+        title: "Voltar sem sair do livro",
+        text: "O botão voltar do celular fecha primeiro o painel aberto, e só depois o livro. E a leitura ficou mais leve.",
+      },
+    ],
+  },
+  {
     version: "0.4.0",
     date: "2026-10-30",
     title: "Sua biblioteca, a salvo",

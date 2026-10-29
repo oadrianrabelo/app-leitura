@@ -6,21 +6,12 @@ interface ReaderUi {
   close: () => void;
 }
 
+// O botão "voltar" fecha o livro via useBackLayer, no componente Reader
 export const useReaderUi = create<ReaderUi>()((set, get) => ({
   bookId: null,
   open: (bookId) => {
     if (get().bookId) return;
-    // Uma entrada no histórico: o botão "voltar" do Android fecha o livro
-    window.history.pushState({ reader: bookId }, "");
     set({ bookId });
   },
-  close: () => {
-    if (!get().bookId) return;
-    set({ bookId: null });
-    if (window.history.state?.reader) window.history.back();
-  },
+  close: () => set({ bookId: null }),
 }));
-
-window.addEventListener("popstate", () => {
-  if (useReaderUi.getState().bookId) useReaderUi.setState({ bookId: null });
-});

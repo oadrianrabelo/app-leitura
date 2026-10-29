@@ -42,7 +42,7 @@
 }
 
 .theme-option.is-selected .theme-label {
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 600;
 }
 
@@ -98,7 +98,7 @@ label.row:active {
   place-items: center;
   border-radius: 8px;
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-text);
   flex-shrink: 0;
 }
 
@@ -117,7 +117,7 @@ label.row:active {
 }
 
 .row-check {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .spin {
@@ -136,4 +136,20 @@ label.row:active {
   font-style: italic;
   color: var(--ink-faint);
   margin-top: var(--space-8);
+}
+
+.row-input {
+  width: 46%;
+  text-align: right;
+  font: inherit;
+  color: var(--ink-soft);
+  background: none;
+  border: 0;
+  outline: none;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.row-input:focus {
+  color: var(--ink);
 }

@@ -28,8 +28,16 @@ ${family ? `body *:not(code):not(pre):not(kbd):not(samp) { font-family: inherit 
 p, li, blockquote, dd, div {
   ${lh ? `line-height: ${lh} !important;` : ""}
 }
+/* Alguns arquivos mandam quebrar palavras em qualquer letra ("falênci/as"): desfaz */
+body, body * {
+  word-break: normal !important;
+  overflow-wrap: break-word !important;
+  line-break: auto !important;
+}
 p, li, blockquote, dd {
   text-align: ${s.justify ? "justify" : "start"};
+  /* A última linha (e as que terminam em quebra forçada) nunca é esticada */
+  text-align-last: start !important;
   -webkit-hyphens: ${s.hyphenate ? "auto" : "manual"};
   hyphens: ${s.hyphenate ? "auto" : "manual"};
   hanging-punctuation: allow-end last;

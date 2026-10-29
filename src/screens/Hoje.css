@@ -60,7 +60,7 @@
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .current-title {
@@ -94,7 +94,7 @@
 }
 
 .stat-icon {
-  color: var(--accent);
+  color: var(--accent-text);
   margin-bottom: var(--space-3);
 }
 
@@ -176,4 +176,50 @@
   font-size: var(--text-xs);
   color: var(--ink-faint);
   margin-top: var(--space-1);
+}
+
+.whisper {
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--ink-soft);
+  font-size: var(--text-md);
+  margin: calc(-1 * var(--space-4)) 0 var(--space-6);
+  line-height: 1.4;
+}
+
+.name-prompt {
+  padding: var(--space-4);
+  margin-bottom: var(--space-5);
+  border-radius: var(--radius-lg);
+  background: var(--accent-soft);
+}
+
+.name-prompt label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: var(--space-3);
+}
+
+.name-prompt-row {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.name-prompt input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  color: var(--ink);
+  background: var(--bg-elevated);
+  border: 0.5px solid var(--hairline-strong);
+  border-radius: var(--radius-md);
+  padding: 0 var(--space-3);
+  height: 40px;
+  outline: none;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.name-prompt input:focus {
+  border-color: var(--accent-text);
 }

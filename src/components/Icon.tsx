@@ -37,6 +37,8 @@ import {
   Type,
   BookOpenText,
   Cloud,
+  Columns2,
+  AlignJustify,
   type LucideProps,
 } from "lucide-react";
 
@@ -79,6 +81,8 @@ const ICONS = {
   type: Type,
   read: BookOpenText,
   cloud: Cloud,
+  margins: Columns2,
+  spacing: AlignJustify,
 } as const;
 
 export type IconName = keyof typeof ICONS;

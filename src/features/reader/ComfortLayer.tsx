@@ -33,7 +33,7 @@ export function ComfortLayer({ settings }: { settings: ReaderSettings }) {
   return (
     <>
       {warm && settings.warmth > 0 && (
-        <div className="comfort-warm" style={{ opacity: settings.warmth }} aria-hidden />
+        <div className="comfort-warm" style={{ opacity: settings.warmth * 0.55 }} aria-hidden />
       )}
       {settings.dim > 0 && <div className="comfort-dim" style={{ opacity: settings.dim }} aria-hidden />}
       <AnimatePresence>

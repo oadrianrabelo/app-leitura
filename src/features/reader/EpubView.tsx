@@ -78,6 +78,7 @@ export const EpubView = forwardRef<ReaderEngine, Props>(function EpubView(props,
 
         view.addEventListener("load", (e) => {
           const { doc } = (e as CustomEvent<{ doc: Document }>).detail;
+          fixLigatures(doc);
           doc.addEventListener("click", (ev) => {
             if ((ev.target as Element | null)?.closest?.("a")) return;
             const sel = doc.getSelection();
@@ -145,6 +146,20 @@ function handleKey(ev: KeyboardEvent, view: FoliateView) {
   } else if (k === "ArrowLeft" || k === "PageUp" || (k === " " && ev.shiftKey)) {
     ev.preventDefault();
     view.prev();
+  }
+}
+
+// Letras ligadas (ﬁ, ﬂ...) que muitas fontes não têm e viram um buraco no texto
+const LIGATURES: Record<string, string> = { "\uFB00": "ff", "\uFB01": "fi", "\uFB02": "fl", "\uFB03": "ffi", "\uFB04": "ffl", "\uFB05": "st", "\uFB06": "st" };
+const LIGATURE_RE = /[\uFB00-\uFB06]/g;
+
+function fixLigatures(doc: Document) {
+  if (!doc.body || !LIGATURE_RE.test(doc.body.textContent ?? "")) return;
+  const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT);
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    const text = node.nodeValue ?? "";
+    LIGATURE_RE.lastIndex = 0;
+    if (LIGATURE_RE.test(text)) node.nodeValue = text.replace(LIGATURE_RE, (c) => LIGATURES[c] ?? c);
   }
 }
 

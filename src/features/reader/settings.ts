@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { safeStorage } from "../../lib/storage";
 
-export type PaperId = "papel" | "sepia" | "salvia" | "cinza" | "noite" | "breu";
+export type PaperId = "papel" | "lavanda" | "rose" | "sepia" | "salvia" | "nevoa" | "cinza" | "noite" | "ameixa" | "oliva" | "breu";
 export type FontId = "original" | "literata" | "source-serif" | "garamond" | "charis" | "atkinson" | "opendyslexic";
 export type Animation = "deslizar" | "folhear" | "esmaecer" | "nenhuma";
 
@@ -18,15 +18,20 @@ export interface Paper {
 
 /**
  * Papéis do leitor. Contraste confortável: suficiente para ler bem, sem o
- * brilho máximo. Sálvia é levemente esverdeado, o tom que menos ofusca.
+ * brilho máximo. Sálvia (esverdeado) e Névoa (azulado) são os que menos ofuscam.
  */
 export const PAPERS: Paper[] = [
-  { id: "papel", label: "Papel", bg: "#f6efe3", ink: "#2b251e", muted: "#8a7d6b", link: "#9a4e27", dark: false },
-  { id: "sepia", label: "Sépia", bg: "#ebdcbf", ink: "#3d2f1f", muted: "#8e7653", link: "#8a3f1c", dark: false },
+  { id: "papel", label: "Papel", bg: "#f6efe3", ink: "#2b251e", muted: "#8a7d6b", link: "#6c51a8", dark: false },
+  { id: "lavanda", label: "Lavanda", bg: "#efeaf6", ink: "#2b2436", muted: "#867d94", link: "#6c51a8", dark: false },
+  { id: "rose", label: "Rosé", bg: "#f4e8e7", ink: "#33272a", muted: "#907d80", link: "#7a4f8e", dark: false },
+  { id: "sepia", label: "Sépia", bg: "#ebdcbf", ink: "#3d2f1f", muted: "#8e7653", link: "#634a9a", dark: false },
   { id: "salvia", label: "Sálvia", bg: "#e2e6d5", ink: "#2b3127", muted: "#7a8270", link: "#46613c", dark: false },
-  { id: "cinza", label: "Cinza", bg: "#d9d6cf", ink: "#26241f", muted: "#77736a", link: "#6d4a2f", dark: false },
-  { id: "noite", label: "Noite", bg: "#1e1b18", ink: "#d8cbb3", muted: "#857a68", link: "#d99a6c", dark: true },
-  { id: "breu", label: "Breu", bg: "#0e0d0c", ink: "#a99d89", muted: "#625a4e", link: "#b98560", dark: true },
+  { id: "nevoa", label: "Névoa", bg: "#e3e8ed", ink: "#232a31", muted: "#76808a", link: "#4b5f8a", dark: false },
+  { id: "cinza", label: "Cinza", bg: "#d9d6cf", ink: "#26241f", muted: "#77736a", link: "#5e4a8a", dark: false },
+  { id: "noite", label: "Noite", bg: "#1e1b18", ink: "#d8cbb3", muted: "#857a68", link: "#c3b0ee", dark: true },
+  { id: "ameixa", label: "Ameixa", bg: "#1d1923", ink: "#ddd3e8", muted: "#857a94", link: "#c8b6f4", dark: true },
+  { id: "oliva", label: "Oliva", bg: "#1b1e19", ink: "#cfd5c3", muted: "#7c8372", link: "#b5c79d", dark: true },
+  { id: "breu", label: "Breu", bg: "#0e0d0c", ink: "#a99d89", muted: "#625a4e", link: "#a690d6", dark: true },
 ];
 
 export const FONTS: { id: FontId; label: string; family: string | null; note?: string }[] = [
@@ -97,10 +102,10 @@ export const useReaderSettings = create<ReaderSettingsState>()(
 /** "auto" segue o tema do app: Noite à noite (ou com o sistema escuro), Papel de dia. */
 export function resolvePaper(paper: ReaderSettings["paper"]): Paper {
   if (paper !== "auto") return PAPERS.find((p) => p.id === paper) ?? PAPERS[0];
-  const appTheme = document.documentElement.dataset.theme;
-  if (appTheme === "noite") return PAPERS.find((p) => p.id === "noite")!;
-  if (appTheme === "sepia") return PAPERS.find((p) => p.id === "sepia")!;
-  return PAPERS[0];
+  // Segue o tema do app; Lavanda pede um papel creme, mais descansado para ler
+  const map: Record<string, PaperId> = { noite: "noite", ameixa: "ameixa", sepia: "sepia", rose: "rose", papel: "papel", lavanda: "papel" };
+  const id = map[document.documentElement.dataset.theme ?? ""] ?? "papel";
+  return PAPERS.find((p) => p.id === id)!;
 }
 
 /** Luz quente ligada agora? No automático, das 19h às 6h. */

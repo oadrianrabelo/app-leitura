@@ -1,6 +1,6 @@
 .reading-form-eyebrow {
   font-size: var(--text-sm);
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 560;
 }
 
@@ -57,7 +57,7 @@
 .field input:focus,
 .field textarea:focus,
 .field select:focus {
-  border-color: var(--accent);
+  border-color: var(--accent-text);
 }
 
 .field textarea {

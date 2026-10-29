@@ -12,11 +12,11 @@ const RES = path.join(ROOT, "src-tauri/gen/android/app/src/main/res");
 const DENSITIES = { mdpi: 108, hdpi: 162, xhdpi: 216, xxhdpi: 324, xxxhdpi: 432 };
 
 const C = {
-  bg: ["#f8efe0", "#efe0c6", "#e2c9a2"],
+  bg: ["#faf6fd", "#eee6f7", "#ddd0ee"],
   glow: "#ffffff",
-  cover: "#8e3b19",
-  ribbon: ["#9c4520", "#c46b38"],
-  base: "#efe0c6",
+  cover: "#7a5fb3",
+  ribbon: ["#8d70c8", "#b9a2ec"],
+  base: "#eee6f7",
 };
 
 const spark = (x, y, r, o) => {
