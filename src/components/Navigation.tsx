@@ -56,7 +56,7 @@ export function Sidebar({ active, onChange }: NavProps) {
   return (
     <aside className="sidebar">
       <div className="sidebar-brand">
-        <img src="/icon.svg" alt="" width={28} height={28} />
+        <img src="/icon.png" alt="" width={28} height={28} />
         <span>Sépia</span>
       </div>
       <nav aria-label="Navegação principal">

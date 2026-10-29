@@ -15,8 +15,8 @@ jobs:
     name: Interface (tipos e build)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
@@ -27,7 +27,7 @@ jobs:
     name: Desktop (cargo check)
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Dependências do sistema
         run: |
           sudo apt-get update
@@ -36,7 +36,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: src-tauri
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
@@ -47,12 +47,12 @@ jobs:
     name: Android (APK de teste)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: ./.github/actions/setup-android
       - run: npm ci
       - name: Build do APK
         run: npx tauri android build --apk --debug --target aarch64
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: sepia-apk-teste
           path: src-tauri/gen/android/app/build/outputs/apk/**/*.apk

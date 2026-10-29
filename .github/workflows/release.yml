@@ -16,8 +16,8 @@ jobs:
     outputs:
       body: ${{ steps.notes.outputs.body }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
       - id: notes
@@ -43,7 +43,7 @@ jobs:
             args: "--target universal-apple-darwin"
     runs-on: ${{ matrix.platform }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Dependências do sistema (Linux)
         if: matrix.platform == 'ubuntu-22.04'
         run: |
@@ -55,7 +55,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: src-tauri
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
@@ -78,7 +78,7 @@ jobs:
     needs: desktop
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: ./.github/actions/setup-android
       - run: npm ci
       - name: Chave de assinatura
