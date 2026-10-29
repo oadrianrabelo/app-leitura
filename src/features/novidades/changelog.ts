@@ -8,6 +8,18 @@ export interface ChangelogEntry {
 /** Mais recente primeiro. Cada release adiciona uma entrada aqui. */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.6.1",
+    date: "2026-10-29",
+    title: "Câmera consertada",
+    highlights: [
+      {
+        icon: "barcode",
+        title: "Leitor de código de barras",
+        text: "Se o leitor do Google ainda não estiver no celular, o Sépia baixa antes de abrir a câmera.",
+      },
+    ],
+  },
+  {
     version: "0.6.0",
     date: "2026-10-29",
     title: "Mais cores no jardim",

@@ -98,7 +98,7 @@ export function PhysicalSheet() {
       search(isbn);
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
-      if (!/cancel/i.test(message)) setError(message);
+      if (!/cancel/i.test(message)) setError(`${message} Enquanto isso, dá para digitar o ISBN no campo abaixo.`);
     }
   };
 

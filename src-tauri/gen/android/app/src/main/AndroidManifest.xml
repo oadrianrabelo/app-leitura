@@ -11,6 +11,10 @@
         android:label="@string/app_name"
         android:theme="@style/Theme.sepia"
         android:usesCleartextTraffic="${usesCleartextTraffic}">
+        <!-- Pede ao Play Services para baixar o leitor de código de barras já na instalação -->
+        <meta-data
+            android:name="com.google.mlkit.vision.DEPENDENCIES"
+            android:value="barcode_ui" />
         <activity
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode"
             android:launchMode="singleTask"
