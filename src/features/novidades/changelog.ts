@@ -8,6 +8,33 @@ export interface ChangelogEntry {
 /** Mais recente primeiro. Cada release adiciona uma entrada aqui. */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.6.0",
+    date: "2026-10-29",
+    title: "Mais cores no jardim",
+    highlights: [
+      {
+        icon: "palette",
+        title: "Flores coloridas e dois temas novos",
+        text: "Folhas verdes, glicínias, florzinhas azuis e borboletas, com as cores de cada tema. Novos temas Jardim e Terracota.",
+      },
+      {
+        icon: "library",
+        title: "Capas ou lombadas",
+        text: "Na biblioteca, escolha ver a estante pelas capas ou pelas lombadas, e filtre só os digitais ou só os físicos.",
+      },
+      {
+        icon: "barcode",
+        title: "Código de barras que funciona",
+        text: "O leitor de código de barras agora é o do Google. A busca por ISBN procura também em catálogos brasileiros, e o teclado não cobre mais o campo.",
+      },
+      {
+        icon: "cloud",
+        title: "Conexão com o Google mais clara",
+        text: "Se algo der errado ao conectar, o Sépia explica o motivo e deixa tentar de novo ou trocar de conta.",
+      },
+    ],
+  },
+  {
     version: "0.5.2",
     date: "2026-10-29",
     title: "Um jardim na estante",

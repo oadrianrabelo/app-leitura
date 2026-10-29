@@ -9,6 +9,7 @@ import { Shelf } from "../features/library/Shelf";
 import { useLibraryUi } from "../features/library/state";
 import { pickAndImport } from "../features/import/importer";
 import { platform } from "../lib/platform";
+import { useSettings, type FormatFilter } from "../lib/settings";
 import { Botanical } from "../components/Botanical";
 import "./Biblioteca.css";
 
@@ -38,6 +39,13 @@ const SORTS: { id: Sort; label: string }[] = [
   { id: "titulo", label: "Título" },
   { id: "autor", label: "Autor" },
 ];
+
+const FORMATS: { id: FormatFilter; label: string }[] = [
+  { id: "todos", label: "Tudo" },
+  { id: "digitais", label: "Digitais" },
+  { id: "fisicos", label: "Físicos" },
+];
+const matchesFormat = (b: Book, f: FormatFilter) => f === "todos" || (f === "fisicos") === (b.format === "fisico");
 
 const collator = new Intl.Collator("pt-BR", { sensitivity: "base" });
 const normalize = (s: string) => s.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
@@ -104,18 +112,31 @@ export function Biblioteca() {
   const [sort, setSort] = useState<Sort>("recentes");
   const [query, setQuery] = useState("");
   const deferredQuery = useDeferredValue(query);
+  const { shelfView, setShelfView, formatFilter, setFormatFilter } = useSettings();
+
+  const formatCounts = useMemo(() => {
+    const c: Record<FormatFilter, number> = { todos: 0, digitais: 0, fisicos: 0 };
+    for (const b of books ?? []) {
+      c.todos++;
+      c[b.format === "fisico" ? "fisicos" : "digitais"]++;
+    }
+    return c;
+  }, [books]);
+  // Só faz sentido separar quando a estante tem dos dois tipos
+  const format = formatCounts.digitais && formatCounts.fisicos ? formatFilter : "todos";
 
   const counts = useMemo(() => {
     const c: Record<Filter, number> = { todos: 0, lido: 0, lendo: 0, "quero-ler": 0, abandonado: 0 };
     for (const b of books ?? []) {
+      if (!matchesFormat(b, format)) continue;
       c.todos++;
       c[b.status]++;
     }
     return c;
-  }, [books]);
+  }, [books, format]);
 
   const visible = useMemo(() => {
-    let list: Book[] = books ?? [];
+    let list: Book[] = (books ?? []).filter((b) => matchesFormat(b, format));
     if (filter !== "todos") list = list.filter((b) => b.status === filter);
     const q = normalize(deferredQuery.trim());
     if (q) list = list.filter((b) => normalize(`${b.title} ${b.authors.join(" ")}`).includes(q));
@@ -127,7 +148,7 @@ export function Biblioteca() {
       const tb = Math.max(lastRead?.get(b.id) ?? 0, b.createdAt);
       return tb - ta;
     });
-  }, [books, filter, deferredQuery, sort, stats]);
+  }, [books, format, filter, deferredQuery, sort, stats]);
 
   if (!books) return <Page eyebrow="Tudo o que você já leu" title="Biblioteca">{null}</Page>;
 
@@ -177,21 +198,59 @@ export function Biblioteca() {
                 </button>
               ))}
             </div>
-            <div className="sort">
-              {SORTS.map((s) => (
+            {format !== "todos" || (formatCounts.digitais > 0 && formatCounts.fisicos > 0) ? (
+              <div className="format-switch" role="tablist" aria-label="Tipo de livro">
+                {FORMATS.map((f) => (
+                  <button
+                    key={f.id}
+                    role="tab"
+                    aria-selected={format === f.id}
+                    className={format === f.id ? "is-active" : ""}
+                    onClick={() => setFormatFilter(f.id)}
+                  >
+                    {f.label}
+                    <span className="chip-count">{formatCounts[f.id]}</span>
+                  </button>
+                ))}
+              </div>
+            ) : null}
+            <div className="library-bar">
+              <div className="sort">
+                {SORTS.map((s) => (
+                  <button
+                    key={s.id}
+                    className={`sort-option${sort === s.id ? " is-active" : ""}`}
+                    onClick={() => setSort(s.id)}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              </div>
+              <div className="view-switch" role="radiogroup" aria-label="Mostrar na estante">
                 <button
-                  key={s.id}
-                  className={`sort-option${sort === s.id ? " is-active" : ""}`}
-                  onClick={() => setSort(s.id)}
+                  role="radio"
+                  aria-checked={shelfView === "capas"}
+                  aria-label="Capas"
+                  className={shelfView === "capas" ? "is-active" : ""}
+                  onClick={() => setShelfView("capas")}
                 >
-                  {s.label}
+                  <Icon name="covers" size={16} />
                 </button>
-              ))}
+                <button
+                  role="radio"
+                  aria-checked={shelfView === "lombadas"}
+                  aria-label="Lombadas"
+                  className={shelfView === "lombadas" ? "is-active" : ""}
+                  onClick={() => setShelfView("lombadas")}
+                >
+                  <Icon name="spines" size={16} className="spines-icon" />
+                </button>
+              </div>
             </div>
           </div>
 
           {visible.length > 0 ? (
-            <Shelf books={visible} timesRead={stats?.timesRead ?? new Map()} onOpen={openBook} />
+            <Shelf books={visible} timesRead={stats?.timesRead ?? new Map()} onOpen={openBook} view={shelfView} />
           ) : (
             <p className="library-nothing">Nenhum livro encontrado.</p>
           )}

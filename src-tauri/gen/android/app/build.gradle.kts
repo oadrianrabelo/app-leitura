@@ -102,6 +102,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-process:2.10.0")
     // Login com a conta Google do aparelho (sincronização com o Drive)
     implementation("com.google.android.gms:play-services-auth:21.3.0")
+    // Leitor de código de barras do Google (ISBN dos livros físicos)
+    implementation("com.google.android.gms:play-services-code-scanner:16.1.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.4")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.0")

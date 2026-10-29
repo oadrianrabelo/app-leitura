@@ -20,8 +20,28 @@ async function call(url: string, init: RequestInit = {}, retry = true): Promise<
     dropAccessToken();
     return call(url, init, false);
   }
-  if (!res.ok) throw new Error(`Google Drive respondeu ${res.status}`);
+  if (res.status === 403) dropAccessToken();
+  if (!res.ok) throw new Error(await explain(res));
   return res;
+}
+
+/** Transforma a resposta de erro do Drive numa frase que dá para agir. */
+async function explain(res: Response): Promise<string> {
+  let reason = "";
+  let message = "";
+  try {
+    const body = (await res.json()) as { error?: { message?: string; errors?: { reason?: string }[]; details?: { reason?: string }[] } };
+    reason = body.error?.errors?.[0]?.reason ?? body.error?.details?.[0]?.reason ?? "";
+    message = body.error?.message ?? "";
+  } catch {
+    // corpo vazio ou não-JSON
+  }
+  if (/accessNotConfigured|SERVICE_DISABLED/i.test(reason + message))
+    return "A API do Google Drive não está ativada no projeto do Google Cloud. Ative-a e tente de novo em alguns minutos.";
+  if (/insufficientPermissions|ACCESS_TOKEN_SCOPE_INSUFFICIENT/i.test(reason + message))
+    return "O Google não deu permissão para a pasta do app no Drive. Conecte de novo e marque o acesso ao Drive.";
+  if (res.status === 403 || res.status === 401) return `O Google recusou o acesso ao Drive (${res.status})${message ? `: ${message}` : ""}`;
+  return `Google Drive respondeu ${res.status}${message ? `: ${message}` : ""}`;
 }
 
 export async function whoAmI(): Promise<{ email: string; name: string }> {

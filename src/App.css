@@ -13,7 +13,9 @@
   position: absolute;
   inset: 0;
   overflow-y: auto;
-  overscroll-behavior-y: contain;
+  /* As ilustrações passam da borda de propósito: nada de rolar para o lado */
+  overflow-x: hidden;
+  overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
   padding-bottom: calc(var(--tabbar-height) + var(--safe-bottom));
   padding-left: var(--safe-left);

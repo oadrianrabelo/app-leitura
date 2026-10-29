@@ -28,6 +28,22 @@
   font-size: var(--text-lg);
 }
 
+.theme-flora {
+  position: absolute;
+  bottom: 7px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 3px;
+}
+
+.theme-flora span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
 .theme-ring {
   position: absolute;
   inset: -5px;
@@ -163,4 +179,20 @@ label.row:active {
 
 .signature-bloom {
   width: 58px;
+}
+
+/* Ícones das listas alternando as cores do jardim */
+.group > .row:nth-child(4n + 2) .row-icon {
+  background: color-mix(in srgb, var(--hue-verde) 15%, transparent);
+  color: var(--hue-verde);
+}
+
+.group > .row:nth-child(4n + 3) .row-icon {
+  background: color-mix(in srgb, var(--hue-azul) 15%, transparent);
+  color: var(--hue-azul);
+}
+
+.group > .row:nth-child(4n + 4) .row-icon {
+  background: color-mix(in srgb, var(--hue-rosa) 15%, transparent);
+  color: var(--hue-rosa);
 }

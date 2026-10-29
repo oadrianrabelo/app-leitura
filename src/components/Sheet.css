@@ -2,6 +2,8 @@
   position: fixed;
   inset: 0;
   z-index: 100;
+  /* Com o teclado aberto, a folha sobe junto */
+  padding-bottom: var(--native-inset-ime, 0px);
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -23,7 +25,7 @@
   background: var(--bg-elevated);
   border-radius: var(--radius-xl) var(--radius-xl) 0 0;
   box-shadow: var(--shadow-lg);
-  padding-bottom: var(--safe-bottom);
+  padding-bottom: max(0px, calc(var(--safe-bottom) - var(--native-inset-ime, 0px)));
   will-change: transform;
 }
 

@@ -9,6 +9,7 @@ import app.tauri.annotation.TauriPlugin
 import app.tauri.plugin.Invoke
 import app.tauri.plugin.JSObject
 import app.tauri.plugin.Plugin
+import com.google.android.gms.auth.GoogleAuthUtil
 import com.google.android.gms.auth.api.identity.AuthorizationRequest
 import com.google.android.gms.auth.api.identity.AuthorizationResult
 import com.google.android.gms.auth.api.identity.Identity
@@ -53,6 +54,23 @@ class GoogleAuthPlugin(private val activity: Activity) : Plugin(activity) {
         if (e is ApiException) invoke.reject(describe(e), "google-${e.statusCode}")
         else invoke.reject(e.message ?: "Falha ao autorizar com o Google")
       }
+  }
+
+  /**
+   * Esquece o token em cache no Google Play Services. Junto com a revogação
+   * feita pelo app, o próximo "Conectar" volta a mostrar a escolha de conta.
+   */
+  @Command
+  fun forget(invoke: Invoke) {
+    val token = invoke.getArgs().getString("token")
+    Thread {
+      try {
+        if (!token.isNullOrEmpty()) GoogleAuthUtil.clearToken(activity, token)
+      } catch (_: Exception) {
+        // Token já inválido: nada a limpar
+      }
+      invoke.resolve()
+    }.start()
   }
 
   @ActivityCallback

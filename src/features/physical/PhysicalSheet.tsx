@@ -35,12 +35,9 @@ const blank = (): BookCandidate => ({
 });
 
 async function scanIsbn(): Promise<string | null> {
-  const scanner = await import("@tauri-apps/plugin-barcode-scanner");
-  let permission = await scanner.checkPermissions();
-  if (permission !== "granted") permission = await scanner.requestPermissions();
-  if (permission !== "granted") throw new Error("Permita o uso da câmera para escanear o código de barras.");
-  const result = await scanner.scan({ formats: [scanner.Format.EAN13, scanner.Format.EAN8], windowed: false });
-  return normalizeIsbn(result.content) ?? result.content;
+  const { invoke } = await import("@tauri-apps/api/core");
+  const result = await invoke<{ content: string }>("scan_barcode");
+  return normalizeIsbn(result.content) ?? (result.content || null);
 }
 
 function CandidateCover({ url }: { url: string | null }) {

@@ -54,6 +54,8 @@ export const useSync = create<SyncState>()(
           set({ connected: true, email: me.email, status: "idle", detail: null });
           await get().syncNow();
         } catch (e) {
+          // Não deixa um token ruim preso: a próxima tentativa começa do zero
+          if (!get().connected) await signOut();
           set({ status: get().connected ? "error" : "off", detail: null, error: e instanceof Error ? e.message : String(e) });
         }
       },

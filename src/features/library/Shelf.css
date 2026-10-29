@@ -73,7 +73,7 @@
   right: 6px;
   width: 11px;
   height: 26px;
-  background: linear-gradient(90deg, #8d70c8, #b59cea, #8d70c8);
+  background: linear-gradient(90deg, var(--accent-text), var(--accent), var(--accent-text));
   clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 78%, 0 100%);
   filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
 }
@@ -98,4 +98,12 @@
 
 .shelf-check {
   background: rgba(164, 84, 43, 0.92);
+}
+
+.shelf-ribbon.is-spine {
+  right: 50%;
+  margin-right: -5px;
+  width: 10px;
+  height: 22px;
+  top: -2px;
 }

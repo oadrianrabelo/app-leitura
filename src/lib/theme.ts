@@ -3,6 +3,8 @@ import { useSettings } from "./settings";
 
 const THEME_COLORS = {
   lavanda: "#f4f1f8",
+  jardim: "#eff3f7",
+  terracota: "#f3e8dc",
   papel: "#f4ede1",
   rose: "#f6eff0",
   sepia: "#eadbc0",

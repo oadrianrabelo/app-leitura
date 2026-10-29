@@ -89,7 +89,10 @@ export function SyncSection() {
             <span className="row-icon">
               <Icon name="close" size={18} />
             </span>
-            <span className="row-label">Desconectar</span>
+            <span className="row-label sync-who">
+              Desconectar ou trocar de conta
+              <small>Seus livros continuam neste aparelho</small>
+            </span>
           </button>
         </div>
       )}

@@ -80,6 +80,8 @@ jobs:
           # Login do Google no desktop (sincronização); vazio = sincronização indisponível no desktop
           VITE_GOOGLE_DESKTOP_CLIENT_ID: ${{ secrets.GOOGLE_DESKTOP_CLIENT_ID }}
           VITE_GOOGLE_DESKTOP_CLIENT_SECRET: ${{ secrets.GOOGLE_DESKTOP_CLIENT_SECRET }}
+          # Chave da Google Books API (opcional): sem ela a busca de livros físicos usa a cota pública
+          VITE_GOOGLE_BOOKS_KEY: ${{ secrets.GOOGLE_BOOKS_KEY }}
         with:
           tagName: ${{ needs.notes.outputs.tag }}
           releaseName: "Sépia ${{ needs.notes.outputs.tag }}"
@@ -111,6 +113,7 @@ jobs:
         env:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: sepia
+          VITE_GOOGLE_BOOKS_KEY: ${{ secrets.GOOGLE_BOOKS_KEY }}
         run: npx tauri android build --apk --target aarch64 --target armv7
       - name: Anexar à release
         env:

@@ -39,6 +39,8 @@ import {
   Cloud,
   Columns2,
   AlignJustify,
+  LayoutGrid,
+  Rows3,
   type LucideProps,
 } from "lucide-react";
 
@@ -78,6 +80,8 @@ const ICONS = {
   bookmarked: BookMarked,
   calendar: Calendar,
   list: List,
+  covers: LayoutGrid,
+  spines: Rows3,
   type: Type,
   read: BookOpenText,
   cloud: Cloud,

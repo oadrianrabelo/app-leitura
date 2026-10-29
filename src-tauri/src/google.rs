@@ -65,6 +65,30 @@ pub async fn google_authorize<R: Runtime>(
     }
 }
 
+/// Android: limpa o token em cache no aparelho (ao desconectar ou trocar de conta).
+#[tauri::command]
+pub async fn google_forget<R: Runtime>(app: tauri::AppHandle<R>, token: String) -> Result<(), String> {
+    #[cfg(target_os = "android")]
+    {
+        use tauri::Manager;
+        let handle = app.state::<GoogleAuth<R>>().0.clone();
+        tauri::async_runtime::spawn_blocking(move || {
+            handle
+                .run_mobile_plugin::<serde_json::Value>("forget", serde_json::json!({ "token": token }))
+                .map(|_| ())
+                .map_err(|e| e.to_string())
+        })
+        .await
+        .map_err(|e| e.to_string())?
+    }
+
+    #[cfg(not(target_os = "android"))]
+    {
+        let _ = (app, token);
+        Ok(())
+    }
+}
+
 /// Desktop: abre uma porta local e devolve o número dela para montar o redirect.
 #[tauri::command]
 pub fn oauth_listen<R: Runtime>(app: tauri::AppHandle<R>) -> Result<u16, String> {

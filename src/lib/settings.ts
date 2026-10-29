@@ -2,7 +2,10 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { safeStorage } from "./storage";
 
-export type ThemeChoice = "sistema" | "lavanda" | "papel" | "rose" | "sepia" | "noite" | "ameixa";
+export type ShelfView = "capas" | "lombadas";
+export type FormatFilter = "todos" | "digitais" | "fisicos";
+
+export type ThemeChoice = "sistema" | "lavanda" | "jardim" | "papel" | "rose" | "terracota" | "sepia" | "noite" | "ameixa";
 
 interface SettingsState {
   theme: ThemeChoice;
@@ -10,6 +13,11 @@ interface SettingsState {
   name: string | null;
   lastSeenVersion: string | null;
   autoCheckUpdates: boolean;
+  /** Estante mostrando a capa ou a lombada dos livros */
+  shelfView: ShelfView;
+  formatFilter: FormatFilter;
+  setShelfView: (view: ShelfView) => void;
+  setFormatFilter: (filter: FormatFilter) => void;
   setTheme: (theme: ThemeChoice) => void;
   setName: (name: string | null) => void;
   setLastSeenVersion: (version: string) => void;
@@ -23,6 +31,10 @@ export const useSettings = create<SettingsState>()(
       name: null,
       lastSeenVersion: null,
       autoCheckUpdates: true,
+      shelfView: "capas",
+      formatFilter: "todos",
+      setShelfView: (shelfView) => set({ shelfView }),
+      setFormatFilter: (formatFilter) => set({ formatFilter }),
       setTheme: (theme) => set({ theme }),
       setName: (name) => set({ name: name?.trim() || null }),
       setLastSeenVersion: (lastSeenVersion) => set({ lastSeenVersion }),

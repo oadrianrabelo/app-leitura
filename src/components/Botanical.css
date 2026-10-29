@@ -1,14 +1,36 @@
 .botanical {
+  position: relative;
   display: block;
   width: 100%;
   pointer-events: none;
-  background-color: var(--botanical-ink);
+  opacity: var(--flora-fundo);
+}
+
+.botanical.is-destaque {
+  opacity: var(--flora-destaque);
+}
+
+.botanical-layer {
+  position: absolute;
+  inset: 0;
   mask-size: 100% 100%;
   -webkit-mask-size: 100% 100%;
   mask-repeat: no-repeat;
   -webkit-mask-repeat: no-repeat;
 }
 
-.botanical.is-destaque {
-  background-color: var(--botanical-ink-strong);
+.botanical-layer.is-folhas {
+  background-color: var(--flora-folhas);
+}
+
+.botanical-layer.is-flores {
+  background-color: var(--flora-flores);
+}
+
+.botanical-layer.is-florzinhas {
+  background-color: var(--flora-florzinhas);
+}
+
+.botanical-layer.is-detalhes {
+  background-color: var(--flora-detalhes);
 }

@@ -1,5 +1,5 @@
 import { AnimatePresence, motion, useDragControls, type PanInfo } from "motion/react";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, type FocusEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { useBackLayer } from "../lib/backStack";
 import "./Sheet.css";
@@ -15,6 +15,13 @@ interface SheetProps {
   locked?: boolean;
   /** Não escurece o fundo e ocupa só a parte de baixo: dá para ver o que muda atrás */
   seeThrough?: boolean;
+}
+
+/** Quando um campo ganha foco, espera o teclado subir e rola até ele. */
+function revealField(e: FocusEvent) {
+  const el = e.target as HTMLElement;
+  if (!el.matches("input, textarea, select")) return;
+  setTimeout(() => el.scrollIntoView({ block: "nearest", behavior: "smooth" }), 320);
 }
 
 /**
@@ -68,7 +75,9 @@ export function Sheet({ open, onClose, children, label, tall = false, locked = f
             <div className="sheet-handle" onPointerDown={(e) => !locked && drag.start(e)} aria-hidden>
               <div className="sheet-grabber" />
             </div>
-            <div className="sheet-content">{children}</div>
+            <div className="sheet-content" onFocus={revealField}>
+              {children}
+            </div>
           </motion.div>
         </div>
       )}

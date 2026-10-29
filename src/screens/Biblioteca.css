@@ -263,6 +263,52 @@ button.library-action .library-action-icon {
   font-variant-numeric: tabular-nums;
 }
 
+.library-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.format-switch,
+.view-switch {
+  display: flex;
+  padding: 3px;
+  border-radius: var(--radius-full);
+  background: var(--bg-sunken);
+}
+
+.format-switch button,
+.view-switch button {
+  flex: 1;
+  height: 30px;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: var(--text-sm);
+  font-weight: 560;
+  color: var(--ink-faint);
+  transition: background-color var(--dur-fast), color var(--dur-fast);
+}
+
+.view-switch button {
+  width: 38px;
+  flex: none;
+}
+
+.format-switch button.is-active,
+.view-switch button.is-active {
+  background: var(--bg-elevated);
+  color: var(--ink);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Lombadas em pé */
+.spines-icon {
+  transform: rotate(90deg);
+}
+
 .sort {
   display: flex;
   gap: var(--space-4);

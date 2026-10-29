@@ -47,9 +47,15 @@
   --safe-left: max(env(safe-area-inset-left, 0px), var(--native-inset-left, 0px));
   --safe-right: max(env(safe-area-inset-right, 0px), var(--native-inset-right, 0px));
 
-  /* Ilustrações botânicas: o tom de texto do acento, bem diluído */
-  --botanical-ink: color-mix(in srgb, var(--accent-text) 26%, transparent);
-  --botanical-ink-strong: color-mix(in srgb, var(--accent-text) 55%, transparent);
+  /* Ilustrações botânicas: quanto aparecem no fundo e em destaque */
+  --flora-fundo: 0.5;
+  --flora-destaque: 0.85;
+
+  /* Cores de apoio (ícones, números): o acento não precisa fazer tudo sozinho */
+  --hue-verde: #4f7d4c;
+  --hue-azul: #406fb4;
+  --hue-rosa: #b0506f;
+  --hue-ouro: #a87a22;
 
   --tabbar-height: 64px;
   --sidebar-width: 248px;
@@ -83,6 +89,10 @@
   --shadow-md: 0 6px 20px -6px rgba(40, 25, 70, 0.16), 0 2px 6px rgba(40, 25, 70, 0.05);
   --shadow-lg: 0 24px 60px -18px rgba(40, 25, 70, 0.32);
   --scrim: rgba(30, 20, 45, 0.3);
+  --flora-folhas: #5f8a5a;
+  --flora-flores: #9479d1;
+  --flora-florzinhas: #5b86c6;
+  --flora-detalhes: #4a78c2;
 }
 
 /* Papel — creme, como página de livro */
@@ -106,6 +116,10 @@
   --shadow-md: 0 6px 20px -6px rgba(60, 40, 15, 0.18), 0 2px 6px rgba(60, 40, 15, 0.06);
   --shadow-lg: 0 24px 60px -18px rgba(60, 40, 15, 0.35);
   --scrim: rgba(40, 30, 18, 0.32);
+  --flora-folhas: #6b8a4f;
+  --flora-flores: #c26f86;
+  --flora-florzinhas: #5f86c4;
+  --flora-detalhes: #c47f45;
 }
 
 /* Rosé — rosado bem suave */
@@ -120,15 +134,19 @@
   --ink-faint: #9a878c;
   --hairline: rgba(90, 40, 55, 0.11);
   --hairline-strong: rgba(90, 40, 55, 0.19);
-  --accent: #bfa3e6;
-  --accent-text: #74539f;
-  --accent-soft: rgba(160, 120, 205, 0.15);
-  --accent-ink: #281c38;
+  --accent: #eaa7bc;
+  --accent-text: #a4466a;
+  --accent-soft: rgba(214, 112, 146, 0.15);
+  --accent-ink: #3a1424;
   --gold: #b88a2e;
   --shadow-sm: 0 1px 2px rgba(70, 30, 40, 0.06);
   --shadow-md: 0 6px 20px -6px rgba(70, 30, 40, 0.16), 0 2px 6px rgba(70, 30, 40, 0.05);
   --shadow-lg: 0 24px 60px -18px rgba(70, 30, 40, 0.32);
   --scrim: rgba(45, 25, 30, 0.3);
+  --flora-folhas: #6f8a5c;
+  --flora-flores: #cf7894;
+  --flora-florzinhas: #9a82d6;
+  --flora-detalhes: #5b86c6;
 }
 
 /* Sépia — mais quente, para o fim de tarde */
@@ -143,22 +161,30 @@
   --ink-faint: #957a58;
   --hairline: rgba(80, 52, 20, 0.14);
   --hairline-strong: rgba(80, 52, 20, 0.24);
-  --accent: #b39adf;
-  --accent-text: #634a9a;
-  --accent-soft: rgba(130, 100, 190, 0.17);
-  --accent-ink: #251a38;
+  --accent: #d9a27e;
+  --accent-text: #8f4c2b;
+  --accent-soft: rgba(184, 104, 62, 0.17);
+  --accent-ink: #3a1e10;
   --gold: #a87a22;
   --shadow-sm: 0 1px 2px rgba(70, 40, 10, 0.08);
   --shadow-md: 0 6px 20px -6px rgba(70, 40, 10, 0.22), 0 2px 6px rgba(70, 40, 10, 0.08);
   --shadow-lg: 0 24px 60px -18px rgba(70, 40, 10, 0.4);
   --scrim: rgba(50, 32, 12, 0.34);
+  --flora-folhas: #6f7743;
+  --flora-flores: #b4583a;
+  --flora-florzinhas: #9b4f63;
+  --flora-detalhes: #c08e3a;
 }
 
 /* Noite — grafite quente, nunca preto puro */
 [data-theme="noite"] {
   color-scheme: dark;
-  --botanical-ink: color-mix(in srgb, var(--accent-text) 16%, transparent);
-  --botanical-ink-strong: color-mix(in srgb, var(--accent-text) 42%, transparent);
+  --flora-fundo: 0.3;
+  --flora-destaque: 0.62;
+  --hue-verde: #9cc292;
+  --hue-azul: #9dbcef;
+  --hue-rosa: #eba7bd;
+  --hue-ouro: #d9b45f;
   --bg: #1b1815;
   --bg-elevated: #24201c;
   --bg-sunken: #151310;
@@ -177,13 +203,21 @@
   --shadow-md: 0 8px 24px -8px rgba(0, 0, 0, 0.55);
   --shadow-lg: 0 24px 60px -16px rgba(0, 0, 0, 0.7);
   --scrim: rgba(0, 0, 0, 0.5);
+  --flora-folhas: #8fae84;
+  --flora-flores: #c4b0f0;
+  --flora-florzinhas: #9fbbe8;
+  --flora-detalhes: #e3a6b8;
 }
 
 /* Ameixa — escuro com fundo arroxeado */
 [data-theme="ameixa"] {
   color-scheme: dark;
-  --botanical-ink: color-mix(in srgb, var(--accent-text) 16%, transparent);
-  --botanical-ink-strong: color-mix(in srgb, var(--accent-text) 42%, transparent);
+  --flora-fundo: 0.3;
+  --flora-destaque: 0.62;
+  --hue-verde: #9cc292;
+  --hue-azul: #9dbcef;
+  --hue-rosa: #eba7bd;
+  --hue-ouro: #d9b45f;
   --bg: #1a1620;
   --bg-elevated: #241f2c;
   --bg-sunken: #141118;
@@ -202,4 +236,63 @@
   --shadow-md: 0 8px 24px -8px rgba(0, 0, 0, 0.6);
   --shadow-lg: 0 24px 60px -16px rgba(0, 0, 0, 0.7);
   --scrim: rgba(5, 0, 12, 0.5);
+  --flora-folhas: #93b38a;
+  --flora-flores: #cdb8f5;
+  --flora-florzinhas: #f0b3c6;
+  --flora-detalhes: #9fc0ef;
+}
+
+/* Jardim — branco azulado, flores azuis e borboletas */
+[data-theme="jardim"] {
+  color-scheme: light;
+  --bg: #eff3f7;
+  --bg-elevated: #fbfcfe;
+  --bg-sunken: #e2e9f1;
+  --surface-glass: #fbfcfe;
+  --ink: #1f2833;
+  --ink-soft: #4d5a69;
+  --ink-faint: #828e9c;
+  --hairline: rgba(30, 55, 90, 0.11);
+  --hairline-strong: rgba(30, 55, 90, 0.19);
+  --accent: #9dbbec;
+  --accent-text: #36609f;
+  --accent-soft: rgba(90, 135, 205, 0.15);
+  --accent-ink: #13243d;
+  --gold: #b88a2e;
+  --shadow-sm: 0 1px 2px rgba(20, 40, 70, 0.06), 0 1px 1px rgba(20, 40, 70, 0.04);
+  --shadow-md: 0 6px 20px -6px rgba(20, 40, 70, 0.16), 0 2px 6px rgba(20, 40, 70, 0.05);
+  --shadow-lg: 0 24px 60px -18px rgba(20, 40, 70, 0.32);
+  --scrim: rgba(15, 25, 40, 0.3);
+  --flora-folhas: #5b8a5e;
+  --flora-flores: #4f7fc4;
+  --flora-florzinhas: #8a9fc4;
+  --flora-detalhes: #3f6fb8;
+}
+
+/* Terracota — areia, ferrugem e malva, como arte boho */
+[data-theme="terracota"] {
+  color-scheme: light;
+  --bg: #f3e8dc;
+  --bg-elevated: #fbf5ee;
+  --bg-sunken: #eadccb;
+  --surface-glass: #fbf5ee;
+  --ink: #33231b;
+  --ink-soft: #66503f;
+  --ink-faint: #9a8270;
+  --hairline: rgba(90, 45, 20, 0.12);
+  --hairline-strong: rgba(90, 45, 20, 0.2);
+  --accent: #dd9f7f;
+  --accent-text: #9c4a29;
+  --accent-soft: rgba(196, 104, 64, 0.16);
+  --accent-ink: #3a1a0c;
+  --gold: #b0802a;
+  --shadow-sm: 0 1px 2px rgba(70, 35, 10, 0.07);
+  --shadow-md: 0 6px 20px -6px rgba(70, 35, 10, 0.18), 0 2px 6px rgba(70, 35, 10, 0.06);
+  --shadow-lg: 0 24px 60px -18px rgba(70, 35, 10, 0.36);
+  --scrim: rgba(45, 22, 10, 0.32);
+  --flora-folhas: #6e7748;
+  --flora-flores: #b65c3a;
+  --flora-florzinhas: #a15869;
+  --flora-detalhes: #c9963f;
+  --hue-rosa: #a8505c;
 }

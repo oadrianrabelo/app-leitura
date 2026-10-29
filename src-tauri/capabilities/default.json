@@ -39,6 +39,12 @@
         },
         {
           "url": "https://oauth2.googleapis.com/*"
+        },
+        {
+          "url": "https://brasilapi.com.br/*"
+        },
+        {
+          "url": "https://*/*"
         }
       ]
     }

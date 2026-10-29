@@ -3,7 +3,7 @@ import { normalizeIsbn } from "../import/metadata";
 
 export interface BookCandidate {
   key: string;
-  source: "google" | "openlibrary";
+  source: "google" | "openlibrary" | "brasil";
   title: string;
   authors: string[];
   publisher: string | null;
@@ -60,9 +60,13 @@ function fromGoogle(v: GoogleVolume): BookCandidate {
   };
 }
 
+// Sem chave, o Google Books divide uma cota diária com o mundo todo e vive esgotado (429)
+const BOOKS_KEY = import.meta.env.VITE_GOOGLE_BOOKS_KEY as string | undefined;
+const timeout = () => ({ signal: AbortSignal.timeout(12000) });
+
 async function searchGoogle(query: string): Promise<BookCandidate[]> {
-  const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=15&printType=books`;
-  const res = await httpFetch(url);
+  const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=15&printType=books${BOOKS_KEY ? `&key=${BOOKS_KEY}` : ""}`;
+  const res = await httpFetch(url, timeout());
   if (!res.ok) throw new Error(`Google Books ${res.status}`);
   const data = (await res.json()) as { items?: GoogleVolume[] };
   return (data.items ?? []).map(fromGoogle);
@@ -83,7 +87,10 @@ interface OpenLibraryDoc {
 
 async function searchOpenLibrary(query: string, isbn: string | null): Promise<BookCandidate[]> {
   const q = isbn ? `isbn=${isbn}` : `q=${encodeURIComponent(query)}`;
-  const res = await httpFetch(`https://openlibrary.org/search.json?${q}&limit=10&fields=key,title,author_name,publisher,first_publish_year,number_of_pages_median,isbn,cover_i,subject,language`);
+  const res = await httpFetch(
+    `https://openlibrary.org/search.json?${q}&limit=10&fields=key,title,author_name,publisher,first_publish_year,number_of_pages_median,isbn,cover_i,subject,language`,
+    timeout(),
+  );
   if (!res.ok) throw new Error(`Open Library ${res.status}`);
   const data = (await res.json()) as { docs?: OpenLibraryDoc[] };
   return (data.docs ?? []).map((d) => ({
@@ -102,16 +109,63 @@ async function searchOpenLibrary(query: string, isbn: string | null): Promise<Bo
   }));
 }
 
-/** Busca por ISBN, título ou autor. Google Books primeiro, Open Library como reforço. */
+interface BrasilApiBook {
+  isbn: string;
+  title: string;
+  subtitle?: string | null;
+  authors?: string[];
+  publisher?: string | null;
+  synopsis?: string | null;
+  year?: number | null;
+  page_count?: number | null;
+  subjects?: string[] | null;
+  cover_url?: string | null;
+}
+
+/** BrasilAPI: junta a base da CBL, do Mercado Editorial e outras. É a que mais acha livros brasileiros. */
+async function searchBrasil(isbn: string): Promise<BookCandidate[]> {
+  const res = await httpFetch(`https://brasilapi.com.br/api/isbn/v1/${isbn}`, timeout());
+  if (res.status === 404) return [];
+  if (!res.ok) throw new Error(`BrasilAPI ${res.status}`);
+  const b = (await res.json()) as BrasilApiBook;
+  return [
+    {
+      key: `b:${b.isbn}`,
+      source: "brasil",
+      title: [b.title, b.subtitle].filter(Boolean).join(": ") || "Sem título",
+      // A CBL costuma mandar "SOBRENOME, Nome" em maiúsculas
+      authors: (b.authors ?? []).map(prettyAuthor),
+      publisher: b.publisher ?? null,
+      year: b.year ?? null,
+      pageCount: b.page_count || null,
+      isbn: normalizeIsbn(b.isbn) ?? isbn,
+      description: b.synopsis ?? null,
+      subjects: b.subjects ?? [],
+      language: null,
+      coverUrl: b.cover_url ?? null,
+    },
+  ];
+}
+
+function prettyAuthor(name: string) {
+  const [last, first] = name.split(",").map((p) => p.trim());
+  const full = first ? `${first} ${last}` : name.trim();
+  if (full !== full.toUpperCase()) return full;
+  return full.toLowerCase().replace(/(^|[\s'-])(\p{L})/gu, (_, sep: string, ch: string) => sep + ch.toUpperCase()).replace(/\b(De|Da|Do|Dos|Das|E)\b/g, (w) => w.toLowerCase());
+}
+
+/** Busca por ISBN, título ou autor em vários catálogos ao mesmo tempo. */
 export async function searchBooks(input: string): Promise<BookCandidate[]> {
   const query = input.trim();
   if (!query) return [];
   const isbn = normalizeIsbn(query);
   const googleQuery = isbn ? `isbn:${isbn}` : query;
 
-  const [google, openlib] = await Promise.allSettled([searchGoogle(googleQuery), searchOpenLibrary(query, isbn)]);
-  const results = [...(google.status === "fulfilled" ? google.value : []), ...(openlib.status === "fulfilled" ? openlib.value : [])];
-  if (results.length === 0 && google.status === "rejected" && openlib.status === "rejected") {
+  const sources = [searchGoogle(googleQuery), searchOpenLibrary(query, isbn)];
+  if (isbn) sources.unshift(searchBrasil(isbn));
+  const settled = await Promise.allSettled(sources);
+  const results = settled.flatMap((r) => (r.status === "fulfilled" ? r.value : []));
+  if (results.length === 0 && settled.every((r) => r.status === "rejected")) {
     throw new Error("Sem conexão com os catálogos de livros");
   }
 
@@ -124,6 +178,8 @@ export async function searchBooks(input: string): Promise<BookCandidate[]> {
     else {
       prev.coverUrl ??= r.coverUrl;
       prev.pageCount ??= r.pageCount;
+      prev.description ??= r.description;
+      prev.year ??= r.year;
     }
   }
   const list = Array.from(seen.values());

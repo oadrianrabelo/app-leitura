@@ -125,9 +125,11 @@ export async function getAccessToken(interactive: boolean): Promise<string> {
   throw new AuthError("A sincronização funciona no app instalado.");
 }
 
+/** Desconecta: revoga o acesso e limpa o cache, para a próxima conexão mostrar a escolha de conta. */
 export async function signOut() {
   const { accessToken, refreshToken } = load();
   safeStorage.set(KEY, "{}");
+  if (platform === "android" && accessToken) await invoke("google_forget", { token: accessToken }).catch(() => {});
   const token = refreshToken ?? accessToken;
   if (token) {
     await httpFetch(`https://oauth2.googleapis.com/revoke?token=${encodeURIComponent(token)}`, { method: "POST" }).catch(() => {});

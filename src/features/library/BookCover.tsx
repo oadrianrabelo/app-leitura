@@ -4,7 +4,7 @@ import type { Book } from "../../db/types";
 import "./BookCover.css";
 
 // Paleta das capas geradas: tons de encadernação de tecido
-const CLOTH = [
+export const CLOTH = [
   ["#7a3b22", "#f1dcc0"],
   ["#2f4a43", "#e3dcc4"],
   ["#4a3a5c", "#ece0d0"],
@@ -15,7 +15,7 @@ const CLOTH = [
   ["#4b3b33", "#efe0cc"],
 ];
 
-function hash(text: string) {
+export function hash(text: string) {
   let h = 0;
   for (let i = 0; i < text.length; i++) h = (h * 31 + text.charCodeAt(i)) | 0;
   return Math.abs(h);

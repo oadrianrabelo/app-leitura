@@ -19,6 +19,8 @@ class MainActivity : TauriActivity() {
       val bars = insets.getInsets(
         WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
       )
+      // Altura do teclado: as folhas sobem para o campo nunca ficar escondido
+      val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
       val density = resources.displayMetrics.density
       val js = """
         (function () {
@@ -27,6 +29,7 @@ class MainActivity : TauriActivity() {
           s.setProperty('--native-inset-bottom', '${bars.bottom / density}px');
           s.setProperty('--native-inset-left', '${bars.left / density}px');
           s.setProperty('--native-inset-right', '${bars.right / density}px');
+          s.setProperty('--native-inset-ime', '${ime.bottom / density}px');
         })();
       """.trimIndent()
       (view as WebView).evaluateJavascript(js, null)
