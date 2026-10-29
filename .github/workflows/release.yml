@@ -23,8 +23,14 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 22
+      # Tag enviada: usa ela. Disparo manual: cria a partir da versão do package.json.
       - id: version
-        run: echo "tag=v$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+        run: |
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then
+            echo "tag=$GITHUB_REF_NAME" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=v$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+          fi
       - id: notes
         run: |
           {
@@ -67,7 +73,8 @@ jobs:
       - run: npm ci
       - uses: tauri-apps/tauri-action@v0
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # O token automático não pode criar tags novas; um token pessoal (RELEASE_TOKEN) pode
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ""
           # Login do Google no desktop (sincronização); vazio = sincronização indisponível no desktop
@@ -107,7 +114,7 @@ jobs:
         run: npx tauri android build --apk --target aarch64 --target armv7
       - name: Anexar à release
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
           TAG: ${{ needs.notes.outputs.tag }}
         run: |
           VERSION="${TAG#v}"
