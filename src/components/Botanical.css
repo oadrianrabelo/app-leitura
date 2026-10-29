@@ -1,0 +1,14 @@
+.botanical {
+  display: block;
+  width: 100%;
+  pointer-events: none;
+  background-color: var(--botanical-ink);
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+}
+
+.botanical.is-destaque {
+  background-color: var(--botanical-ink-strong);
+}

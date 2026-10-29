@@ -8,6 +8,23 @@ export interface ChangelogEntry {
 /** Mais recente primeiro. Cada release adiciona uma entrada aqui. */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.5.2",
+    date: "2026-10-29",
+    title: "Um jardim na estante",
+    highlights: [
+      {
+        icon: "sparkles",
+        title: "Orquídeas em traço de gravura",
+        text: "Novas ilustrações, num tom só, no fundo das telas, que acompanham o tema que você escolher.",
+      },
+      {
+        icon: "library",
+        title: "Guirlandas nas prateleiras",
+        text: "Folhinhas e pequenas flores penduradas em cada prateleira da sua estante.",
+      },
+    ],
+  },
+  {
     version: "0.5.1",
     date: "2026-10-29",
     title: "Orquídeas",

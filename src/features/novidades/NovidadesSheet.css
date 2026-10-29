@@ -4,15 +4,14 @@
 
 .novidades-orchid {
   position: absolute;
-  top: -22px;
-  right: -16px;
-  width: 92px;
+  top: -30px;
+  right: -40px;
+  width: 190px;
   pointer-events: none;
 }
 
-.novidades-title,
-.novidades-eyebrow {
-  max-width: calc(100% - 78px);
+.novidades > :not(.novidades-orchid) {
+  position: relative;
 }
 
 .novidades-eyebrow {

@@ -1,7 +1,7 @@
 import { motion } from "motion/react";
 import { Page } from "../components/Page";
 import { Icon } from "../components/Icon";
-import { LeafSprig } from "../components/Botanical";
+import { Botanical } from "../components/Botanical";
 import "./Conquistas.css";
 
 // Uma prévia das insígnias que vêm por aí. Ainda trancadas.
@@ -18,7 +18,7 @@ const BADGES = [
 
 export function Conquistas() {
   return (
-    <Page eyebrow="Sua jornada" title="Conquistas" decoration={<LeafSprig className="decor-leaves" />}>
+    <Page eyebrow="Sua jornada" title="Conquistas" decoration={<Botanical art="haste" className="decor-mirror" />}>
       <p className="badges-intro">
         Insígnias que celebram o hábito, não só a quantidade. Elas destrancam conforme você lê.
       </p>

@@ -9,7 +9,7 @@ import { Shelf } from "../features/library/Shelf";
 import { useLibraryUi } from "../features/library/state";
 import { pickAndImport } from "../features/import/importer";
 import { platform } from "../lib/platform";
-import { LeafSprig, OrchidSprig } from "../components/Botanical";
+import { Botanical } from "../components/Botanical";
 import "./Biblioteca.css";
 
 // Lombadas "fantasma" da estante vazia: altura, largura e tom variados como numa estante real.
@@ -46,8 +46,8 @@ function EmptyLibrary({ onImport, onPhysical }: { onImport: () => void; onPhysic
   return (
     <>
       <div className="shelf" aria-hidden>
-        <OrchidSprig className="shelf-orchid" />
-        <LeafSprig className="shelf-leaves" />
+        <Botanical art="haste" className="shelf-orchid" />
+        <Botanical art="guirlanda-1" tone="destaque" className="shelf-garland" />
         <div className="shelf-books">
           {SPINES.map((s, i) => (
             <motion.span

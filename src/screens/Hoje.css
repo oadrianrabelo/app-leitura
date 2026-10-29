@@ -179,7 +179,6 @@
 }
 
 .whisper {
-  max-width: calc(100% - 84px);
   font-family: var(--font-display);
   font-style: italic;
   color: var(--ink-soft);

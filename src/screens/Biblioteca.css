@@ -5,22 +5,28 @@
   padding: 0 var(--space-6);
 }
 
-/* Um vaso de orquídea na ponta da prateleira e folhas caindo do outro lado */
+/* Orquídea crescendo atrás da estante e uma guirlanda pendurada na tábua */
 .shelf-orchid {
   position: absolute;
-  right: -6px;
-  bottom: 6px;
-  width: 92px;
+  right: -40px;
+  bottom: -6px;
+  width: 170px;
+  z-index: 0;
+}
+
+.shelf-garland {
+  position: absolute;
+  left: -18px;
+  right: -18px;
+  width: auto;
+  bottom: -40px;
   z-index: 2;
 }
 
-.shelf-leaves {
-  position: absolute;
-  left: -14px;
-  bottom: -46px;
-  width: 110px;
-  transform: scaleY(-1) rotate(-8deg);
-  z-index: 2;
+.shelf-books,
+.shelf-board {
+  position: relative;
+  z-index: 1;
 }
 
 .shelf-books {

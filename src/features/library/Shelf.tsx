@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { Book } from "../../db/types";
 import { BookCover } from "./BookCover";
+import { Botanical } from "../../components/Botanical";
 import "./Shelf.css";
 
 interface ShelfProps {
@@ -54,6 +55,12 @@ export function Shelf({ books, timesRead, onOpen }: ShelfProps) {
               })}
             </div>
             <div className="shelf-row-board" />
+            {/* Guirlanda de folhas e florzinhas pendurada na tábua, alternando o lado */}
+            <Botanical
+              art={i % 2 ? "guirlanda-2" : "guirlanda-1"}
+              className={`shelf-row-garland${i % 2 ? " is-right" : ""}`}
+              tone="destaque"
+            />
           </div>
         ))}
     </div>

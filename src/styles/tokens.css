@@ -47,6 +47,10 @@
   --safe-left: max(env(safe-area-inset-left, 0px), var(--native-inset-left, 0px));
   --safe-right: max(env(safe-area-inset-right, 0px), var(--native-inset-right, 0px));
 
+  /* Ilustrações botânicas: o tom de texto do acento, bem diluído */
+  --botanical-ink: color-mix(in srgb, var(--accent-text) 26%, transparent);
+  --botanical-ink-strong: color-mix(in srgb, var(--accent-text) 55%, transparent);
+
   --tabbar-height: 64px;
   --sidebar-width: 248px;
 }
@@ -153,6 +157,8 @@
 /* Noite — grafite quente, nunca preto puro */
 [data-theme="noite"] {
   color-scheme: dark;
+  --botanical-ink: color-mix(in srgb, var(--accent-text) 16%, transparent);
+  --botanical-ink-strong: color-mix(in srgb, var(--accent-text) 42%, transparent);
   --bg: #1b1815;
   --bg-elevated: #24201c;
   --bg-sunken: #151310;
@@ -176,6 +182,8 @@
 /* Ameixa — escuro com fundo arroxeado */
 [data-theme="ameixa"] {
   color-scheme: dark;
+  --botanical-ink: color-mix(in srgb, var(--accent-text) 16%, transparent);
+  --botanical-ink-strong: color-mix(in srgb, var(--accent-text) 42%, transparent);
   --bg: #1a1620;
   --bg-elevated: #241f2c;
   --bg-sunken: #141118;
