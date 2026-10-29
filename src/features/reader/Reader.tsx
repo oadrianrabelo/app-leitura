@@ -67,6 +67,7 @@ function ReaderBody({ book }: { book: Book }) {
   const [panel, setPanel] = useState<"settings" | "toc" | null>(null);
   const [finishOpen, setFinishOpen] = useState(false);
   const [scrub, setScrub] = useState<number | null>(null);
+  const [downloading, setDownloading] = useState(false);
 
   const engine = useRef<ReaderEngine>(null);
   const fx = useRef<PageTurnFxHandle>(null);
@@ -80,9 +81,23 @@ function ReaderBody({ book }: { book: Book }) {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const record = book.fileId ? await db.files.get(book.fileId) : undefined;
+      let record = book.fileId ? await db.files.get(book.fileId) : undefined;
+      if (!record && book.fileHash) {
+        // Importado em outro aparelho: busca no Drive
+        setDownloading(true);
+        try {
+          const { downloadBookFile } = await import("../sync/sync");
+          const id = await downloadBookFile(book);
+          record = id ? await db.files.get(id) : undefined;
+        } catch {
+          /* cai na mensagem abaixo */
+        } finally {
+          setDownloading(false);
+        }
+      }
+      if (cancelled) return;
       if (!record) {
-        setError("O arquivo deste livro não está neste aparelho.");
+        setError("O arquivo deste livro não está neste aparelho. Conecte o Google Drive em Ajustes para trazê-lo do outro aparelho.");
         return;
       }
       const position = await getPosition(book.id);
@@ -210,6 +225,7 @@ function ReaderBody({ book }: { book: Book }) {
         ) : (
           <div className="reader-loading">
             <span />
+            {downloading && <p>Trazendo o livro do Google Drive…</p>}
           </div>
         )}
         <PageTurnFx ref={fx} animation={settings.animation} paper={paper} />

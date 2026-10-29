@@ -36,6 +36,7 @@ import {
   List,
   Type,
   BookOpenText,
+  Cloud,
   type LucideProps,
 } from "lucide-react";
 
@@ -77,6 +78,7 @@ const ICONS = {
   list: List,
   type: Type,
   read: BookOpenText,
+  cloud: Cloud,
 } as const;
 
 export type IconName = keyof typeof ICONS;

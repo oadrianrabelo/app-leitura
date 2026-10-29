@@ -2,8 +2,8 @@
 //! (`UpdateInstallerPlugin.kt`). No desktop quem cuida é o tauri-plugin-updater.
 
 use tauri::{
-    plugin::{Builder, TauriPlugin},
     Runtime,
+    plugin::{Builder, TauriPlugin},
 };
 
 #[cfg(target_os = "android")]

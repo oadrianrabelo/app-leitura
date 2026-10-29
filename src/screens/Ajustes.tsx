@@ -7,6 +7,7 @@ import { appVersion, BUILD_VERSION } from "../lib/version";
 import { platform } from "../lib/platform";
 import { useUpdates } from "../features/updates/updates";
 import { useNovidades } from "../features/novidades/novidades";
+import { SyncSection } from "../features/sync/SyncSection";
 import "./Ajustes.css";
 
 const THEMES: { id: ThemeChoice; label: string; icon: IconName; swatch: [string, string] }[] = [
@@ -73,6 +74,8 @@ export function Ajustes() {
           Nenhum tema usa branco ou preto puros. O contraste é suficiente para ler bem, sem ofuscar.
         </p>
       </Section>
+
+      <SyncSection />
 
       {canUpdate && (
         <Section title="Atualizações">

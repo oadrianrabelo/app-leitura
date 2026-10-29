@@ -8,6 +8,28 @@ export interface ChangelogEntry {
 /** Mais recente primeiro. Cada release adiciona uma entrada aqui. */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.4.0",
+    date: "2026-10-30",
+    title: "Sua biblioteca, a salvo",
+    highlights: [
+      {
+        icon: "cloud",
+        title: "Sincronização com o Google Drive",
+        text: "Biblioteca, leituras, marcadores e o ponto onde você parou ficam guardados e iguais em todos os aparelhos.",
+      },
+      {
+        icon: "file",
+        title: "Seus livros em qualquer lugar",
+        text: "Os EPUBs e PDFs também vão para o Drive. Em outro aparelho, é só abrir que o livro chega.",
+      },
+      {
+        icon: "info",
+        title: "Privado de verdade",
+        text: "O Sépia usa uma pasta só dele no seu Drive: não vê nem mexe nos seus outros arquivos.",
+      },
+    ],
+  },
+  {
     version: "0.3.0",
     date: "2026-10-29",
     title: "Hora de ler",

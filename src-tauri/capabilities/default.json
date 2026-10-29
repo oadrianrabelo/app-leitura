@@ -36,6 +36,9 @@
         },
         {
           "url": "https://*.us.archive.org/*"
+        },
+        {
+          "url": "https://oauth2.googleapis.com/*"
         }
       ]
     }

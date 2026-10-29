@@ -14,6 +14,7 @@ import { useLibraryUi } from "./state";
 import { useReaderUi } from "../reader/state";
 import { db } from "../../db/db";
 import { usePosition } from "../../db/reading";
+import { useSync } from "../sync/sync";
 import "./BookDetail.css";
 
 const FORMAT_LABEL: Record<Book["format"], string> = { epub: "EPUB", pdf: "PDF", mobi: "MOBI", fisico: "Livro físico" };
@@ -68,7 +69,8 @@ function DetailBody({ book, readings }: { book: Book; readings: Reading[] }) {
   const active = readings.find((r) => r.state === "lendo");
   const physical = book.format === "fisico";
   const medium: Reading["medium"] = physical ? "fisico" : "digital";
-  const readable = !physical && !!book.fileId;
+  const syncConnected = useSync((s) => s.connected);
+  const readable = !physical && (!!book.fileId || (!!book.fileHash && syncConnected));
   const openReader = () => {
     closeBook();
     setTimeout(() => useReaderUi.getState().open(book.id), 240);

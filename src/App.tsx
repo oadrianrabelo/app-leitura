@@ -15,6 +15,9 @@ import { Reader } from "./features/reader/Reader";
 import { useUpdates } from "./features/updates/updates";
 import { useApplyTheme } from "./lib/theme";
 import { useSettings } from "./lib/settings";
+import { startAutoSync } from "./features/sync/sync";
+
+startAutoSync();
 import "./App.css";
 
 /**
