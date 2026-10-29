@@ -1,10 +1,12 @@
 name: Release
 
-# Publica uma versão nova quando uma tag vX.Y.Z é enviada.
+# Publica uma versão nova: ao enviar uma tag vX.Y.Z, ou manualmente (Actions →
+# Release → Run workflow), que cria a tag a partir da versão do package.json.
 # O app instalado consulta a release mais recente e se atualiza sozinho.
 on:
   push:
     tags: ["v*"]
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -15,11 +17,14 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       body: ${{ steps.notes.outputs.body }}
+      tag: ${{ steps.version.outputs.tag }}
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
         with:
           node-version: 22
+      - id: version
+        run: echo "tag=v$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
       - id: notes
         run: |
           {
@@ -66,8 +71,9 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ""
         with:
-          tagName: ${{ github.ref_name }}
-          releaseName: "Sépia ${{ github.ref_name }}"
+          tagName: ${{ needs.notes.outputs.tag }}
+          releaseName: "Sépia ${{ needs.notes.outputs.tag }}"
+          releaseCommitish: ${{ github.sha }}
           releaseBody: ${{ needs.notes.outputs.body }}
           releaseDraft: false
           prerelease: false
@@ -75,7 +81,7 @@ jobs:
 
   android:
     name: Android
-    needs: desktop
+    needs: [notes, desktop]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -99,8 +105,9 @@ jobs:
       - name: Anexar à release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ needs.notes.outputs.tag }}
         run: |
-          VERSION="${GITHUB_REF_NAME#v}"
+          VERSION="${TAG#v}"
           APK=$(find src-tauri/gen/android/app/build/outputs/apk -name "*release*.apk" | head -n 1)
           cp "$APK" "Sepia_${VERSION}_android.apk"
-          gh release upload "$GITHUB_REF_NAME" "Sepia_${VERSION}_android.apk" --clobber
+          gh release upload "$TAG" "Sepia_${VERSION}_android.apk" --clobber
