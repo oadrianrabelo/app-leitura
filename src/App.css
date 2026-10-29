@@ -5,17 +5,40 @@
 }
 
 .app-main {
+  position: relative;
   height: 100%;
+}
+
+.tab-panel {
+  position: absolute;
+  inset: 0;
   overflow-y: auto;
   overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
   padding-bottom: calc(var(--tabbar-height) + var(--safe-bottom));
   padding-left: var(--safe-left);
   padding-right: var(--safe-right);
+  contain: strict;
+}
+
+.tab-panel.is-active {
+  animation: tab-in 180ms var(--ease-out);
+}
+
+.tab-panel[hidden] {
+  display: none;
+}
+
+@keyframes tab-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
 }
 
 @media (min-width: 900px) {
-  .app-main {
+  .tab-panel {
     padding-bottom: 0;
-    padding-left: var(--sidebar-width);
+    left: var(--sidebar-width);
   }
 }

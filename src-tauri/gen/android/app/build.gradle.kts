@@ -61,7 +61,9 @@ android {
             }
         }
         getByName("release") {
-            signingConfigs.findByName("release")?.let { signingConfig = it }
+            // Sem keystore (builds de teste do CI), assina com a chave de debug para o
+            // APK otimizado poder ser instalado.
+            signingConfig = signingConfigs.findByName("release") ?: signingConfigs.getByName("debug")
             optimization {
                enable = true
             }

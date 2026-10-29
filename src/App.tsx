@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, MotionConfig, motion } from "motion/react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { MotionConfig } from "motion/react";
 import { Sidebar, TabBar, type TabId } from "./components/Navigation";
 import { Hoje } from "./screens/Hoje";
 import { Biblioteca } from "./screens/Biblioteca";
@@ -12,10 +12,27 @@ import { useApplyTheme } from "./lib/theme";
 import { useSettings } from "./lib/settings";
 import "./App.css";
 
+/**
+ * Cada aba fica montada depois da primeira visita: trocar de aba é só mostrar/esconder,
+ * sem refazer a tela. Cada uma guarda a própria rolagem.
+ */
+function TabPanel({ active, children, panelRef }: { active: boolean; children: ReactNode; panelRef?: (el: HTMLElement | null) => void }) {
+  const [visited, setVisited] = useState(active);
+  useEffect(() => {
+    if (active) setVisited(true);
+  }, [active]);
+  if (!visited) return null;
+  return (
+    <section className={`tab-panel${active ? " is-active" : ""}`} hidden={!active} ref={panelRef}>
+      {children}
+    </section>
+  );
+}
+
 export default function App() {
   useApplyTheme();
   const [tab, setTab] = useState<TabId>("hoje");
-  const scrollRef = useRef<HTMLElement>(null);
+  const panels = useRef(new Map<TabId, HTMLElement>());
   const autoCheck = useSettings((s) => s.autoCheckUpdates);
   const checkUpdates = useUpdates((s) => s.check);
 
@@ -28,32 +45,34 @@ export default function App() {
 
   const changeTab = (next: TabId) => {
     if (next === tab) {
-      scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+      panels.current.get(tab)?.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
     setTab(next);
-    scrollRef.current?.scrollTo({ top: 0 });
+  };
+
+  const panelRef = (id: TabId) => (el: HTMLElement | null) => {
+    if (el) panels.current.set(id, el);
+    else panels.current.delete(id);
   };
 
   return (
     <MotionConfig reducedMotion="user">
       <div className="app">
         <Sidebar active={tab} onChange={changeTab} />
-        <main className="app-main" ref={scrollRef}>
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div
-              key={tab}
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-            >
-              {tab === "hoje" && <Hoje onOpenLibrary={() => changeTab("biblioteca")} />}
-              {tab === "biblioteca" && <Biblioteca />}
-              {tab === "conquistas" && <Conquistas />}
-              {tab === "ajustes" && <Ajustes />}
-            </motion.div>
-          </AnimatePresence>
+        <main className="app-main">
+          <TabPanel active={tab === "hoje"} panelRef={panelRef("hoje")}>
+            <Hoje onOpenLibrary={() => changeTab("biblioteca")} />
+          </TabPanel>
+          <TabPanel active={tab === "biblioteca"} panelRef={panelRef("biblioteca")}>
+            <Biblioteca />
+          </TabPanel>
+          <TabPanel active={tab === "conquistas"} panelRef={panelRef("conquistas")}>
+            <Conquistas />
+          </TabPanel>
+          <TabPanel active={tab === "ajustes"} panelRef={panelRef("ajustes")}>
+            <Ajustes />
+          </TabPanel>
         </main>
         <TabBar active={tab} onChange={changeTab} />
         <UpdateSheet />

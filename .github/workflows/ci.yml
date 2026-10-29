@@ -51,7 +51,7 @@ jobs:
       - uses: ./.github/actions/setup-android
       - run: npm ci
       - name: Build do APK
-        run: npx tauri android build --apk --debug --target aarch64
+        run: npx tauri android build --apk --target aarch64
       - uses: actions/upload-artifact@v5
         with:
           name: sepia-apk-teste

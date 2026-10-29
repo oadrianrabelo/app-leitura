@@ -7,9 +7,9 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   padding: 6px max(var(--space-2), var(--safe-left)) calc(6px + var(--safe-bottom));
+  /* Sem backdrop-filter: no WebView do Android o desfoque custa caro na rolagem */
   background: var(--surface-glass);
-  backdrop-filter: saturate(1.6) blur(20px);
-  -webkit-backdrop-filter: saturate(1.6) blur(20px);
+  transform: translateZ(0);
   border-top: 0.5px solid var(--hairline);
 }
 

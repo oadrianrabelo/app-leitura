@@ -11,8 +11,6 @@
   position: absolute;
   inset: 0;
   background: var(--scrim);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
 }
 
 .sheet {
@@ -27,6 +25,7 @@
   box-shadow: var(--shadow-lg);
   padding-bottom: var(--safe-bottom);
   touch-action: none;
+  will-change: transform;
 }
 
 .sheet-grabber {
