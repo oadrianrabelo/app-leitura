@@ -1,0 +1,129 @@
+.tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding: 6px max(var(--space-2), var(--safe-left)) calc(6px + var(--safe-bottom));
+  background: var(--surface-glass);
+  backdrop-filter: saturate(1.6) blur(20px);
+  -webkit-backdrop-filter: saturate(1.6) blur(20px);
+  border-top: 0.5px solid var(--hairline);
+}
+
+.tabbar-item {
+  isolation: isolate;
+  position: relative;
+  height: 52px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: var(--ink-faint);
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.tabbar-item.is-active {
+  color: var(--accent);
+}
+
+.tabbar-pill {
+  position: absolute;
+  inset: 2px 10px;
+  border-radius: 16px;
+  background: var(--accent-soft);
+  z-index: -1;
+}
+
+.tabbar-icon {
+  display: grid;
+  place-items: center;
+}
+
+.tabbar-label {
+  font-size: 11px;
+  font-weight: 560;
+  letter-spacing: 0.005em;
+}
+
+.sidebar {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .tabbar {
+    display: none;
+  }
+
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: var(--sidebar-width);
+    padding: var(--space-6) var(--space-3);
+    border-right: 0.5px solid var(--hairline);
+    background: var(--bg-sunken);
+    z-index: 50;
+  }
+
+  .sidebar nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: 0 var(--space-3) var(--space-6);
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: 560;
+    letter-spacing: -0.02em;
+  }
+
+  .sidebar-brand img {
+    border-radius: 7px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .sidebar-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    height: 36px;
+    padding: 0 var(--space-3);
+    border-radius: var(--radius-sm);
+    color: var(--ink-soft);
+    font-weight: 500;
+    transition: color var(--dur-fast);
+  }
+
+  .sidebar-item:hover {
+    color: var(--ink);
+  }
+
+  .sidebar-item.is-active {
+    color: var(--accent);
+  }
+
+  .sidebar-item > svg,
+  .sidebar-item > span:not(.sidebar-pill) {
+    position: relative;
+  }
+
+  .sidebar-pill {
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-sm);
+    background: var(--accent-soft);
+  }
+}

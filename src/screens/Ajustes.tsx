@@ -1,0 +1,128 @@
+import { useEffect, useState } from "react";
+import { motion } from "motion/react";
+import { Page, Section } from "../components/Page";
+import { Icon, type IconName } from "../components/Icon";
+import { useSettings, type ThemeChoice } from "../lib/settings";
+import { appVersion, BUILD_VERSION } from "../lib/version";
+import { platform } from "../lib/platform";
+import { useUpdates } from "../features/updates/updates";
+import { useNovidades } from "../features/novidades/novidades";
+import "./Ajustes.css";
+
+const THEMES: { id: ThemeChoice; label: string; icon: IconName; swatch: [string, string] }[] = [
+  { id: "sistema", label: "Automático", icon: "monitor", swatch: ["#f4ede1", "#1b1815"] },
+  { id: "papel", label: "Papel", icon: "sun", swatch: ["#f4ede1", "#2a241d"] },
+  { id: "sepia", label: "Sépia", icon: "coffee", swatch: ["#eadbc0", "#3b2c1c"] },
+  { id: "noite", label: "Noite", icon: "moon", swatch: ["#1b1815", "#e6d9c3"] },
+];
+
+export function Ajustes() {
+  const { theme, setTheme, autoCheckUpdates, setAutoCheckUpdates } = useSettings();
+  const { status, check, info, openSheet } = useUpdates();
+  const showNovidades = useNovidades((s) => s.show);
+  const [version, setVersion] = useState(BUILD_VERSION);
+
+  useEffect(() => {
+    appVersion().then(setVersion);
+  }, []);
+
+  const canUpdate = platform === "android" || platform === "desktop";
+  let updateLabel = "Procurar atualização";
+  if (status === "checking") updateLabel = "Procurando…";
+  if (status === "up-to-date") updateLabel = "Você está na versão mais recente";
+  if (status === "available" && info) updateLabel = `Instalar a versão ${info.version}`;
+  if (status === "error") updateLabel = "Sem conexão. Tentar de novo";
+
+  return (
+    <Page eyebrow="Do seu jeito" title="Ajustes">
+      <Section title="Aparência">
+        <div className="themes" role="radiogroup" aria-label="Tema">
+          {THEMES.map((t) => {
+            const selected = theme === t.id;
+            return (
+              <button
+                key={t.id}
+                role="radio"
+                aria-checked={selected}
+                className={`theme-option${selected ? " is-selected" : ""}`}
+                onClick={() => setTheme(t.id)}
+              >
+                <span
+                  className="theme-swatch"
+                  style={
+                    t.id === "sistema"
+                      ? { background: `linear-gradient(135deg, ${t.swatch[0]} 50%, ${t.swatch[1]} 50%)` }
+                      : { background: t.swatch[0], color: t.swatch[1] }
+                  }
+                >
+                  {t.id !== "sistema" && <span className="theme-swatch-text">Aa</span>}
+                  {selected && (
+                    <motion.span
+                      layoutId="theme-ring"
+                      className="theme-ring"
+                      transition={{ type: "spring", stiffness: 500, damping: 36 }}
+                    />
+                  )}
+                </span>
+                <span className="theme-label">{t.label}</span>
+              </button>
+            );
+          })}
+        </div>
+        <p className="settings-footnote">
+          Nenhum tema usa branco ou preto puros. O contraste é suficiente para ler bem, sem ofuscar.
+        </p>
+      </Section>
+
+      {canUpdate && (
+        <Section title="Atualizações">
+          <div className="group">
+            <button
+              className="row"
+              onClick={() => (status === "available" ? openSheet() : check())}
+              disabled={status === "checking"}
+            >
+              <span className="row-icon">
+                <Icon name="refresh" size={18} className={status === "checking" ? "spin" : ""} />
+              </span>
+              <span className="row-label">{updateLabel}</span>
+              {status === "up-to-date" && <Icon name="check" size={18} className="row-check" />}
+            </button>
+            <label className="row">
+              <span className="row-icon">
+                <Icon name="download" size={18} />
+              </span>
+              <span className="row-label">Procurar ao abrir o app</span>
+              <input
+                type="checkbox"
+                className="switch"
+                checked={autoCheckUpdates}
+                onChange={(e) => setAutoCheckUpdates(e.target.checked)}
+              />
+            </label>
+          </div>
+        </Section>
+      )}
+
+      <Section title="Sobre">
+        <div className="group">
+          <button className="row" onClick={showNovidades}>
+            <span className="row-icon">
+              <Icon name="sparkles" size={18} />
+            </span>
+            <span className="row-label">Novidades</span>
+            <Icon name="chevron" size={18} className="row-chevron" />
+          </button>
+          <div className="row">
+            <span className="row-icon">
+              <Icon name="info" size={18} />
+            </span>
+            <span className="row-label">Versão</span>
+            <span className="row-value">{version}</span>
+          </div>
+        </div>
+        <p className="settings-signature">Feito com carinho para quem ama ler.</p>
+      </Section>
+    </Page>
+  );
+}

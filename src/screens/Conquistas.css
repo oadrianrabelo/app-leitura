@@ -1,0 +1,52 @@
+.badges-intro {
+  color: var(--ink-soft);
+  margin: calc(-1 * var(--space-2)) 0 var(--space-6);
+  max-width: 520px;
+}
+
+.badges {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+}
+
+.badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--space-5) var(--space-3);
+  background: var(--bg-elevated);
+  border: 0.5px solid var(--hairline);
+  border-radius: var(--radius-lg);
+}
+
+.badge-medal {
+  width: 60px;
+  height: 60px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  margin-bottom: var(--space-3);
+  color: var(--ink-faint);
+  background: radial-gradient(circle at 35% 30%, var(--bg-elevated), var(--bg-sunken) 70%);
+  border: 1px dashed var(--hairline-strong);
+}
+
+.badge-name {
+  font-weight: 600;
+  font-size: var(--text-sm);
+  letter-spacing: -0.01em;
+}
+
+.badge-hint {
+  font-size: var(--text-xs);
+  color: var(--ink-faint);
+  margin-top: 2px;
+}
+
+@media (min-width: 640px) {
+  .badges {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

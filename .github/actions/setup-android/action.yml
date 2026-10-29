@@ -1,0 +1,25 @@
+name: Preparar build Android
+description: Java, Android SDK/NDK, Rust com alvos Android e Node.
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: "17"
+    - uses: android-actions/setup-android@v3
+    - name: Instalar NDK
+      shell: bash
+      run: |
+        sdkmanager --install "ndk;27.0.12077973" > /dev/null
+        echo "NDK_HOME=$ANDROID_HOME/ndk/27.0.12077973" >> "$GITHUB_ENV"
+    - uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: aarch64-linux-android,armv7-linux-androideabi
+    - uses: Swatinem/rust-cache@v2
+      with:
+        workspaces: src-tauri
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 22
+        cache: npm

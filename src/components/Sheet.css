@@ -1,0 +1,56 @@
+.sheet-root {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.sheet-scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--scrim);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+.sheet {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  max-height: calc(100% - var(--safe-top) - 24px);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  box-shadow: var(--shadow-lg);
+  padding-bottom: var(--safe-bottom);
+  touch-action: none;
+}
+
+.sheet-grabber {
+  width: 38px;
+  height: 5px;
+  border-radius: var(--radius-full);
+  background: var(--hairline-strong);
+  margin: 8px auto 4px;
+  flex-shrink: 0;
+}
+
+.sheet-content {
+  overflow-y: auto;
+  padding: var(--space-4) var(--space-6) var(--space-6);
+  touch-action: pan-y;
+}
+
+@media (min-width: 900px) {
+  .sheet-root {
+    align-items: center;
+  }
+
+  .sheet {
+    border-radius: var(--radius-xl);
+    padding-bottom: 0;
+  }
+}

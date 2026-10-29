@@ -1,0 +1,119 @@
+/*
+ * Tokens do Sépia.
+ * Nada de branco puro com preto puro: todos os temas usam contraste
+ * confortável (acima de 7:1 para texto, mas sem o brilho máximo da tela).
+ */
+
+:root {
+  /* Tipografia */
+  --font-ui: "Inter Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Fraunces Variable", "Iowan Old Style", Georgia, serif;
+  --font-reading: "Literata Variable", "Iowan Old Style", Georgia, serif;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.8125rem;
+  --text-base: 0.9375rem;
+  --text-md: 1.0625rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.625rem;
+  --text-2xl: 2.125rem;
+
+  /* Espaçamento (grade de 4px) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 26px;
+  --radius-full: 999px;
+
+  /* Movimento */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 140ms;
+  --dur-base: 240ms;
+
+  /* Áreas seguras: env() quando o WebView expõe, ponte nativa no Android */
+  --safe-top: max(env(safe-area-inset-top, 0px), var(--native-inset-top, 0px));
+  --safe-bottom: max(env(safe-area-inset-bottom, 0px), var(--native-inset-bottom, 0px));
+  --safe-left: max(env(safe-area-inset-left, 0px), var(--native-inset-left, 0px));
+  --safe-right: max(env(safe-area-inset-right, 0px), var(--native-inset-right, 0px));
+
+  --tabbar-height: 64px;
+  --sidebar-width: 248px;
+}
+
+/* Papel — claro, levemente creme */
+:root,
+[data-theme="papel"] {
+  color-scheme: light;
+  --bg: #f4ede1;
+  --bg-elevated: #fbf7f0;
+  --bg-sunken: #ebe2d3;
+  --surface-glass: rgba(251, 247, 240, 0.86);
+  --ink: #2a241d;
+  --ink-soft: #5e5446;
+  --ink-faint: #8f8371;
+  --hairline: rgba(60, 45, 25, 0.12);
+  --hairline-strong: rgba(60, 45, 25, 0.2);
+  --accent: #a4542b;
+  --accent-soft: rgba(164, 84, 43, 0.12);
+  --accent-ink: #fbf5ec;
+  --gold: #b88a2e;
+  --shadow-sm: 0 1px 2px rgba(60, 40, 15, 0.06), 0 1px 1px rgba(60, 40, 15, 0.04);
+  --shadow-md: 0 6px 20px -6px rgba(60, 40, 15, 0.18), 0 2px 6px rgba(60, 40, 15, 0.06);
+  --shadow-lg: 0 24px 60px -18px rgba(60, 40, 15, 0.35);
+  --scrim: rgba(40, 30, 18, 0.32);
+}
+
+/* Sépia — mais quente, para o fim de tarde */
+[data-theme="sepia"] {
+  color-scheme: light;
+  --bg: #eadbc0;
+  --bg-elevated: #f3e7d1;
+  --bg-sunken: #dfcdae;
+  --surface-glass: rgba(243, 231, 209, 0.86);
+  --ink: #3b2c1c;
+  --ink-soft: #6a5236;
+  --ink-faint: #957a58;
+  --hairline: rgba(80, 52, 20, 0.14);
+  --hairline-strong: rgba(80, 52, 20, 0.24);
+  --accent: #9a4a22;
+  --accent-soft: rgba(154, 74, 34, 0.13);
+  --accent-ink: #f8eedd;
+  --gold: #a87a22;
+  --shadow-sm: 0 1px 2px rgba(70, 40, 10, 0.08);
+  --shadow-md: 0 6px 20px -6px rgba(70, 40, 10, 0.22), 0 2px 6px rgba(70, 40, 10, 0.08);
+  --shadow-lg: 0 24px 60px -18px rgba(70, 40, 10, 0.4);
+  --scrim: rgba(50, 32, 12, 0.34);
+}
+
+/* Noite — grafite quente com texto âmbar suave, nunca preto puro */
+[data-theme="noite"] {
+  color-scheme: dark;
+  --bg: #1b1815;
+  --bg-elevated: #24201c;
+  --bg-sunken: #151310;
+  --surface-glass: rgba(36, 32, 28, 0.86);
+  --ink: #e6d9c3;
+  --ink-soft: #b4a58d;
+  --ink-faint: #7f7262;
+  --hairline: rgba(230, 210, 180, 0.09);
+  --hairline-strong: rgba(230, 210, 180, 0.16);
+  --accent: #d98d5f;
+  --accent-soft: rgba(217, 141, 95, 0.14);
+  --accent-ink: #1b1815;
+  --gold: #d4ab5a;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 24px -8px rgba(0, 0, 0, 0.55);
+  --shadow-lg: 0 24px 60px -16px rgba(0, 0, 0, 0.7);
+  --scrim: rgba(0, 0, 0, 0.5);
+}

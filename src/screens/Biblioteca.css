@@ -1,0 +1,128 @@
+.shelf {
+  margin: var(--space-4) auto 0;
+  max-width: 340px;
+  padding: 0 var(--space-6);
+}
+
+.shelf-books {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 3px;
+  height: 104px;
+}
+
+.spine {
+  display: block;
+  border-radius: 3px 3px 1px 1px;
+  border: 0.5px solid var(--hairline-strong);
+  position: relative;
+}
+
+.spine::after {
+  content: "";
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  top: 14px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--hairline-strong);
+}
+
+.spine.tone-1 {
+  background: linear-gradient(90deg, var(--bg-sunken), var(--bg-elevated) 60%, var(--bg-sunken));
+}
+
+.spine.tone-2 {
+  background: linear-gradient(90deg, var(--accent-soft), var(--bg-elevated) 60%, var(--accent-soft));
+}
+
+.spine.tone-3 {
+  background: linear-gradient(90deg, var(--bg-sunken), var(--bg) 60%, var(--bg-sunken));
+}
+
+.spine.is-tilted {
+  transform-origin: bottom right;
+  rotate: 9deg;
+  margin-left: 10px;
+}
+
+.shelf-board {
+  height: 10px;
+  border-radius: 3px;
+  background: linear-gradient(var(--bg-elevated), var(--bg-sunken));
+  border: 0.5px solid var(--hairline-strong);
+  box-shadow: var(--shadow-md);
+}
+
+.shelf-empty {
+  text-align: center;
+  margin: var(--space-8) auto 0;
+  max-width: 400px;
+}
+
+.shelf-empty h2 {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 560;
+  letter-spacing: -0.02em;
+}
+
+.shelf-empty p {
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+  margin-top: var(--space-2);
+}
+
+.library-actions {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-8);
+}
+
+.library-action {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+  padding: var(--space-4);
+  background: var(--bg-elevated);
+  border: 0.5px solid var(--hairline);
+  border-radius: var(--radius-lg);
+}
+
+.library-action-icon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: var(--bg-sunken);
+  color: var(--ink-soft);
+}
+
+.library-action-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.library-action-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.library-action-text {
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+}
+
+@media (min-width: 640px) {
+  .library-actions {
+    grid-template-columns: 1fr 1fr;
+  }
+}

@@ -1,0 +1,21 @@
+.app {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+}
+
+.app-main {
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  padding-bottom: calc(var(--tabbar-height) + var(--safe-bottom));
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
+}
+
+@media (min-width: 900px) {
+  .app-main {
+    padding-bottom: 0;
+    padding-left: var(--sidebar-width);
+  }
+}
