@@ -71,6 +71,12 @@ p {
   scrollbar-color: var(--hairline-strong) transparent;
 }
 
+/* Raminho de folhas no canto das páginas */
+.decor-leaves {
+  width: 112px;
+  transform: rotate(-24deg) translate(8px, 4px);
+}
+
 /* Interruptor */
 .switch {
   appearance: none;

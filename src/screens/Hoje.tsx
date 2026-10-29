@@ -11,6 +11,7 @@ import { useReaderUi } from "../features/reader/state";
 import { useRhythm } from "../db/reading";
 import { useReadings } from "../db/hooks";
 import { WeekRow } from "../components/WeekRow";
+import { OrchidSprig } from "../components/Botanical";
 import { useSettings } from "../lib/settings";
 import { useState } from "react";
 import "./Hoje.css";
@@ -81,7 +82,11 @@ export function Hoje({ onOpenLibrary }: { onOpenLibrary: () => void }) {
   ];
 
   return (
-    <Page eyebrow={weekday.format(now)} title={name ? `${greeting(now)}, ${name}` : greeting(now)}>
+    <Page
+      eyebrow={weekday.format(now)}
+      title={name ? `${greeting(now)}, ${name}` : greeting(now)}
+      decoration={<OrchidSprig />}
+    >
       <p className="whisper">{whisper(now, current[0]?.title ?? null, rhythm?.readToday ?? false)}</p>
       {!name && <NamePrompt />}
       {current.length > 0 ? (

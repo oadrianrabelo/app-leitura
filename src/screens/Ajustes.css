@@ -153,3 +153,15 @@ label.row:active {
 .row-input:focus {
   color: var(--ink);
 }
+
+.settings-signature {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.signature-bloom {
+  width: 54px;
+  opacity: 0.9;
+}

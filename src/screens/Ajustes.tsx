@@ -8,6 +8,7 @@ import { platform } from "../lib/platform";
 import { useUpdates } from "../features/updates/updates";
 import { useNovidades } from "../features/novidades/novidades";
 import { SyncSection } from "../features/sync/SyncSection";
+import { LeafSprig, OrchidBloom } from "../components/Botanical";
 import "./Ajustes.css";
 
 const THEMES: { id: ThemeChoice; label: string; icon: IconName; swatch: [string, string] }[] = [
@@ -38,7 +39,7 @@ export function Ajustes() {
   if (status === "error") updateLabel = "Sem conexão. Tentar de novo";
 
   return (
-    <Page eyebrow="Do seu jeito" title="Ajustes">
+    <Page eyebrow="Do seu jeito" title="Ajustes" decoration={<LeafSprig className="decor-leaves" />}>
       <Section title="Você">
         <div className="group">
           <label className="row">
@@ -146,7 +147,10 @@ export function Ajustes() {
             <span className="row-value">{version}</span>
           </div>
         </div>
-        <p className="settings-signature">Feito com carinho para quem ama ler.</p>
+        <div className="settings-signature">
+          <OrchidBloom className="signature-bloom" />
+          <p>Feito com carinho para quem ama ler.</p>
+        </div>
       </Section>
     </Page>
   );

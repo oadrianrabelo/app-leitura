@@ -7,6 +7,7 @@ import { finishReading } from "../../db/reading";
 import type { Book } from "../../db/types";
 import { BookCover } from "../library/BookCover";
 import { Stars } from "../library/Stars";
+import { OrchidBloom, LeafSprig } from "../../components/Botanical";
 import "./FinishSheet.css";
 
 interface Props {
@@ -54,6 +55,9 @@ export function FinishSheet({ open, onClose, book, readingId }: Props) {
     <Sheet open={open} onClose={onClose} label="Fim do livro">
       <div className="finish">
         <div className="finish-hero">
+          <LeafSprig className="finish-leaves is-left" />
+          <LeafSprig className="finish-leaves is-right" />
+          <OrchidBloom className="finish-bloom" />
           {SPARKS.map((i) => (
             <motion.span
               key={i}

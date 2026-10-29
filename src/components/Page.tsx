@@ -8,11 +8,14 @@ interface PageProps {
   title: string;
   children: ReactNode;
   actions?: ReactNode;
+  /** Ilustração no canto de cima, atrás do título */
+  decoration?: ReactNode;
 }
 
-export function Page({ eyebrow, title, children, actions }: PageProps) {
+export function Page({ eyebrow, title, children, actions, decoration }: PageProps) {
   return (
     <div className="page">
+      {decoration && <div className="page-decor">{decoration}</div>}
       <header className="page-header">
         <div>
           {eyebrow && <p className="page-eyebrow">{capitalize(eyebrow)}</p>}
@@ -20,7 +23,7 @@ export function Page({ eyebrow, title, children, actions }: PageProps) {
         </div>
         {actions && <div className="page-actions">{actions}</div>}
       </header>
-      {children}
+      <div className="page-body">{children}</div>
     </div>
   );
 }

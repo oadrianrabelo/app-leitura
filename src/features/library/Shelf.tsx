@@ -20,7 +20,8 @@ export function Shelf({ books, timesRead, onOpen }: ShelfProps) {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const ro = new ResizeObserver(([entry]) => setWidth(entry.contentRect.width));
+    // Aba escondida mede 0: ignora, senão a estante inteira seria desmontada e recriada
+    const ro = new ResizeObserver(([entry]) => entry.contentRect.width > 0 && setWidth(entry.contentRect.width));
     ro.observe(el);
     return () => ro.disconnect();
   }, []);

@@ -60,3 +60,28 @@
 .finish .reading-form-actions {
   width: 100%;
 }
+
+.finish-leaves {
+  position: absolute;
+  bottom: 6px;
+  width: 120px;
+  opacity: 0.9;
+}
+
+.finish-leaves.is-left {
+  left: 8%;
+  transform: scaleX(-1) rotate(-10deg);
+}
+
+.finish-leaves.is-right {
+  right: 8%;
+  transform: rotate(-10deg);
+}
+
+.finish-bloom {
+  position: absolute;
+  width: 46px;
+  top: 6px;
+  left: calc(50% + 34px);
+  z-index: 2;
+}

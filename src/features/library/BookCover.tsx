@@ -35,7 +35,9 @@ export const BookCover = memo(function BookCover({ book, width, className = "" }
   return (
     <div className={`cover ${className}`} style={{ width, height }}>
       {url ? (
-        <img src={url} alt="" draggable={false} loading="lazy" decoding="async" />
+        <img src={url} alt="" draggable={false} decoding="async" />
+      ) : url === undefined ? (
+        <div className="cover-loading" />
       ) : (
         <div className="cover-generated" style={{ background: bg, color: fg, fontSize: width / 8.5 }}>
           <span className="cover-generated-title">{book.title}</span>

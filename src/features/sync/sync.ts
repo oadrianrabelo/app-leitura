@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { db, uuid } from "../../db/db";
 import type { Book } from "../../db/types";
+import { invalidateCover } from "../../db/hooks";
 import { safeStorage } from "../../lib/storage";
 import { AuthError, getAccessToken, signOut } from "./google";
 import * as drive from "./drive";
@@ -172,6 +173,7 @@ async function runSync(device: string, syncFiles: boolean, progress: (d: string)
       applyingRemote = true;
       try {
         await db.covers.put({ bookId: book.id, blob, updatedAt: Date.now() });
+        invalidateCover(book.id);
         await db.books.update(book.id, { hasCover: true });
       } finally {
         applyingRemote = false;

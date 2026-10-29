@@ -1,10 +1,33 @@
 .page {
+  position: relative;
   max-width: 760px;
   margin: 0 auto;
   padding: calc(var(--safe-top) + var(--space-8)) var(--space-5) var(--space-10);
 }
 
+.page-decor {
+  position: absolute;
+  top: calc(var(--safe-top) - 4px);
+  right: -16px;
+  width: 118px;
+  pointer-events: none;
+  opacity: 0.92;
+  z-index: 0;
+}
+
+[data-theme="noite"] .page-decor,
+[data-theme="ameixa"] .page-decor {
+  opacity: 0.7;
+}
+
+.page-body {
+  position: relative;
+  z-index: 1;
+}
+
 .page-header {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
@@ -17,6 +40,10 @@
   color: var(--ink-faint);
   font-weight: 500;
   margin-bottom: 2px;
+}
+
+.page-header > div {
+  max-width: calc(100% - 96px);
 }
 
 .page-title {

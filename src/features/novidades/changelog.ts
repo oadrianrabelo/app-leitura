@@ -8,6 +8,23 @@ export interface ChangelogEntry {
 /** Mais recente primeiro. Cada release adiciona uma entrada aqui. */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.5.1",
+    date: "2026-10-29",
+    title: "Orquídeas",
+    highlights: [
+      {
+        icon: "sparkles",
+        title: "Flores pelo caminho",
+        text: "Orquídeas e folhas verdes enfeitam o Sépia, da tela de boas-vindas ao fim de cada livro.",
+      },
+      {
+        icon: "library",
+        title: "Estante sem piscar",
+        text: "As capas aparecem na hora ao voltar para a biblioteca.",
+      },
+    ],
+  },
+  {
     version: "0.5.0",
     date: "2026-10-29",
     title: "Do seu jeito",

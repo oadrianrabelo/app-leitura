@@ -1,4 +1,5 @@
 import { db, now, uuid } from "./db";
+import { invalidateCover } from "./hooks";
 import type { Book, BookStatus, Reading, ReadingState } from "./types";
 
 export type NewBook = Omit<Book, "id" | "createdAt" | "updatedAt" | "deletedAt" | "hasCover" | "favorite" | "tint"> &
@@ -29,6 +30,7 @@ export async function updateBook(id: string, changes: Partial<Book>) {
 
 export async function setCover(bookId: string, blob: Blob, tint: string | null) {
   const t = now();
+  invalidateCover(bookId);
   await db.transaction("rw", db.books, db.covers, async () => {
     await db.covers.put({ bookId, blob, updatedAt: t });
     await db.books.update(bookId, { hasCover: true, tint, updatedAt: t });
@@ -43,6 +45,7 @@ export async function deleteBook(id: string) {
     await db.files.where("bookId").equals(id).delete();
     await db.covers.delete(id);
   });
+  invalidateCover(id);
 }
 
 /** Livros visíveis (não excluídos). */

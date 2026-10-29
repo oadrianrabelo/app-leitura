@@ -7,6 +7,7 @@ import { useSettings } from "../../lib/settings";
 import { BUILD_VERSION } from "../../lib/version";
 import { CHANGELOG } from "./changelog";
 import { useNovidades } from "./novidades";
+import { OrchidSprig } from "../../components/Botanical";
 import "./NovidadesSheet.css";
 
 const dateFormat = new Intl.DateTimeFormat("pt-BR", { day: "numeric", month: "long", year: "numeric" });
@@ -34,6 +35,7 @@ export function NovidadesSheet() {
   return (
     <Sheet open={open} onClose={close} label="Novidades">
       <div className="novidades">
+        <OrchidSprig className="novidades-orchid" />
         <p className="novidades-eyebrow">
           Novidades da versão {latest.version} · {dateFormat.format(new Date(`${latest.date}T12:00:00`))}
         </p>
