@@ -43,7 +43,7 @@ export function Ajustes() {
   if (status === "error") updateLabel = "Sem conexão. Tentar de novo";
 
   return (
-    <Page eyebrow="Do seu jeito" title="Ajustes" decoration={<Botanical art="raminho" className="decor-sprig" />}>
+    <Page eyebrow="Do seu jeito" title="Ajustes" decoration={<Botanical art="haste" />}>
       <Section title="Você">
         <div className="group">
           <label className="row">

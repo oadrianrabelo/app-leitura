@@ -22,6 +22,11 @@ export const CHANGELOG: ChangelogEntry[] = [
         title: "Mais variedade",
         text: "Seis guirlandas diferentes e trepadeiras entrelaçadas subindo de baixo para cima.",
       },
+      {
+        icon: "library",
+        title: "Plantas sem corte",
+        text: "Os ramos agora saem pelas bordas da tela, como se o jardim continuasse lá fora.",
+      },
     ],
   },
   {

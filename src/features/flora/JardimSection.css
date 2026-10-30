@@ -31,9 +31,10 @@
 
 .jardim-garland {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
+  top: 10px;
+  left: -10%;
+  width: 120%;
+  transform: translateY(-22.2%);
 }
 
 .jardim-empty {

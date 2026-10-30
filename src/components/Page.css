@@ -8,9 +8,10 @@
 
 .page-decor {
   position: absolute;
-  top: calc(var(--safe-top) - 10px);
-  right: -18px;
-  width: min(78%, 340px);
+  /* sai pelo topo e pela direita: a trepadeira continua para fora da tela */
+  top: -24px;
+  right: -20px;
+  width: min(80%, 350px);
   pointer-events: none;
   z-index: 0;
 }

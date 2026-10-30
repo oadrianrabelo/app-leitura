@@ -5,22 +5,29 @@
   padding: 0 var(--space-6);
 }
 
-/* Orquídea crescendo atrás da estante e uma guirlanda pendurada na tábua */
+/* Trepadeira subindo atrás da estante e glicínias penduradas na tábua, saindo pelas bordas da tela */
 .shelf-orchid {
   position: absolute;
-  right: -40px;
-  bottom: -6px;
-  width: 170px;
+  right: -30px;
+  bottom: 4px;
+  width: 150px;
   z-index: 0;
+  mask-image: linear-gradient(to top, transparent 0, #000 7%);
+  -webkit-mask-image: linear-gradient(to top, transparent 0, #000 7%);
 }
 
 .shelf-garland {
   position: absolute;
-  left: -18px;
-  right: -18px;
-  width: auto;
-  bottom: -40px;
-  z-index: 2;
+  top: calc(100% - 10px);
+  left: 50%;
+  width: calc(100vw + 60px);
+  max-width: none;
+  margin-left: calc(-50vw - 30px);
+  transform: translateY(-22.2%);
+  z-index: 0;
+  /* as pontas dos cachos somem antes do texto logo abaixo */
+  mask-image: linear-gradient(to bottom, #000 40%, transparent 62%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 40%, transparent 62%);
 }
 
 .shelf-books,
@@ -82,9 +89,14 @@
 }
 
 .shelf-empty {
+  position: relative;
+  z-index: 1;
   text-align: center;
-  margin: var(--space-8) auto 0;
+  margin: var(--space-12) auto 0;
   max-width: 400px;
+  text-shadow:
+    0 0 6px var(--bg),
+    0 0 14px var(--bg);
 }
 
 .shelf-empty h2 {
@@ -330,4 +342,13 @@ button.library-action .library-action-icon {
   text-align: center;
   color: var(--ink-faint);
   margin-top: var(--space-10);
+}
+
+@media (min-width: 900px) {
+  .shelf-garland {
+    mask-image: linear-gradient(to bottom, #000 40%, transparent 62%), linear-gradient(90deg, transparent, #000 15%, #000 85%, transparent);
+    -webkit-mask-image: linear-gradient(to bottom, #000 40%, transparent 62%), linear-gradient(90deg, transparent, #000 15%, #000 85%, transparent);
+    mask-composite: intersect;
+    -webkit-mask-composite: source-in;
+  }
 }

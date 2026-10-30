@@ -63,6 +63,8 @@
 
 .sheet-content {
   overflow-y: auto;
+  /* ilustrações saem pelas bordas da folha, sem criar rolagem para o lado */
+  overflow-x: hidden;
   padding: var(--space-4) var(--space-6) var(--space-6);
   touch-action: pan-y;
 }

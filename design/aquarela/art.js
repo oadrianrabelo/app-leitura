@@ -290,10 +290,10 @@
     const { seed = 7, palette = "lilas" } = opts;
     A.setSeed(seed);
     const S = 1.6;
-    // ramo principal: sobe pela direita, faz a curva no canto e corre pelo topo
-    vine(g, [[W - 70, H + 20], [W - 120, H * 0.78], [W - 60, H * 0.55], [W - 130, H * 0.32], [W - 90, H * 0.12], [W * 0.72, 60], [W * 0.42, 90], [W * 0.1, 50]], {
+    // ramo principal: entra pela borda direita (como se viesse de fora da tela), sobe, faz a curva no canto e corre pelo topo
+    vine(g, [[W + 60, H * 0.8], [W - 100, H * 0.68], [W - 60, H * 0.48], [W - 130, H * 0.3], [W - 90, H * 0.12], [W * 0.72, 60], [W * 0.46, 96], [W * 0.28, 66]], {
       w: 10, leaves: 22, leafLen: 160, leafSize: 1.2, palette, size: S,
-      racemes: [[0.62, H * 0.42], [0.7, H * 0.3], [0.78, H * 0.22], [0.88, H * 0.12], [0.96, H * 0.08], [0.3, H * 0.18], [0.45, H * 0.2]],
+      racemes: [[0.6, H * 0.36], [0.68, H * 0.28], [0.77, H * 0.22], [0.87, H * 0.14], [0.95, H * 0.09], [0.3, H * 0.14], [0.45, H * 0.16]],
     });
     // ramo fino atravessando o canto na diagonal
     vine(g, [[W * 0.5, -30], [W * 0.68, H * 0.1], [W * 0.86, H * 0.2], [W + 30, H * 0.3]], {

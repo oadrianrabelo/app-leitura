@@ -8,7 +8,8 @@ import "./Botanical.css";
  */
 const FILES = import.meta.glob<string>("../assets/aquarela/*.webp", { eager: true, import: "default", query: "?url" });
 
-const GARLAND = 560 / 1100;
+// proporção (altura / largura) de cada peça, já com as margens de respiro
+const GARLAND = 720 / 1100;
 const ART = {
   haste: { file: "canto", ratio: 1500 / 1100 },
   "guirlanda-1": { file: "guirlanda-1", ratio: GARLAND },
@@ -17,8 +18,8 @@ const ART = {
   "guirlanda-4": { file: "guirlanda-4", ratio: GARLAND },
   "guirlanda-5": { file: "guirlanda-5", ratio: GARLAND },
   "guirlanda-6": { file: "guirlanda-6", ratio: GARLAND },
-  trepadeira: { file: "trepadeira", ratio: 1100 / 420 },
-  "trepadeira-2": { file: "trepadeira-2", ratio: 1300 / 460 },
+  trepadeira: { file: "trepadeira", ratio: 1240 / 780 },
+  "trepadeira-2": { file: "trepadeira-2", ratio: 1440 / 820 },
   raminho: { file: "raminho", ratio: 1 },
   orquidea: { file: "raminho", ratio: 1 },
 } as const;

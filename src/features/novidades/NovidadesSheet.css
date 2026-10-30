@@ -4,14 +4,24 @@
 
 .novidades-orchid {
   position: absolute;
-  top: -30px;
-  right: -40px;
-  width: 190px;
+  top: calc(-1 * var(--space-4) - 30px);
+  right: calc(-1 * var(--space-6) - 16px);
+  width: 170px;
+  /* some antes de chegar na lista de novidades */
+  mask-image: linear-gradient(to bottom, #000 30%, transparent 55%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 30%, transparent 55%);
   pointer-events: none;
 }
 
 .novidades > :not(.novidades-orchid) {
   position: relative;
+}
+
+.novidades-eyebrow,
+.novidades-title {
+  text-shadow:
+    0 0 6px var(--bg-elevated),
+    0 0 14px var(--bg-elevated);
 }
 
 .novidades-eyebrow {

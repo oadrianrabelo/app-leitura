@@ -54,7 +54,7 @@ function EmptyLibrary({ onImport, onPhysical }: { onImport: () => void; onPhysic
   return (
     <>
       <div className="shelf" aria-hidden>
-        <Botanical art="haste" className="shelf-orchid" />
+        <Botanical art="trepadeira-2" tone="destaque" className="shelf-orchid" />
         <Botanical art="guirlanda-1" tone="destaque" className="shelf-garland" />
         <div className="shelf-books">
           {SPINES.map((s, i) => (
