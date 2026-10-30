@@ -8,9 +8,9 @@
 
 .page-decor {
   position: absolute;
-  top: calc(var(--safe-top) - 4px);
-  right: -46px;
-  width: 230px;
+  top: calc(var(--safe-top) - 10px);
+  right: -18px;
+  width: min(78%, 340px);
   pointer-events: none;
   z-index: 0;
 }
@@ -35,6 +35,15 @@
   color: var(--ink-faint);
   font-weight: 500;
   margin-bottom: 2px;
+}
+
+.page-header p,
+.page-header h1 {
+  /* halo da cor do fundo: o texto continua legível por cima das glicínias */
+  text-shadow:
+    0 0 6px var(--bg),
+    0 0 14px var(--bg),
+    0 0 24px var(--bg);
 }
 
 .page-title {

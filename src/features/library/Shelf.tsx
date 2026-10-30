@@ -13,6 +13,7 @@ interface ShelfProps {
   view?: ShelfView;
 }
 
+const GARLANDS = ["guirlanda-1", "guirlanda-2", "guirlanda-3", "guirlanda-4"] as const;
 const MIN_COVER = 92;
 const GAP = 16;
 const SPINE_GAP = 2;
@@ -87,12 +88,16 @@ export function Shelf({ books, timesRead, onOpen, view = "capas" }: ShelfProps) 
               })}
             </div>
             <div className="shelf-row-board" />
-            {/* Guirlanda de folhas e florzinhas pendurada na tábua, alternando o lado */}
+            {/* Glicínias penduradas na tábua: desenhos e lados variando de prateleira em prateleira */}
             <Botanical
-              art={i % 2 ? "guirlanda-2" : "guirlanda-1"}
-              className={`shelf-row-garland${i % 2 ? " is-right" : ""}`}
+              art={GARLANDS[(i * 3 + 1) % GARLANDS.length]}
+              className={`shelf-row-garland${i % 2 ? " is-flipped" : ""}`}
               tone="destaque"
             />
+            {/* De vez em quando, uma trepadeira subindo pela lateral */}
+            {i % 3 === 1 && (
+              <Botanical art="trepadeira" className={`shelf-row-climber${i % 2 ? " is-left" : ""}`} tone="destaque" />
+            )}
           </div>
         ))}
     </div>

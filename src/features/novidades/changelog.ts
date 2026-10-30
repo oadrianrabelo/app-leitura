@@ -8,6 +8,23 @@ export interface ChangelogEntry {
 /** Mais recente primeiro. Cada release adiciona uma entrada aqui. */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.7.0",
+    date: "2026-10-30",
+    title: "Glicínias em aquarela",
+    highlights: [
+      {
+        icon: "sparkles",
+        title: "Um jardim pintado à mão",
+        text: "Glicínias em aquarela sobem pela estante, atravessam o canto da tela e pendem das prateleiras, cada uma de um jeito.",
+      },
+      {
+        icon: "palette",
+        title: "Cores de cada tema",
+        text: "Lilás na Lavanda, azul no Jardim, rosa no Rosé e no Papel, coral no Terracota e no Sépia.",
+      },
+    ],
+  },
+  {
     version: "0.6.2",
     date: "2026-10-30",
     title: "Ajustes",

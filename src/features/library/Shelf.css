@@ -19,9 +19,23 @@
   z-index: 0;
 }
 
-.shelf-row-garland.is-right {
-  left: auto;
-  right: -6px;
+.shelf-row-garland.is-flipped {
+  transform: scaleX(-1);
+}
+
+/* Trepadeira subindo pela ponta da prateleira, por cima da lombada do canto */
+.shelf-row-climber {
+  position: absolute;
+  bottom: 4px;
+  right: -22px;
+  width: 74px;
+  z-index: 3;
+}
+
+.shelf-row-climber.is-left {
+  right: auto;
+  left: -22px;
+  transform: scaleX(-1);
 }
 
 .shelf-row-books {

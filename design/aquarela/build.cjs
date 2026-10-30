@@ -6,9 +6,12 @@ const path = require("path");
 const OUT = path.resolve(__dirname, "../../src/assets/aquarela");
 
 const PIECES = {
-  "guirlanda-1": ["garland", 1600, 560, { seed: 3 }],
-  "guirlanda-2": ["garland", 1600, 560, { seed: 9, flip: true }],
-  canto: ["corner", 900, 900, { seed: 7 }],
+  "guirlanda-1": ["shelfGarland", 1100, 560, { seed: 1 }],
+  "guirlanda-2": ["shelfGarland", 1100, 560, { seed: 2 }],
+  "guirlanda-3": ["shelfGarland", 1100, 560, { seed: 3 }],
+  "guirlanda-4": ["shelfGarland", 1100, 560, { seed: 4 }],
+  trepadeira: ["climb", 420, 1100, { seed: 2 }],
+  canto: ["cornerBig", 1100, 1500, { seed: 7 }],
   raminho: ["sprig", 700, 700, { seed: 5 }],
 };
 const PALETTES = ["lilas", "azul", "rosa", "coral"];
@@ -31,7 +34,7 @@ const PALETTES = ["lilas", "azul", "rosa", "coral"];
       const g = c.getContext("2d");
       window.Arte[fn](g, W, H, opts);
       window.Aquarela.granulate(g, W, H, 0.22);
-      return c.toDataURL("image/webp", 0.8).split(",")[1];
+      return c.toDataURL("image/webp", 0.74).split(",")[1];
     }, job);
     const file = path.join(OUT, `${job.name}-${job.opts.palette}.webp`);
     fs.writeFileSync(file, Buffer.from(data, "base64"));
