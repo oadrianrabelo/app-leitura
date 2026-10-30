@@ -1,4 +1,5 @@
 import { useEffect, useState, type CSSProperties } from "react";
+import { useSettings } from "../lib/settings";
 import "./Botanical.css";
 
 /*
@@ -14,7 +15,10 @@ const ART = {
   "guirlanda-2": { file: "guirlanda-2", ratio: GARLAND },
   "guirlanda-3": { file: "guirlanda-3", ratio: GARLAND },
   "guirlanda-4": { file: "guirlanda-4", ratio: GARLAND },
+  "guirlanda-5": { file: "guirlanda-5", ratio: GARLAND },
+  "guirlanda-6": { file: "guirlanda-6", ratio: GARLAND },
   trepadeira: { file: "trepadeira", ratio: 1100 / 420 },
+  "trepadeira-2": { file: "trepadeira-2", ratio: 1300 / 460 },
   raminho: { file: "raminho", ratio: 1 },
   orquidea: { file: "raminho", ratio: 1 },
 } as const;
@@ -52,10 +56,19 @@ interface Props {
   tone?: "fundo" | "destaque";
 }
 
-export function Botanical({ art, className = "", style, tone = "fundo" }: Props) {
+/** Paleta das flores: a escolhida em Ajustes, ou a que combina com o tema */
+export function useFloraPalette() {
   const theme = useTheme();
+  const color = useSettings((s) => s.floraColor);
+  return color === "tema" ? (PALETTE[theme] ?? "lilas") : color;
+}
+
+export function Botanical({ art, className = "", style, tone = "fundo" }: Props) {
+  const palette = useFloraPalette();
+  const amount = useSettings((s) => s.floraAmount);
+  if (amount === "nenhuma") return null;
   const { file, ratio } = ART[art];
-  const src = FILES[`../assets/aquarela/${file}-${PALETTE[theme] ?? "lilas"}.webp`];
+  const src = FILES[`../assets/aquarela/${file}-${palette}.webp`];
   return (
     <img
       className={`botanical is-${tone} ${className}`}

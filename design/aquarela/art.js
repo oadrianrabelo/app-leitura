@@ -115,6 +115,14 @@
     coral: [[[248, 222, 204], [232, 160, 128], [184, 92, 66]], [[246, 216, 214], [222, 150, 150], [170, 84, 92]]],
   };
 
+  /** Cor do i-ésimo cacho: na paleta "mista" cada cacho vem de uma cor diferente */
+  const MIXED = () => [PALETTES.lilas[0], PALETTES.rosa[0], PALETTES.azul[0], PALETTES.coral[1], PALETTES.lilas[1], PALETTES.rosa[1], PALETTES.azul[1]];
+  function pick(palette, i) {
+    if (palette === "mista") { const m = MIXED(); return m[i % m.length]; }
+    const [pal, alt] = PALETTES[palette];
+    return i % 3 === 1 ? alt : pal;
+  }
+
   /** Galho principal: dois ramos que se enroscam, com espessura irregular e gavinhas */
   function branch(g, pts, w) {
     const path = spline(pts, 120);
@@ -182,9 +190,8 @@
     const at = (t) => path[Math.round(t * 120)];
     compoundLeaf(g, at(0.1)[0], at(0.1)[1], 2.4, 130, 0.85);
     compoundLeaf(g, at(0.85)[0], at(0.85)[1], 0.5, 140, 0.9);
-    const [pal, alt] = PALETTES[palette];
-    wisteria(g, at(0.3)[0], at(0.3)[1] + 6, H * 0.72, pal, -0.08);
-    wisteria(g, at(0.66)[0], at(0.66)[1] + 6, H * 0.55, alt, 0.08);
+    wisteria(g, at(0.3)[0], at(0.3)[1] + 6, H * 0.72, pick(palette, 0), -0.08);
+    wisteria(g, at(0.66)[0], at(0.66)[1] + 6, H * 0.55, pick(palette, 1), 0.08);
     compoundLeaf(g, at(0.5)[0], at(0.5)[1], 1.2, 100, 0.75);
   }
 
@@ -202,10 +209,10 @@
       const side = k % 2 ? 1 : -1;
       compoundLeaf(g, p[0], p[1], dirAt(t) + side * (0.7 + rnd() * 0.6), leafLen * (0.75 + rnd() * 0.5), leafSize * (0.85 + rnd() * 0.3));
     }
-    const [pal, alt] = PALETTES[palette];
+    const offset = o.colorOffset ?? 0;
     racemes.forEach(([t, len, sway = (rnd() - 0.5) * 0.25], i) => {
       const p = at(t);
-      wisteria(g, p[0] + gauss() * 4, p[1] + 4 * size, len, i % 3 === 1 ? alt : pal, sway, size * (0.85 + rnd() * 0.3));
+      wisteria(g, p[0] + gauss() * 4, p[1] + 4 * size, len, pick(palette, i + offset), sway, size * (0.85 + rnd() * 0.3));
     });
     for (let k = 0; k < front; k++) {
       const t = rnd();
@@ -221,24 +228,25 @@
     A.setSeed(seed * 7919);
     if (flip) { g.translate(W, 0); g.scale(-1, 1); }
     const kind = seed % 3;
+    const colorOffset = seed * 2;
     const S = 1.55;
     if (kind === 0) {
       // ramo reto com cachos de comprimentos bem diferentes
       vine(g, [[-20, 46], [W * 0.3, 60], [W * 0.62, 42], [W + 20, 58]], {
-        w: 7, leaves: 9, leafLen: 120, leafSize: 1.1, palette, size: S,
+        w: 7, leaves: 9, leafLen: 120, leafSize: 1.1, palette, size: S, colorOffset,
         racemes: [[0.1, H * 0.38], [0.3, H * 0.78], [0.52, H * 0.5], [0.72, H * 0.9], [0.9, H * 0.42]],
       });
     } else if (kind === 1) {
       // ramo que pende em barriga, com cachos no ponto mais baixo e uma ponta caindo
       vine(g, [[-20, 34], [W * 0.25, 90], [W * 0.5, 120], [W * 0.75, 70], [W + 20, 30]], {
-        w: 7, leaves: 10, leafLen: 120, leafSize: 1.1, palette, size: S,
+        w: 7, leaves: 10, leafLen: 120, leafSize: 1.1, palette, size: S, colorOffset,
         racemes: [[0.35, H * 0.62], [0.5, H * 0.72], [0.62, H * 0.5], [0.88, H * 0.34]],
       });
       vine(g, [[W * 0.05, 50], [W * 0.08, H * 0.4], [W * 0.03, H * 0.75]], { w: 3, leaves: 5, leafLen: 100, palette, size: S, racemes: [], front: 1 });
     } else {
       // folhagem farta de um lado, com dois cachos grandes do outro
       vine(g, [[-20, 50], [W * 0.4, 66], [W + 20, 44]], {
-        w: 7, leaves: 12, leafLen: 140, leafSize: 1.15, palette, size: S,
+        w: 7, leaves: 12, leafLen: 140, leafSize: 1.15, palette, size: S, colorOffset,
         racemes: [[0.7, H * 0.85], [0.82, H * 0.6], [0.2, H * 0.4]],
       });
       vine(g, [[W * 0.55, 60], [W * 0.5, H * 0.35], [W * 0.56, H * 0.62]], { w: 3, leaves: 4, leafLen: 90, palette, size: S, racemes: [], front: 0 });
@@ -253,10 +261,28 @@
     const v = vine(g, [[W * 0.4, H + 10], [W * 0.62, H * 0.75], [W * 0.3, H * 0.5], [W * 0.6, H * 0.25], [W * 0.42, H * 0.06]], {
       w: 6, leaves: 12, leafLen: 120, leafSize: 1.05, palette, size: 1.5, racemes: [], front: 2,
     });
-    const [pal, alt] = PALETTES[palette];
     const p = v.at(0.8), q = v.at(0.92);
-    wisteria(g, p[0], p[1], H * 0.32, pal, 0.1, 1.5);
-    wisteria(g, q[0], q[1], H * 0.22, alt, -0.1, 1.35);
+    wisteria(g, p[0], p[1], H * 0.32, pick(palette, seed), 0.1, 1.5);
+    wisteria(g, q[0], q[1], H * 0.22, pick(palette, seed + 1), -0.1, 1.35);
+  }
+
+  /** Duas trepadeiras entrelaçadas subindo de baixo para cima, com cachos pelo caminho */
+  function climbTwined(g, W, H, opts = {}) {
+    const { seed = 4, palette = "lilas", flip = false } = opts;
+    A.setSeed(seed * 15485863);
+    if (flip) { g.translate(W, 0); g.scale(-1, 1); }
+    const twist = (phase, amp) => {
+      const pts = [];
+      for (let i = 0; i <= 8; i++) {
+        const t = i / 8;
+        pts.push([W * 0.5 + Math.sin(t * Math.PI * 2.5 + phase + gauss() * 0.25) * W * amp * (0.8 + rnd() * 0.4), H + 10 - t * (H * 0.96)]);
+      }
+      return pts;
+    };
+    vine(g, twist(0, 0.22), { w: 6, leaves: 14, leafLen: 125, leafSize: 1.05, palette, size: 1.5, front: 2,
+      racemes: [[0.55, H * 0.2], [0.78, H * 0.26], [0.95, H * 0.18]], colorOffset: seed });
+    vine(g, twist(Math.PI, 0.2), { w: 4, leaves: 10, leafLen: 110, leafSize: 0.95, palette, size: 1.45, front: 2,
+      racemes: [[0.4, H * 0.16], [0.68, H * 0.22], [0.88, H * 0.2]], colorOffset: seed + 3 });
   }
 
   /** Canto de cima, à direita: a trepadeira sobe pela borda, atravessa o canto e segue pelo topo */
@@ -276,5 +302,5 @@
     });
   }
 
-  window.Arte = { shelfGarland, climb, cornerBig, garland, corner, sprig, wisteria, compoundLeaf, leaf, branch, PALETTES };
+  window.Arte = { shelfGarland, climb, climbTwined, cornerBig, garland, corner, sprig, wisteria, compoundLeaf, leaf, branch, PALETTES };
 })();

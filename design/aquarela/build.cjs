@@ -10,11 +10,14 @@ const PIECES = {
   "guirlanda-2": ["shelfGarland", 1100, 560, { seed: 2 }],
   "guirlanda-3": ["shelfGarland", 1100, 560, { seed: 3 }],
   "guirlanda-4": ["shelfGarland", 1100, 560, { seed: 4 }],
+  "guirlanda-5": ["shelfGarland", 1100, 560, { seed: 5 }],
+  "guirlanda-6": ["shelfGarland", 1100, 560, { seed: 6 }],
   trepadeira: ["climb", 420, 1100, { seed: 2 }],
+  "trepadeira-2": ["climbTwined", 460, 1300, { seed: 4 }],
   canto: ["cornerBig", 1100, 1500, { seed: 7 }],
   raminho: ["sprig", 700, 700, { seed: 5 }],
 };
-const PALETTES = ["lilas", "azul", "rosa", "coral"];
+const PALETTES = ["lilas", "azul", "rosa", "coral", "mista"];
 
 (async () => {
   fs.mkdirSync(OUT, { recursive: true });
@@ -24,6 +27,7 @@ const PALETTES = ["lilas", "azul", "rosa", "coral"];
     for (const palette of PALETTES) jobs.push({ name, fn, W, H, opts: { ...opts, palette } });
   // algumas abas em paralelo
   const run = async (job) => {
+    if (process.env.ONLY_MISSING && fs.existsSync(path.join(OUT, `${job.name}-${job.opts.palette}.webp`))) return;
     const p = await b.newPage();
     await p.setContent("<body></body>");
     await p.addScriptTag({ path: path.join(__dirname, "paint.js") });
@@ -33,8 +37,8 @@ const PALETTES = ["lilas", "azul", "rosa", "coral"];
       c.width = W; c.height = H;
       const g = c.getContext("2d");
       window.Arte[fn](g, W, H, opts);
-      window.Aquarela.granulate(g, W, H, 0.22);
-      return c.toDataURL("image/webp", 0.74).split(",")[1];
+      window.Aquarela.granulate(g, W, H, 0.16);
+      return c.toDataURL("image/webp", 0.7).split(",")[1];
     }, job);
     const file = path.join(OUT, `${job.name}-${job.opts.palette}.webp`);
     fs.writeFileSync(file, Buffer.from(data, "base64"));

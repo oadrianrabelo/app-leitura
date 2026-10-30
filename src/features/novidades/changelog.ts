@@ -8,6 +8,23 @@ export interface ChangelogEntry {
 /** Mais recente primeiro. Cada release adiciona uma entrada aqui. */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.8.0",
+    date: "2026-10-30",
+    title: "Seu jardim, do seu jeito",
+    highlights: [
+      {
+        icon: "palette",
+        title: "Jardim em Ajustes",
+        text: "Escolha a cor das glicínias (lilás, azul, rosa, coral ou colorida, misturando todas), quanto enfeite quer e se as trepadeiras sobem pela estante.",
+      },
+      {
+        icon: "sparkles",
+        title: "Mais variedade",
+        text: "Seis guirlandas diferentes e trepadeiras entrelaçadas subindo de baixo para cima.",
+      },
+    ],
+  },
+  {
     version: "0.7.0",
     date: "2026-10-30",
     title: "Glicínias em aquarela",

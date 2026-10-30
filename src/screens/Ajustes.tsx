@@ -8,6 +8,7 @@ import { platform } from "../lib/platform";
 import { useUpdates } from "../features/updates/updates";
 import { useNovidades } from "../features/novidades/novidades";
 import { SyncSection } from "../features/sync/SyncSection";
+import { JardimSection } from "../features/flora/JardimSection";
 import { Botanical } from "../components/Botanical";
 import "./Ajustes.css";
 
@@ -107,6 +108,8 @@ export function Ajustes() {
           Nenhum tema usa branco ou preto puros. O contraste é suficiente para ler bem, sem ofuscar.
         </p>
       </Section>
+
+      <JardimSection />
 
       <SyncSection />
 

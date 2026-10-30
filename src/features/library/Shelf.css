@@ -32,6 +32,10 @@
   z-index: 3;
 }
 
+.shelf-row-climber.is-twined {
+  width: 84px;
+}
+
 .shelf-row-climber.is-left {
   right: auto;
   left: -22px;

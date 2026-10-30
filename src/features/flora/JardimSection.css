@@ -1,0 +1,113 @@
+.jardim {
+  padding: var(--space-4);
+  background: var(--bg-elevated);
+  border: 0.5px solid var(--hairline);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Pedacinho de prateleira mostrando como fica */
+.jardim-preview {
+  position: relative;
+  height: 112px;
+  margin: calc(-1 * var(--space-1)) calc(-1 * var(--space-4)) var(--space-1);
+  overflow: hidden;
+}
+
+.jardim-board {
+  position: absolute;
+  top: 14px;
+  left: 0;
+  right: 0;
+  height: 10px;
+  background: linear-gradient(180deg, var(--bg-elevated) 0%, var(--bg-sunken) 100%);
+  border-top: 0.5px solid var(--hairline-strong);
+  border-bottom: 0.5px solid var(--hairline-strong);
+  box-shadow: 0 6px 10px -6px rgba(60, 40, 15, 0.3);
+  z-index: 1;
+}
+
+.jardim-garland {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+.jardim-empty {
+  position: absolute;
+  inset: 30px 0 0;
+  display: grid;
+  place-items: center;
+  font-size: var(--text-sm);
+  color: var(--ink-faint);
+}
+
+.jardim-label {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.jardim-colors {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--space-1);
+}
+
+.jardim-color {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--ink-faint);
+}
+
+.jardim-swatch {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.12);
+  outline: 2px solid transparent;
+  outline-offset: 3px;
+  transition: outline-color var(--dur-fast);
+}
+
+.jardim-color.is-selected {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.jardim-color.is-selected .jardim-swatch {
+  outline-color: var(--accent);
+}
+
+.jardim-amount {
+  display: flex;
+  padding: 3px;
+  border-radius: var(--radius-full);
+  background: var(--bg-sunken);
+}
+
+.jardim-amount button {
+  flex: 1;
+  height: 32px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: 560;
+  color: var(--ink-faint);
+  transition: background-color var(--dur-fast), color var(--dur-fast);
+}
+
+.jardim-amount button.is-active {
+  background: var(--bg-elevated);
+  color: var(--ink);
+  box-shadow: var(--shadow-sm);
+}
+
+.jardim-group {
+  margin-top: var(--space-3);
+}

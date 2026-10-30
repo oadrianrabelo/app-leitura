@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Book } from "../../db/types";
 import { BookCover } from "./BookCover";
 import { BookSpine, spineSize } from "./BookSpine";
-import type { ShelfView } from "../../lib/settings";
+import { useSettings, type ShelfView } from "../../lib/settings";
 import { Botanical } from "../../components/Botanical";
 import "./Shelf.css";
 
@@ -13,7 +13,7 @@ interface ShelfProps {
   view?: ShelfView;
 }
 
-const GARLANDS = ["guirlanda-1", "guirlanda-2", "guirlanda-3", "guirlanda-4"] as const;
+const GARLANDS = ["guirlanda-1", "guirlanda-2", "guirlanda-3", "guirlanda-4", "guirlanda-5", "guirlanda-6"] as const;
 const MIN_COVER = 92;
 const GAP = 16;
 const SPINE_GAP = 2;
@@ -21,6 +21,12 @@ const SPINE_GAP = 2;
 /** Livros em pé sobre prateleiras: cada linha da grade ganha sua tábua. */
 export function Shelf({ books, timesRead, onOpen, view = "capas" }: ShelfProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const amount = useSettings((s) => s.floraAmount);
+  const climbers = useSettings((s) => s.floraClimbers);
+  // Quanto enfeite cada prateleira ganha, conforme Ajustes → Jardim
+  const hasGarland = (i: number) => amount === "normal" || amount === "muita" || (amount === "pouca" && i % 2 === 0);
+  // a primeira prateleira não ganha trepadeira: ela subiria por cima dos botões da tela
+  const hasClimber = (i: number) => climbers && i > 0 && (amount === "muita" || (amount === "normal" && i % 3 === 1) || (amount === "pouca" && i % 4 === 1));
   const [width, setWidth] = useState(0);
 
   useEffect(() => {
@@ -89,14 +95,20 @@ export function Shelf({ books, timesRead, onOpen, view = "capas" }: ShelfProps) 
             </div>
             <div className="shelf-row-board" />
             {/* Glicínias penduradas na tábua: desenhos e lados variando de prateleira em prateleira */}
-            <Botanical
-              art={GARLANDS[(i * 3 + 1) % GARLANDS.length]}
-              className={`shelf-row-garland${i % 2 ? " is-flipped" : ""}`}
-              tone="destaque"
-            />
-            {/* De vez em quando, uma trepadeira subindo pela lateral */}
-            {i % 3 === 1 && (
-              <Botanical art="trepadeira" className={`shelf-row-climber${i % 2 ? " is-left" : ""}`} tone="destaque" />
+            {hasGarland(i) && (
+              <Botanical
+                art={GARLANDS[(i * 5 + 1) % GARLANDS.length]}
+                className={`shelf-row-garland${i % 2 ? " is-flipped" : ""}`}
+                tone="destaque"
+              />
+            )}
+            {/* Trepadeiras subindo pela lateral, alternando o lado e o desenho */}
+            {hasClimber(i) && (
+              <Botanical
+                art={i % 4 < 2 ? "trepadeira" : "trepadeira-2"}
+                className={`shelf-row-climber${i % 2 ? " is-left" : ""}${i % 4 < 2 ? "" : " is-twined"}`}
+                tone="destaque"
+              />
             )}
           </div>
         ))}
