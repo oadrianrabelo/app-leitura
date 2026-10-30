@@ -1,47 +1,66 @@
-import type { CSSProperties } from "react";
-import layers from "../assets/botanica/layers.json";
+import { useEffect, useState, type CSSProperties } from "react";
 import "./Botanical.css";
 
 /*
- * Ilustrações botânicas em traço de gravura (geradas por design/botanica),
- * coloridas como gravura pintada à mão: cada camada (folhas, flores,
- * florzinhas, detalhes) é uma máscara pintada com uma cor do tema.
+ * Ilustrações em aquarela (geradas por design/aquarela): glicínias, folhas e
+ * galhos. Cada peça existe em quatro paletas; aparece a que combina com o tema.
  */
-const FILES = import.meta.glob<string>("../assets/botanica/*.png", { eager: true, import: "default" });
-const src = (name: string, layer: string) => FILES[`../assets/botanica/${name}-${layer}.png`];
+const FILES = import.meta.glob<string>("../assets/aquarela/*.webp", { eager: true, import: "default", query: "?url" });
 
 const ART = {
-  haste: { file: "orquidea-haste", ratio: 912 / 720 },
-  "guirlanda-1": { file: "guirlanda-1", ratio: 286 / 988 },
-  "guirlanda-2": { file: "guirlanda-2", ratio: 286 / 988 },
-  raminho: { file: "raminho", ratio: 408 / 456 },
-  orquidea: { file: "orquidea", ratio: 1 },
-  borboleta: { file: "borboleta", ratio: 168 / 204 },
+  haste: { file: "canto", ratio: 1 },
+  "guirlanda-1": { file: "guirlanda-1", ratio: 560 / 1600 },
+  "guirlanda-2": { file: "guirlanda-2", ratio: 560 / 1600 },
+  raminho: { file: "raminho", ratio: 1 },
+  orquidea: { file: "raminho", ratio: 1 },
 } as const;
 
 export type BotanicalArt = keyof typeof ART;
+
+const PALETTE: Record<string, string> = {
+  lavanda: "lilas",
+  ameixa: "lilas",
+  noite: "lilas",
+  jardim: "azul",
+  rose: "rosa",
+  papel: "rosa",
+  terracota: "coral",
+  sepia: "coral",
+};
+
+/** Tema aplicado no <html> (já resolvido, mesmo no automático) */
+function useTheme() {
+  const read = () => document.documentElement.dataset.theme ?? "lavanda";
+  const [theme, setTheme] = useState(read);
+  useEffect(() => {
+    const mo = new MutationObserver(() => setTheme(read()));
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    return () => mo.disconnect();
+  }, []);
+  return theme;
+}
 
 interface Props {
   art: BotanicalArt;
   className?: string;
   style?: CSSProperties;
-  /** "fundo" bem suave; "destaque" um pouco mais presente */
+  /** "fundo" mais suave; "destaque" mais presente */
   tone?: "fundo" | "destaque";
 }
 
-// Desligadas até chegarem ilustrações de verdade (aquarela/gravura): as geradas
-// por código ficaram artificiais demais.
-const ENABLED = false;
-
 export function Botanical({ art, className = "", style, tone = "fundo" }: Props) {
-  if (!ENABLED) return null;
+  const theme = useTheme();
   const { file, ratio } = ART[art];
+  const src = FILES[`../assets/aquarela/${file}-${PALETTE[theme] ?? "lilas"}.webp`];
   return (
-    <span className={`botanical is-${tone} ${className}`} style={{ aspectRatio: `${1 / ratio}`, ...style }} aria-hidden>
-      {(layers as Record<string, string[]>)[file].map((layer) => {
-        const url = `url(${src(file, layer)})`;
-        return <span key={layer} className={`botanical-layer is-${layer}`} style={{ maskImage: url, WebkitMaskImage: url }} />;
-      })}
-    </span>
+    <img
+      className={`botanical is-${tone} ${className}`}
+      src={src}
+      alt=""
+      draggable={false}
+      decoding="async"
+      style={{ aspectRatio: `${1 / ratio}`, ...style }}
+      aria-hidden
+    />
   );
 }

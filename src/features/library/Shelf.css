@@ -15,7 +15,7 @@
   position: absolute;
   top: calc(100% - 12px);
   left: -6px;
-  width: 78%;
+  width: 100%;
   z-index: 0;
 }
 
