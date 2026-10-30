@@ -33,14 +33,24 @@ class BarcodePlugin(private val activity: Activity) : Plugin(activity) {
 
   @Command
   fun scan(invoke: Invoke) {
-    val scanner = GmsBarcodeScanning.getClient(activity, options)
-    val modules = ModuleInstall.getClient(activity)
-    modules.areModulesAvailable(scanner)
-      .addOnSuccessListener { response ->
-        if (response.areModulesAvailable()) start(invoke, scanner)
-        else install(invoke, scanner)
-      }
-      .addOnFailureListener { start(invoke, scanner) }
+    try {
+      val scanner = GmsBarcodeScanning.getClient(activity, options)
+      val modules = ModuleInstall.getClient(activity)
+      modules.areModulesAvailable(scanner)
+        .addOnSuccessListener { response ->
+          if (response.areModulesAvailable()) start(invoke, scanner)
+          else install(invoke, scanner)
+        }
+        .addOnFailureListener { start(invoke, scanner) }
+    } catch (e: Exception) {
+      invoke.reject(describe(e))
+    }
+  }
+
+  // Mensagem com o começo da pilha: ajuda a achar a causa quando algo falha no aparelho
+  private fun describe(e: Throwable): String {
+    val where = e.stackTrace.take(4).joinToString(" ← ") { "${it.className.substringAfterLast('.')}.${it.methodName}:${it.lineNumber}" }
+    return "Falha no leitor de código de barras (${e.javaClass.simpleName}: ${e.message ?: "sem detalhes"}) [$where]"
   }
 
   private fun install(invoke: Invoke, scanner: GmsBarcodeScanner) {
@@ -83,6 +93,14 @@ class BarcodePlugin(private val activity: Activity) : Plugin(activity) {
   }
 
   private fun start(invoke: Invoke, scanner: GmsBarcodeScanner) {
+    try {
+      startScan(invoke, scanner)
+    } catch (e: Exception) {
+      invoke.reject(describe(e))
+    }
+  }
+
+  private fun startScan(invoke: Invoke, scanner: GmsBarcodeScanner) {
     scanner.startScan()
       .addOnSuccessListener { barcode ->
         val out = JSObject()
@@ -91,7 +109,7 @@ class BarcodePlugin(private val activity: Activity) : Plugin(activity) {
       }
       .addOnCanceledListener { invoke.reject("Leitura cancelada", "cancelled") }
       .addOnFailureListener { e ->
-        invoke.reject("Não foi possível abrir o leitor de código de barras (${e.javaClass.simpleName}: ${e.message ?: "sem detalhes"})")
+        invoke.reject(describe(e))
       }
   }
 }

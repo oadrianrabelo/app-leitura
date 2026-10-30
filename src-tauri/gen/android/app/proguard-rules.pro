@@ -19,3 +19,12 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+# ML Kit (leitor de código de barras): os componentes são descobertos por
+# reflexão a partir do manifesto; sem isso o R8 remove/renomeia e o leitor
+# falha com NullPointerException.
+-keep class com.google.mlkit.** { *; }
+-keep class com.google.android.gms.internal.mlkit_code_scanner.** { *; }
+-keep class com.google.android.gms.internal.mlkit_vision_barcode.** { *; }
+-keep class com.google.android.gms.internal.mlkit_common.** { *; }
+-keep class com.google.android.gms.common.moduleinstall.** { *; }
+-keepattributes SourceFile,LineNumberTable

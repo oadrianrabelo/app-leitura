@@ -8,6 +8,23 @@ export interface ChangelogEntry {
 /** Mais recente primeiro. Cada release adiciona uma entrada aqui. */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.6.2",
+    date: "2026-10-30",
+    title: "Ajustes",
+    highlights: [
+      {
+        icon: "barcode",
+        title: "Leitor de código de barras",
+        text: "Mais uma correção na abertura da câmera.",
+      },
+      {
+        icon: "sparkles",
+        title: "Ilustrações em pausa",
+        text: "As folhas e flores saem de cena enquanto preparamos ilustrações mais bonitas e naturais.",
+      },
+    ],
+  },
+  {
     version: "0.6.1",
     date: "2026-10-29",
     title: "Câmera consertada",

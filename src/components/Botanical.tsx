@@ -29,7 +29,12 @@ interface Props {
   tone?: "fundo" | "destaque";
 }
 
+// Desligadas até chegarem ilustrações de verdade (aquarela/gravura): as geradas
+// por código ficaram artificiais demais.
+const ENABLED = false;
+
 export function Botanical({ art, className = "", style, tone = "fundo" }: Props) {
+  if (!ENABLED) return null;
   const { file, ratio } = ART[art];
   return (
     <span className={`botanical is-${tone} ${className}`} style={{ aspectRatio: `${1 / ratio}`, ...style }} aria-hidden>
