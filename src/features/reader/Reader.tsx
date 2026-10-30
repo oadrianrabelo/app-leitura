@@ -1,3 +1,4 @@
+import { useSettings } from "../../lib/settings";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import type { TocItem } from "foliate-js/view.js";
@@ -27,6 +28,7 @@ import { useReaderUi } from "./state";
 import { useBackLayer } from "../../lib/backStack";
 import type { LocationInfo, ReaderEngine, TapZone } from "./engine";
 import { compareLocations } from "./locations";
+import "../conquistas/ribbons.css";
 import "./Reader.css";
 
 interface Loaded {
@@ -183,7 +185,7 @@ function ReaderBody({ book }: { book: Book }) {
         fraction: loc.fraction,
         excerpt: loc.excerpt,
         chapter: loc.chapter,
-      });
+      }, useSettings.getState().bookmarkStyle);
     navigator.vibrate?.(12);
   }, [loc, currentBookmark, book.id]);
 
@@ -249,7 +251,7 @@ function ReaderBody({ book }: { book: Book }) {
         <PageTurnFx ref={fx} animation={settings.animation} paper={paper} />
         {currentBookmark && (
           <motion.span
-            className="reader-ribbon"
+            className={`reader-ribbon ribbon ribbon-${currentBookmark.style}`}
             initial={{ y: -40 }}
             animate={{ y: 0 }}
             transition={{ type: "spring", stiffness: 500, damping: 26 }}

@@ -78,8 +78,6 @@
   width: 14px;
   height: 30px;
   margin-top: 2px;
-  background: linear-gradient(90deg, #8d70c8, #b59cea, #8d70c8);
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 78%, 0 100%);
 }
 
 .bookmark-body {

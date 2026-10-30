@@ -1,9 +1,136 @@
-.badges-intro {
-  color: var(--ink-soft);
-  margin: calc(-1 * var(--space-2)) 0 var(--space-6);
-  max-width: 520px;
+.section-lead {
+  color: var(--ink-faint);
+  font-size: var(--text-sm);
+  margin: calc(-1 * var(--space-1)) var(--space-1) var(--space-3);
 }
 
+/* Meta do ano */
+.goal {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background: var(--bg-elevated);
+  border: 0.5px solid var(--hairline);
+  border-radius: var(--radius-lg);
+  text-align: left;
+}
+
+.goal-ring {
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+}
+
+.goal-track {
+  fill: none;
+  stroke: var(--bg-sunken);
+  stroke-width: 7;
+}
+
+.goal-fill {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 7;
+  stroke-linecap: round;
+  transition: stroke-dasharray 600ms var(--ease-out);
+}
+
+.goal-count {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 560;
+  fill: var(--ink);
+}
+
+.goal-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.goal-eyebrow {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+}
+
+.goal-body strong {
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  font-weight: 560;
+}
+
+.goal-body span:last-child {
+  font-size: var(--text-sm);
+  color: var(--ink-faint);
+}
+
+.goal-edit {
+  color: var(--ink-faint);
+  align-self: flex-start;
+}
+
+.goal-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-6);
+  margin: var(--space-6) 0 var(--space-4);
+}
+
+.goal-stepper button {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--bg-sunken);
+  font-size: 24px;
+  color: var(--ink-soft);
+}
+
+.goal-stepper span {
+  min-width: 90px;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 52px;
+  font-weight: 540;
+  font-variant-numeric: tabular-nums;
+}
+
+.goal-presets {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.goal-presets button {
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--radius-full);
+  border: 0.5px solid var(--hairline-strong);
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+}
+
+.goal-presets button.is-active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--bg);
+}
+
+.goal-clear {
+  color: var(--ink-faint);
+  font-size: var(--text-sm);
+  padding: var(--space-2);
+}
+
+/* Insígnias */
 .badges {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -15,22 +142,20 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: var(--space-5) var(--space-3);
+  gap: var(--space-1);
+  padding: var(--space-5) var(--space-3) var(--space-4);
   background: var(--bg-elevated);
   border: 0.5px solid var(--hairline);
   border-radius: var(--radius-lg);
+  transition: transform 160ms var(--ease-out);
 }
 
-.badge-medal {
-  width: 60px;
-  height: 60px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  margin-bottom: var(--space-3);
-  color: var(--ink-faint);
-  background: radial-gradient(circle at 35% 30%, var(--bg-elevated), var(--bg-sunken) 70%);
-  border: 1px dashed var(--hairline-strong);
+.badge:active {
+  transform: scale(0.97);
+}
+
+.badge .medal {
+  margin-bottom: var(--space-2);
 }
 
 .badge-name {
@@ -42,11 +167,145 @@
 .badge-hint {
   font-size: var(--text-xs);
   color: var(--ink-faint);
-  margin-top: 2px;
+  line-height: 1.35;
+}
+
+.badge.is-locked .badge-name {
+  color: var(--ink-soft);
+}
+
+.badge-pips {
+  display: flex;
+  gap: 3px;
+  margin-top: var(--space-1);
+}
+
+.badge-pips span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--hairline-strong);
+}
+
+.badge-pips span.is-on {
+  background: var(--accent);
 }
 
 @media (min-width: 640px) {
   .badges {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
+}
+
+/* Detalhe da conquista */
+.ach {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.ach .medal {
+  margin-bottom: var(--space-3);
+}
+
+.ach-now {
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+  margin-top: var(--space-1);
+}
+
+.ach-tiers {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-5) 0 0;
+  width: 100%;
+  text-align: left;
+}
+
+.ach-tiers li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-top: 0.5px solid var(--hairline);
+}
+
+.ach-tier-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ach-tier-body strong {
+  font-weight: 500;
+  font-size: var(--text-sm);
+}
+
+.ach-tiers li:not(.is-done) .ach-tier-body strong {
+  color: var(--ink-soft);
+}
+
+.ach-tier-body small {
+  font-size: var(--text-xs);
+  color: var(--ink-faint);
+}
+
+.ach-check {
+  color: var(--accent-text);
+}
+
+/* Coleção de fitas */
+.ribbons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-2);
+}
+
+.ribbon-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-1) var(--space-2);
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated);
+  border: 0.5px solid var(--hairline);
+  transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
+}
+
+.ribbon-card.is-active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1.5px var(--accent);
+}
+
+.ribbon-sample {
+  width: 18px;
+  height: 46px;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2));
+}
+
+.ribbon-card.is-locked .ribbon-sample {
+  filter: grayscale(1) opacity(0.25);
+}
+
+.ribbon-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.ribbon-hint {
+  font-size: 10px;
+  line-height: 1.25;
+  color: var(--ink-faint);
+  text-align: center;
+}
+
+.row-value-clip {
+  max-width: 55%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

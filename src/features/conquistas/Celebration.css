@@ -1,0 +1,99 @@
+.celebrate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.celebrate-hero {
+  position: relative;
+  height: 130px;
+  display: grid;
+  place-items: center;
+  margin-bottom: var(--space-2);
+}
+
+.celebrate-spark {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.celebrate-spark:nth-child(3n) {
+  background: var(--hue-rosa);
+}
+
+.celebrate-spark:nth-child(3n + 1) {
+  background: var(--gold);
+}
+
+.celebrate-list {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-4) 0 0;
+  width: 100%;
+  text-align: left;
+  max-height: 40vh;
+  overflow-y: auto;
+}
+
+.celebrate-list li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-top: 0.5px solid var(--hairline);
+}
+
+.celebrate-list span {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.celebrate-list strong {
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.celebrate-list small {
+  font-size: var(--text-xs);
+  color: var(--ink-faint);
+}
+
+.celebrate-ribbons {
+  width: 100%;
+  margin-top: var(--space-4);
+}
+
+.celebrate-ribbons p {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--ink-soft);
+  margin-bottom: var(--space-2);
+}
+
+.celebrate-ribbons div {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.celebrate-ribbon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.celebrate-ribbon .ribbon {
+  width: 18px;
+  height: 44px;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2));
+}

@@ -1,0 +1,60 @@
+/* Desenho de cada fita colecionável (leitor, sumário e coleção) */
+.ribbon {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%);
+  background: linear-gradient(90deg, #8468c0, #b39ae8 45%, #8468c0);
+}
+
+.ribbon-glicinia {
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.55) 0 1.5px, transparent 2px) 0 0 / 8px 9px,
+    linear-gradient(180deg, #c9b3ef, #9070cf 60%, #6c4fa8);
+}
+
+.ribbon-aurora {
+  background: linear-gradient(180deg, #ffd9a8, #f6a29a 50%, #d9779c);
+}
+
+.ribbon-noturna {
+  background:
+    radial-gradient(circle, #fff6c8 0 1px, transparent 1.4px) 2px 3px / 9px 11px,
+    radial-gradient(circle, rgba(255, 246, 200, 0.7) 0 0.8px, transparent 1.2px) 6px 8px / 11px 13px,
+    linear-gradient(180deg, #2b3a6b, #1a2140);
+}
+
+.ribbon-renda {
+  background:
+    radial-gradient(circle, transparent 0 2px, rgba(255, 255, 255, 0.85) 2.4px 3px, transparent 3.4px) 0 0 / 9px 9px,
+    linear-gradient(90deg, #e9dccd, #f8f1e6 50%, #e3d4c3);
+}
+
+.ribbon-chama {
+  background: linear-gradient(180deg, #ffd36e, #f28a3c 55%, #c94a2a);
+}
+
+.ribbon-listrada {
+  background: repeating-linear-gradient(135deg, #f3e7d6 0 4px, #c46f86 4px 7px);
+}
+
+.ribbon-veludo {
+  background: linear-gradient(90deg, #5c1a2c, #9c3450 45%, #5c1a2c);
+}
+
+.ribbon-dourada {
+  background: linear-gradient(90deg, #a87a22, #f2d27a 45%, #c49a2c 70%, #a87a22);
+}
+
+.ribbon-marinha {
+  background:
+    repeating-linear-gradient(180deg, transparent 0 7px, rgba(255, 255, 255, 0.75) 7px 8px),
+    linear-gradient(90deg, #1f3b66, #2f5a94 50%, #1f3b66);
+}
+
+.ribbon-folhagem {
+  background:
+    radial-gradient(ellipse 3px 1.6px at 50% 50%, rgba(220, 240, 200, 0.7) 98%, transparent) 0 0 / 7px 8px,
+    linear-gradient(90deg, #3d6b44, #6fa06a 50%, #3d6b44);
+}
+
+.ribbon-colorida {
+  background: linear-gradient(180deg, #c9a7ee, #8fb2ec 25%, #9fd2a6 45%, #f6dc8a 65%, #f2a690 82%, #e48fb2);
+}

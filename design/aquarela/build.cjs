@@ -1,9 +1,29 @@
 // Gera todas as aquarelas do app em src/assets/aquarela (WebP com transparência).
 // Uma versão de cada peça por paleta; o app escolhe a do tema atual.
+// O pintor fica em src/features/flora/painter (o app usa o mesmo código para o jardim vivo).
 const { chromium } = require("playwright");
 const fs = require("fs");
+const http = require("http");
 const path = require("path");
 const OUT = path.resolve(__dirname, "../../src/assets/aquarela");
+const PAINTER = path.resolve(__dirname, "../../src/features/flora/painter");
+
+// Servidor mínimo: módulos ES não carregam de file://
+function serve() {
+  return new Promise((ok) => {
+    const server = http.createServer((req, res) => {
+      if (req.url === "/") {
+        res.setHeader("Content-Type", "text/html");
+        return res.end(`<script type="module">import { Arte } from "./art.js"; import { Aquarela } from "./paint.js"; window.Arte = Arte; window.Aquarela = Aquarela; window.ready = true;</script>`);
+      }
+      const file = path.join(PAINTER, path.basename(req.url));
+      if (!fs.existsSync(file)) { res.statusCode = 404; return res.end(); }
+      res.setHeader("Content-Type", "text/javascript");
+      res.end(fs.readFileSync(file));
+    });
+    server.listen(0, () => ok(server));
+  });
+}
 
 // [função, largura, altura, opções, margem {l, r, t, b}]: a margem dá espaço para as
 // folhas nunca baterem na borda da imagem. Onde não há margem, o ramo sai pela borda
@@ -26,6 +46,8 @@ const PALETTES = ["lilas", "azul", "rosa", "coral", "mista"];
 
 (async () => {
   fs.mkdirSync(OUT, { recursive: true });
+  const server = await serve();
+  const URL = `http://127.0.0.1:${server.address().port}/`;
   const b = await chromium.launch();
   const jobs = [];
   for (const [name, [fn, W, H, opts, pad]] of Object.entries(PIECES))
@@ -34,9 +56,8 @@ const PALETTES = ["lilas", "azul", "rosa", "coral", "mista"];
   const run = async (job) => {
     if (process.env.ONLY_MISSING && fs.existsSync(path.join(OUT, `${job.name}-${job.opts.palette}.webp`))) return;
     const p = await b.newPage();
-    await p.setContent("<body></body>");
-    await p.addScriptTag({ path: path.join(__dirname, "paint.js") });
-    await p.addScriptTag({ path: path.join(__dirname, "art.js") });
+    await p.goto(URL);
+    await p.waitForFunction(() => window.ready);
     const data = await p.evaluate(({ fn, W, H, opts, pad }) => {
       const c = document.createElement("canvas");
       c.width = W + pad.l + pad.r; c.height = H + pad.t + pad.b;
@@ -54,4 +75,5 @@ const PALETTES = ["lilas", "azul", "rosa", "coral", "mista"];
   };
   for (let i = 0; i < jobs.length; i += 4) await Promise.all(jobs.slice(i, i + 4).map(run));
   await b.close();
+  server.close();
 })();

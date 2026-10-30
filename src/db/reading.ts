@@ -48,9 +48,9 @@ export function useBookmarks(bookId: string | null) {
   }, [bookId]);
 }
 
-export async function addBookmark(data: Pick<Bookmark, "bookId" | "location" | "fraction" | "excerpt" | "chapter">) {
+export async function addBookmark(data: Pick<Bookmark, "bookId" | "location" | "fraction" | "excerpt" | "chapter">, style = "fita") {
   const t = now();
-  await db.bookmarks.add({ ...data, id: uuid(), createdAt: t, updatedAt: t, deletedAt: null, style: "fita" });
+  await db.bookmarks.add({ ...data, id: uuid(), createdAt: t, updatedAt: t, deletedAt: null, style });
 }
 
 export async function removeBookmark(id: string) {

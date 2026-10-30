@@ -8,6 +8,33 @@ export interface ChangelogEntry {
 /** Mais recente primeiro. Cada release adiciona uma entrada aqui. */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.9.0",
+    date: "2026-10-30",
+    title: "Conquistas",
+    highlights: [
+      {
+        icon: "sparkles",
+        title: "Seu jardim",
+        text: "Uma glicínia só sua, pintada em aquarela no próprio celular: ganha um cacho a cada livro terminado e uma pétala no chão a cada dia de leitura.",
+      },
+      {
+        icon: "award",
+        title: "Insígnias com níveis",
+        text: "18 conquistas, do bronze à glicínia: constância, coruja, café com livro, maratona, fã de carteirinha, calhamaço e muito mais. Elas contam também o que você já leu.",
+      },
+      {
+        icon: "bookmark",
+        title: "Marcadores colecionáveis",
+        text: "Fitas que você ganha com as insígnias, para usar nos marcadores do leitor.",
+      },
+      {
+        icon: "target",
+        title: "Meta do ano e recordes",
+        text: "Escolha quantos livros quer ler no ano e veja sua maior sequência, seu melhor ano e o maior livro que já leu.",
+      },
+    ],
+  },
+  {
     version: "0.8.0",
     date: "2026-10-30",
     title: "Seu jardim, do seu jeito",

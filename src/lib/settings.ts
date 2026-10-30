@@ -26,6 +26,15 @@ interface SettingsState {
   setFloraColor: (c: FloraColor) => void;
   setFloraAmount: (a: FloraAmount) => void;
   setFloraClimbers: (v: boolean) => void;
+  /** Fita usada nos marcadores do leitor (colecionáveis das conquistas) */
+  bookmarkStyle: string;
+  /** Meta de livros no ano (null = sem meta) */
+  yearGoal: number | null;
+  /** Níveis de conquista já comemorados neste aparelho; null = ainda não comparou nenhum */
+  seenAchievements: string[] | null;
+  setBookmarkStyle: (style: string) => void;
+  setYearGoal: (goal: number | null) => void;
+  setSeenAchievements: (keys: string[]) => void;
   setShelfView: (view: ShelfView) => void;
   setFormatFilter: (filter: FormatFilter) => void;
   setTheme: (theme: ThemeChoice) => void;
@@ -49,6 +58,12 @@ export const useSettings = create<SettingsState>()(
       setFloraColor: (floraColor) => set({ floraColor }),
       setFloraAmount: (floraAmount) => set({ floraAmount }),
       setFloraClimbers: (floraClimbers) => set({ floraClimbers }),
+      bookmarkStyle: "fita",
+      yearGoal: null,
+      seenAchievements: null,
+      setBookmarkStyle: (bookmarkStyle) => set({ bookmarkStyle }),
+      setYearGoal: (yearGoal) => set({ yearGoal }),
+      setSeenAchievements: (seenAchievements) => set({ seenAchievements }),
       setShelfView: (shelfView) => set({ shelfView }),
       setFormatFilter: (formatFilter) => set({ formatFilter }),
       setTheme: (theme) => set({ theme }),

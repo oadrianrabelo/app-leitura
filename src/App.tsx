@@ -7,6 +7,7 @@ import { Conquistas } from "./screens/Conquistas";
 import { Ajustes } from "./screens/Ajustes";
 import { UpdateSheet } from "./features/updates/UpdateSheet";
 import { NovidadesSheet } from "./features/novidades/NovidadesSheet";
+import { Celebration } from "./features/conquistas/Celebration";
 import { ImportSheet } from "./features/import/ImportSheet";
 import { AddSheet } from "./features/library/AddSheet";
 import { BookDetail } from "./features/library/BookDetail";
@@ -93,6 +94,7 @@ export default function App() {
         <PhysicalSheet />
         <UpdateSheet />
         <NovidadesSheet />
+        <Celebration />
       </div>
     </MotionConfig>
   );

@@ -3,6 +3,7 @@ import type { TocItem } from "foliate-js/view.js";
 import { Sheet } from "../../components/Sheet";
 import { Icon } from "../../components/Icon";
 import type { Bookmark } from "../../db/types";
+import "../conquistas/ribbons.css";
 import "./TocSheet.css";
 
 interface Props {
@@ -59,7 +60,7 @@ export function TocSheet({ open, onClose, toc, bookmarks, currentChapter, onGo, 
           {bookmarks.map((b) => (
             <li key={b.id}>
               <button className="bookmark-item" onClick={() => onGo(b.location)}>
-                <span className="bookmark-ribbon" aria-hidden />
+                <span className={`bookmark-ribbon ribbon ribbon-${b.style}`} aria-hidden />
                 <span className="bookmark-body">
                   <span className="bookmark-meta">
                     {b.chapter ?? "Marcador"} · {Math.round(b.fraction * 100)}%

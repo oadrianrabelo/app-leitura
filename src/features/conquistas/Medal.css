@@ -1,0 +1,73 @@
+.medal {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.medal-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.medal-track {
+  fill: none;
+  stroke: var(--hairline);
+  stroke-width: 2.5;
+}
+
+.medal-progress {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.medal-face {
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #fffaf2;
+  box-shadow:
+    inset 0 2px 3px rgba(255, 255, 255, 0.45),
+    inset 0 -3px 5px rgba(0, 0, 0, 0.18),
+    0 3px 8px -3px rgba(40, 25, 10, 0.35);
+}
+
+/* Trancada: só o desenho, apagadinho */
+.medal.tier-0 .medal-face {
+  background: var(--bg-sunken);
+  color: var(--ink-faint);
+  box-shadow: inset 0 0 0 1px var(--hairline);
+}
+
+.medal.tier-1 .medal-face {
+  background: radial-gradient(circle at 35% 30%, #e7b088, #b87346 60%, #8f5530);
+}
+
+.medal.tier-2 .medal-face {
+  background: radial-gradient(circle at 35% 30%, #f4f6f8, #b5bcc6 60%, #87909c);
+  color: #3d4550;
+}
+
+.medal.tier-3 .medal-face {
+  background: radial-gradient(circle at 35% 30%, #fbe7a4, #d9ae45 60%, #a87a22);
+  color: #5a3f0a;
+}
+
+.medal.tier-4 .medal-face {
+  background: radial-gradient(circle at 35% 30%, #e6daf8, #a88cdc 60%, #7656b8);
+}
+
+.medal.tier-5 .medal-face {
+  background: radial-gradient(circle at 35% 30%, #fbd2e0, #e07aa2 60%, #a8466a);
+}
+
+.medal.tier-6 .medal-face {
+  background: conic-gradient(from 30deg, #c9a7ee, #8fb2ec, #9fd2a6, #f6dc8a, #f2a690, #e48fb2, #c9a7ee);
+  color: #3a2a4a;
+}

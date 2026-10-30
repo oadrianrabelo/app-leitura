@@ -1,0 +1,67 @@
+.jardim-vivo {
+  position: relative;
+  border-radius: var(--radius-xl);
+  background: var(--bg-elevated);
+  border: 0.5px solid var(--hairline);
+  overflow: hidden;
+  margin-bottom: var(--space-2);
+}
+
+.jardim-vivo-art {
+  position: relative;
+  aspect-ratio: 1000 / 760;
+  background:
+    radial-gradient(ellipse at 50% 110%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 60%);
+}
+
+.jardim-vivo-art img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  animation: jardim-in 900ms var(--ease-out);
+}
+
+@keyframes jardim-in {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+  }
+}
+
+.jardim-vivo-growing {
+  position: absolute;
+  left: 50%;
+  bottom: var(--space-3);
+  transform: translateX(-50%);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--bg-elevated) 85%, transparent);
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+  animation: jardim-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes jardim-pulse {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.jardim-vivo-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-3) var(--space-4) var(--space-4);
+}
+
+.jardim-vivo-text strong {
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  font-weight: 560;
+}
+
+.jardim-vivo-text span {
+  font-size: var(--text-sm);
+  color: var(--ink-faint);
+}
