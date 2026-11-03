@@ -35,6 +35,8 @@ export interface Book extends Synced {
   fileId: string | null;
   /** SHA-256 do arquivo, para não importar o mesmo livro duas vezes */
   fileHash: string | null;
+  /** Posição escolhida arrastando na estante ("Minha ordem"); menor vem antes */
+  shelfOrder?: number | null;
 }
 
 export type ReadingState = "lendo" | "concluida" | "abandonada";

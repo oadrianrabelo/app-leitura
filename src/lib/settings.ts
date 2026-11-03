@@ -3,6 +3,7 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import { safeStorage } from "./storage";
 
 export type ShelfView = "capas" | "lombadas";
+export type LibrarySort = "recentes" | "titulo" | "autor" | "minha";
 export type FormatFilter = "todos" | "digitais" | "fisicos";
 
 export type FloraColor = "tema" | "lilas" | "azul" | "rosa" | "coral" | "mista";
@@ -18,6 +19,8 @@ interface SettingsState {
   autoCheckUpdates: boolean;
   /** Estante mostrando a capa ou a lombada dos livros */
   shelfView: ShelfView;
+  librarySort: LibrarySort;
+  setLibrarySort: (sort: LibrarySort) => void;
   formatFilter: FormatFilter;
   /** Glicínias: cor, quantidade de enfeites e trepadeiras na estante */
   floraColor: FloraColor;
@@ -51,6 +54,8 @@ export const useSettings = create<SettingsState>()(
       lastSeenVersion: null,
       autoCheckUpdates: true,
       shelfView: "capas",
+      librarySort: "recentes",
+      setLibrarySort: (librarySort) => set({ librarySort }),
       formatFilter: "todos",
       floraColor: "tema",
       floraAmount: "normal",

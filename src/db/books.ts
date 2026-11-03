@@ -136,3 +136,32 @@ export async function setInitialStatus(bookId: string, status: BookStatus, finis
     await updateBook(bookId, { status });
   }
 }
+
+/**
+ * Muda um livro de lugar na "Minha ordem". `order` é a ordem completa desejada (todos os
+ * livros); só o livro movido é regravado, com um número entre os vizinhos. Se ainda não
+ * existe ordem própria (ou os números ficaram apertados), grava a ordem inteira uma vez.
+ */
+export async function moveOnShelf(order: string[], movedId: string, prevId: string | null, nextId: string | null, reset = false) {
+  await db.transaction("rw", db.books, async () => {
+    const books = await db.books.bulkGet(order);
+    const byId = new Map(books.filter(Boolean).map((b) => [b!.id, b!]));
+    const val = (id: string | null) => (id ? (byId.get(id)?.shelfOrder ?? null) : null);
+    const step = 1024;
+    let prev = val(prevId);
+    let next = val(nextId);
+    const needsReset =
+      reset ||
+      order.some((id) => typeof byId.get(id)?.shelfOrder !== "number") ||
+      (prev !== null && next !== null && Math.abs(next - prev) < 1e-6);
+    const t = now();
+    if (needsReset) {
+      // a ordem desejada já tem o livro no lugar novo: basta numerar todos
+      await Promise.all(order.map((id, i) => db.books.update(id, { shelfOrder: (i + 1) * step, updatedAt: t })));
+      return;
+    }
+    if (prev === null && next === null) return;
+    const value = prev === null ? next! - step : next === null ? prev + step : (prev + next) / 2;
+    await db.books.update(movedId, { shelfOrder: value, updatedAt: t });
+  });
+}

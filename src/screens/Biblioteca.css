@@ -321,9 +321,16 @@ button.library-action .library-action-icon {
   transform: rotate(90deg);
 }
 
+.library-hint {
+  font-size: var(--text-xs);
+  color: var(--ink-faint);
+  margin: calc(-1 * var(--space-3)) var(--space-1) var(--space-4);
+}
+
 .sort {
   display: flex;
-  gap: var(--space-4);
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
   padding-left: var(--space-1);
 }
 

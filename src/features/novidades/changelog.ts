@@ -8,6 +8,18 @@ export interface ChangelogEntry {
 /** Mais recente primeiro. Cada release adiciona uma entrada aqui. */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.9.1",
+    date: "2026-11-03",
+    title: "A estante do seu jeito",
+    highlights: [
+      {
+        icon: "library",
+        title: "Arraste para organizar",
+        text: "Segure um livro na biblioteca e arraste para onde quiser. A estante passa para \u201cMinha ordem\u201d e a arrumação sincroniza com seus outros aparelhos.",
+      },
+    ],
+  },
+  {
     version: "0.9.0",
     date: "2026-10-30",
     title: "Conquistas",

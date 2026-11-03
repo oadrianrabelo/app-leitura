@@ -81,6 +81,39 @@
   transform: scale(0.96);
 }
 
+.shelf-book {
+  touch-action: pan-y;
+  -webkit-touch-callout: none;
+}
+
+/* O lugar vazio que o livro levantado deixa na prateleira */
+.shelf-book.is-lifted {
+  opacity: 0.22;
+  filter: grayscale(0.6);
+}
+
+/* O livro "na mão", seguindo o dedo */
+.shelf-ghost {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 200;
+  pointer-events: none;
+  transform-origin: center;
+  filter: drop-shadow(0 18px 24px rgba(30, 20, 10, 0.35));
+}
+
+.shelf-ghost .cover,
+.shelf-ghost .spine-book {
+  animation: shelf-lift 180ms var(--ease-out);
+}
+
+@keyframes shelf-lift {
+  from {
+    transform: scale(0.94);
+  }
+}
+
 @media (hover: hover) {
   .shelf-book:hover {
     transform: translateY(-4px);

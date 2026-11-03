@@ -9,7 +9,8 @@ import { Shelf } from "../features/library/Shelf";
 import { useLibraryUi } from "../features/library/state";
 import { pickAndImport } from "../features/import/importer";
 import { platform } from "../lib/platform";
-import { useSettings, type FormatFilter } from "../lib/settings";
+import { useSettings, type FormatFilter, type LibrarySort } from "../lib/settings";
+import { moveOnShelf } from "../db/books";
 import { Botanical } from "../components/Botanical";
 import "./Biblioteca.css";
 
@@ -24,7 +25,7 @@ const SPINES = [
 ];
 
 type Filter = "todos" | BookStatus;
-type Sort = "recentes" | "titulo" | "autor";
+type Sort = LibrarySort;
 
 const FILTERS: { id: Filter; label: string }[] = [
   { id: "todos", label: "Todos" },
@@ -38,6 +39,7 @@ const SORTS: { id: Sort; label: string }[] = [
   { id: "recentes", label: "Recentes" },
   { id: "titulo", label: "Título" },
   { id: "autor", label: "Autor" },
+  { id: "minha", label: "Minha ordem" },
 ];
 
 const FORMATS: { id: FormatFilter; label: string }[] = [
@@ -109,7 +111,8 @@ export function Biblioteca() {
   const stats = useLibraryStats();
   const { openBook, setAddOpen, setPhysicalOpen } = useLibraryUi();
   const [filter, setFilter] = useState<Filter>("todos");
-  const [sort, setSort] = useState<Sort>("recentes");
+  const sort = useSettings((s) => s.librarySort);
+  const setSort = useSettings((s) => s.setLibrarySort);
   const [query, setQuery] = useState("");
   const deferredQuery = useDeferredValue(query);
   const { shelfView, setShelfView, formatFilter, setFormatFilter } = useSettings();
@@ -135,20 +138,47 @@ export function Biblioteca() {
     return c;
   }, [books, format]);
 
+  // Ordem de todos os livros (a mesma usada na tela, antes dos filtros)
+  const compare = useMemo(() => {
+    const lastRead = stats?.lastRead;
+    return (a: Book, b: Book) => {
+      if (sort === "titulo") return collator.compare(a.title, b.title);
+      if (sort === "autor") return collator.compare(a.authors[0] ?? "~", b.authors[0] ?? "~") || collator.compare(a.title, b.title);
+      if (sort === "minha") {
+        // livros que ainda não têm lugar (chegaram depois) aparecem primeiro
+        const oa = a.shelfOrder ?? null, ob = b.shelfOrder ?? null;
+        if (oa === null || ob === null) return oa === ob ? b.createdAt - a.createdAt : oa === null ? -1 : 1;
+        return oa - ob;
+      }
+      const ta = Math.max(lastRead?.get(a.id) ?? 0, a.createdAt);
+      const tb = Math.max(lastRead?.get(b.id) ?? 0, b.createdAt);
+      return tb - ta;
+    };
+  }, [sort, stats]);
+
+  /** Soltou um livro em outro lugar: vira "Minha ordem", partindo da ordem que estava na tela */
+  const reorder = (shownOrder: string[], movedId: string) => {
+    const all = [...(books ?? [])].sort(compare).map((b) => b.id);
+    const idx = shownOrder.indexOf(movedId);
+    const prevShown = shownOrder[idx - 1] ?? null;
+    const nextShown = shownOrder[idx + 1] ?? null;
+    const full = all.filter((id) => id !== movedId);
+    const at = prevShown ? full.indexOf(prevShown) + 1 : nextShown ? full.indexOf(nextShown) : 0;
+    full.splice(at, 0, movedId);
+    const pos = full.indexOf(movedId);
+    if (sort !== "minha") setSort("minha");
+    // vindo de outra ordenação, grava a ordem inteira para nada mudar de lugar sozinho
+    const fresh = sort !== "minha";
+    moveOnShelf(full, movedId, fresh ? null : (full[pos - 1] ?? null), fresh ? null : (full[pos + 1] ?? null), fresh);
+  };
+
   const visible = useMemo(() => {
     let list: Book[] = (books ?? []).filter((b) => matchesFormat(b, format));
     if (filter !== "todos") list = list.filter((b) => b.status === filter);
     const q = normalize(deferredQuery.trim());
     if (q) list = list.filter((b) => normalize(`${b.title} ${b.authors.join(" ")}`).includes(q));
-    const lastRead = stats?.lastRead;
-    return [...list].sort((a, b) => {
-      if (sort === "titulo") return collator.compare(a.title, b.title);
-      if (sort === "autor") return collator.compare(a.authors[0] ?? "~", b.authors[0] ?? "~") || collator.compare(a.title, b.title);
-      const ta = Math.max(lastRead?.get(a.id) ?? 0, a.createdAt);
-      const tb = Math.max(lastRead?.get(b.id) ?? 0, b.createdAt);
-      return tb - ta;
-    });
-  }, [books, format, filter, deferredQuery, sort, stats]);
+    return [...list].sort(compare);
+  }, [books, format, filter, deferredQuery, compare]);
 
   if (!books) return <Page eyebrow="Tudo o que você já leu" title="Biblioteca">{null}</Page>;
 
@@ -249,8 +279,11 @@ export function Biblioteca() {
             </div>
           </div>
 
+          {sort === "minha" && visible.length > 1 && (
+            <p className="library-hint">Segure um livro e arraste para mudar de lugar.</p>
+          )}
           {visible.length > 0 ? (
-            <Shelf books={visible} timesRead={stats?.timesRead ?? new Map()} onOpen={openBook} view={shelfView} />
+            <Shelf books={visible} timesRead={stats?.timesRead ?? new Map()} onOpen={openBook} view={shelfView} onReorder={reorder} />
           ) : (
             <p className="library-nothing">Nenhum livro encontrado.</p>
           )}
