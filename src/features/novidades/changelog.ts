@@ -8,6 +8,23 @@ export interface ChangelogEntry {
 /** Mais recente primeiro. Cada release adiciona uma entrada aqui. */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.10.1",
+    date: "2026-11-03",
+    title: "Um livro, um lugar",
+    highlights: [
+      {
+        icon: "library",
+        title: "Juntar livros repetidos",
+        text: "Cadastrou pela busca e depois importou o arquivo? O Sépia percebe que é o mesmo livro e junta os dois: você escolhe a capa, e arquivo, leituras e marcadores ficam num lugar só.",
+      },
+      {
+        icon: "refresh",
+        title: "Capas trocadas sincronizam",
+        text: "Trocar a capa de um livro agora chega também aos seus outros aparelhos.",
+      },
+    ],
+  },
+  {
     version: "0.10.0",
     date: "2026-11-03",
     title: "Sua história de leitura, inteira",

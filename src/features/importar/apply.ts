@@ -4,28 +4,10 @@ import { addBook, addReading, setCover } from "../../db/books";
 import type { Book } from "../../db/types";
 import { processCover } from "../import/image";
 import { normalizeIsbn } from "../import/metadata";
+import { keyOf, looseMatch } from "../../db/similar";
 import { findCovers } from "../physical/lookup";
 import type { ImportedBook, ParsedImport } from "./formats";
 
-const norm = (s: string) => s.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
-/** Título sem subtítulo nem série: "Duna (Duna, #1)" e "Duna: edição especial" viram "duna" */
-const titleKey = (t: string) => norm(t.replace(/\(.*?\)/g, "").split(/[:–—]/)[0]);
-const surname = (authors: string[]) => norm(authors[0] ?? "").split(" ").pop() ?? "";
-const keyOf = (title: string, authors: string[]) => `${titleKey(title)}|${surname(authors)}`;
-
-/** "Memórias Póstumas" e "Memórias Póstumas de Brás Cubas", do mesmo autor, são o mesmo livro */
-function looseMatch(books: Book[], title: string, authors: string[]): Book | undefined {
-  const t = titleKey(title);
-  const who = surname(authors);
-  if (t.length < 6) return undefined;
-  const hits = books.filter((b) => {
-    if (who && surname(b.authors) !== who) return false;
-    const o = titleKey(b.title);
-    return o.length >= 6 && (o.startsWith(t) || t.startsWith(o));
-  });
-  // só aceita quando não há dúvida
-  return hits.length === 1 ? hits[0] : undefined;
-}
 const sameDay = (a: number | null, b: number | null) => !!a && !!b && Math.abs(a - b) < 36 * 3600 * 1000;
 
 export interface ImportPlan {

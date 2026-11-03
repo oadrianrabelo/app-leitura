@@ -330,3 +330,34 @@
   font-weight: 600;
   color: var(--accent-text);
 }
+
+/* Aviso de livro repetido na estante */
+.detail-twin {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+
+.detail-twin span {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.detail-twin strong {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.detail-twin small {
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+}

@@ -1,4 +1,10 @@
+import { useState } from "react";
 import { motion } from "motion/react";
+import { useLiveQuery } from "dexie-react-hooks";
+import { db } from "../../db/db";
+import { findSimilar } from "../../db/similar";
+import type { Book } from "../../db/types";
+import { MergeSheet } from "../library/MergeSheet";
 import { Sheet } from "../../components/Sheet";
 import { Button } from "../../components/Button";
 import { BookCover } from "../library/BookCover";
@@ -20,6 +26,9 @@ export function ImportSheet() {
   const added = outcomes.filter((o) => o.kind === "added");
   const duplicates = outcomes.filter((o) => o.kind === "duplicate");
   const failed = outcomes.filter((o) => o.kind === "error" || o.kind === "skipped");
+  // Livros importados que parecem já estar na estante (ex.: cadastrados pela busca)
+  const shelf = useLiveQuery(() => db.books.toArray(), []);
+  const [merge, setMerge] = useState<{ book: Book; other: Book } | null>(null);
 
   return (
     <Sheet open={phase !== "idle"} onClose={finish} label="Importar livros" tall={phase === "review" && added.length > 2} locked={phase === "importing"}>
@@ -71,12 +80,28 @@ export function ImportSheet() {
             {added.map((o) => {
               if (o.kind !== "added") return null;
               const choice = choices[o.book.id];
+              const live = shelf?.find((b) => b.id === o.book.id);
+              const merged = !!live?.deletedAt;
+              const twin = live && !merged && shelf ? findSimilar(live, shelf) : undefined;
+              if (merged)
+                return (
+                  <li key={o.book.id} className="import-item is-merged">
+                    <p className="import-item-title">{o.book.title}</p>
+                    <p className="import-item-author">Juntado com o livro que já estava na estante ✓</p>
+                  </li>
+                );
               return (
                 <li key={o.book.id} className="import-item">
                   <BookCover book={o.book} width={52} />
                   <div className="import-item-body">
                     <p className="import-item-title">{o.book.title}</p>
                     <p className="import-item-author">{o.book.authors.join(", ") || "Autor desconhecido"}</p>
+                    {twin && live && (
+                      <p className="import-item-twin">
+                        Já está na estante{twin.title !== live.title ? ` como “${twin.title}”` : ""}.{" "}
+                        <button onClick={() => setMerge({ book: live, other: twin })}>Juntar</button>
+                      </p>
+                    )}
                     <div className="segmented" role="radiogroup">
                       {STATUS.map((s) => (
                         <button
@@ -129,6 +154,9 @@ export function ImportSheet() {
             </div>
           )}
 
+          {merge && (
+            <MergeSheet book={merge.book} other={merge.other} open={!!merge} onClose={() => setMerge(null)} />
+          )}
           <Button size="lg" onClick={finish} className="import-done">
             {added.length > 0 ? "Pronto" : "Fechar"}
           </Button>

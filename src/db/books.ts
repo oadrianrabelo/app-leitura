@@ -165,3 +165,76 @@ export async function moveOnShelf(order: string[], movedId: string, prevId: stri
     await db.books.update(movedId, { shelfOrder: value, updatedAt: t });
   });
 }
+
+/**
+ * Junta dois registros do mesmo livro num só (`keepId` fica, `dropId` sai). Vêm junto:
+ * arquivo, leituras (sem repetir a mesma data), sessões, marcadores, ponto de leitura e
+ * as informações que faltavam. A capa fica a de `coverFrom`.
+ */
+export async function mergeBooks(keepId: string, dropId: string, coverFrom: string) {
+  const t = now();
+  await db.transaction("rw", [db.books, db.readings, db.sessions, db.bookmarks, db.positions, db.files, db.covers], async () => {
+    const keep = await db.books.get(keepId);
+    const drop = await db.books.get(dropId);
+    if (!keep || !drop) return;
+
+    // Informações: completa o que falta, sem trocar o que já existe
+    const pick = <K extends keyof Book>(k: K) => (keep[k] === null || keep[k] === undefined || keep[k] === "" ? drop[k] : keep[k]);
+    const changes: Partial<Book> = {
+      isbn: pick("isbn"),
+      publisher: pick("publisher"),
+      year: pick("year"),
+      language: pick("language"),
+      description: pick("description"),
+      subjects: [...new Set([...keep.subjects, ...drop.subjects])],
+      favorite: keep.favorite || drop.favorite,
+      // número de páginas da edição vale mais que a estimativa pelo texto
+      pageCount: keep.pageCount && !keep.pageCountEstimated ? keep.pageCount : drop.pageCount && !drop.pageCountEstimated ? drop.pageCount : (keep.pageCount ?? drop.pageCount),
+      pageCountEstimated: keep.pageCount && !keep.pageCountEstimated ? false : drop.pageCount && !drop.pageCountEstimated ? false : keep.pageCountEstimated,
+      updatedAt: t,
+    };
+    // Arquivo do livro: se só o outro tem, passa para cá
+    if (!keep.fileHash && drop.fileHash) {
+      changes.fileHash = drop.fileHash;
+      changes.fileId = drop.fileId;
+      changes.format = drop.format;
+      if (drop.fileId) await db.files.update(drop.fileId, { bookId: keepId });
+    }
+    // Capa escolhida
+    if (coverFrom === dropId) {
+      const cover = await db.covers.get(dropId);
+      if (cover) {
+        await db.covers.put({ bookId: keepId, blob: cover.blob, updatedAt: t });
+        changes.hasCover = true;
+        changes.tint = drop.tint;
+      }
+    }
+    await db.books.update(keepId, changes);
+
+    // Leituras: a do outro entra, a não ser que já exista uma terminada no mesmo dia
+    const mine = (await db.readings.where("bookId").equals(keepId).toArray()).filter((r) => !r.deletedAt);
+    const sameDay = (a: number | null, b: number | null) => !!a && !!b && Math.abs(a - b) < 36 * 3600 * 1000;
+    for (const r of await db.readings.where("bookId").equals(dropId).toArray()) {
+      if (r.deletedAt) continue;
+      const dup =
+        (r.finishedAt && mine.some((m) => sameDay(m.finishedAt, r.finishedAt))) ||
+        (r.state === "lendo" && mine.some((m) => m.state === "lendo"));
+      if (dup) await db.readings.update(r.id, { deletedAt: t, updatedAt: t });
+      else await db.readings.update(r.id, { bookId: keepId, updatedAt: t });
+    }
+    await db.sessions.where("bookId").equals(dropId).modify({ bookId: keepId, updatedAt: t });
+    await db.bookmarks.where("bookId").equals(dropId).modify({ bookId: keepId, updatedAt: t });
+    const pos = await db.positions.get(dropId);
+    if (pos) {
+      if (!(await db.positions.get(keepId))) await db.positions.put({ ...pos, bookId: keepId, updatedAt: t });
+      await db.positions.delete(dropId);
+    }
+
+    // O registro que sai: marcado como excluído (sincroniza) e sem capa/arquivo próprios
+    await db.books.update(dropId, { deletedAt: t, updatedAt: t, fileId: null });
+    await db.covers.delete(dropId);
+  });
+  invalidateCover(keepId);
+  invalidateCover(dropId);
+  await refreshStatus(keepId);
+}

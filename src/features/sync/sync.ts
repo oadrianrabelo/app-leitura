@@ -166,15 +166,18 @@ async function runSync(device: string, syncFiles: boolean, progress: (d: string)
     const name = coverName(book.id);
     const there = remoteNames.get(name);
     const here = await db.covers.get(book.id);
-    if (here && !there) {
+    const remoteAt = there ? Date.parse(there.modifiedTime) : 0;
+    // capa trocada aqui (mais nova que a do Drive) ou que ainda não foi: envia
+    if (here && (!there || here.updatedAt > remoteAt + 60_000)) {
       progress(`Enviando capa de ${book.title}…`);
-      await drive.upload(name, new Uint8Array(await here.blob.arrayBuffer()), "image/jpeg", { appProperties: { bookId: book.id } });
-    } else if (!here && there) {
+      await drive.upload(name, new Uint8Array(await here.blob.arrayBuffer()), "image/jpeg", { id: there?.id, appProperties: { bookId: book.id } });
+    } else if (there && (!here || remoteAt > here.updatedAt + 60_000)) {
       progress(`Baixando capa de ${book.title}…`);
       const blob = new Blob([await drive.download(there.id)], { type: "image/jpeg" });
       applyingRemote = true;
       try {
-        await db.covers.put({ bookId: book.id, blob, updatedAt: Date.now() });
+        // guarda a data do Drive: assim a mesma capa não volta a ser enviada
+        await db.covers.put({ bookId: book.id, blob, updatedAt: remoteAt });
         invalidateCover(book.id);
         await db.books.update(book.id, { hasCover: true });
       } finally {
@@ -197,10 +200,13 @@ async function runSync(device: string, syncFiles: boolean, progress: (d: string)
   }
 
   // 5. Remove do Drive as capas e arquivos de livros excluídos
-  const deleted = new Set((await db.books.toArray()).filter((b) => b.deletedAt !== null).map((b) => b.id));
+  const all = await db.books.toArray();
+  const deleted = new Set(all.filter((b) => b.deletedAt !== null).map((b) => b.id));
+  // arquivo que passou para outro livro (livros juntados) continua no Drive
+  const liveFiles = new Set(all.filter((b) => b.deletedAt === null && b.fileHash).map((b) => fileName(b.fileHash!)));
   for (const f of files) {
     const bookId = f.appProperties?.bookId;
-    if (bookId && deleted.has(bookId)) await drive.remove(f.id);
+    if (bookId && deleted.has(bookId) && !liveFiles.has(f.name)) await drive.remove(f.id);
   }
 }
 

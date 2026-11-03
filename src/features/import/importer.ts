@@ -143,6 +143,8 @@ export const useImport = create<ImportState>()((set, get) => ({
   async finish() {
     const { choices } = get();
     for (const [bookId, choice] of Object.entries(choices)) {
+      // livro que foi juntado com outro já na estante: o estado vem do que ficou
+      if ((await db.books.get(bookId))?.deletedAt) continue;
       if (choice.status !== "quero-ler") await setInitialStatus(bookId, choice.status, choice.year);
     }
     set({ phase: "idle", outcomes: [], choices: {} });

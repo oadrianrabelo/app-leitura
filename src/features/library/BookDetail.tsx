@@ -7,6 +7,9 @@ import { useBook, useReadings } from "../../db/hooks";
 import type { Book, Reading } from "../../db/types";
 import { BookCover } from "./BookCover";
 import { CoverSearchSheet } from "./CoverSearchSheet";
+import { MergeSheet } from "./MergeSheet";
+import { findSimilar } from "../../db/similar";
+import { useLiveQuery } from "dexie-react-hooks";
 import { processCover } from "../import/image";
 import { EditBookSheet } from "./EditBookSheet";
 import { ReadingSheet, type ReadingDraft } from "./ReadingSheet";
@@ -53,12 +56,16 @@ function ReadingCard({ reading, index, onEdit }: { reading: Reading; index: numb
 
 function DetailBody({ book, readings }: { book: Book; readings: Reading[] }) {
   const closeBook = useLibraryUi((s) => s.closeBook);
+  const openBook = useLibraryUi((s) => s.openBook);
   const position = usePosition(book.id);
   const [draft, setDraft] = useState<ReadingDraft | null>(null);
   const [editing, setEditing] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [showFull, setShowFull] = useState(false);
   const [coverSearch, setCoverSearch] = useState(false);
+  const [merging, setMerging] = useState<"sugestao" | "escolher" | null>(null);
+  // Outro registro que parece o mesmo livro (ex.: um da busca e outro do arquivo)
+  const twin = useLiveQuery(async () => findSimilar(book, await db.books.toArray()) ?? null, [book.id, book.title, book.isbn]);
 
   // Ordem cronológica para numerar (1ª, 2ª...), exibida da mais recente para a mais antiga
   const numbered = useMemo(() => {
@@ -226,7 +233,25 @@ function DetailBody({ book, readings }: { book: Book; readings: Reading[] }) {
         </section>
       )}
 
+      {twin && (
+        <div className="detail-twin">
+          <Icon name="library" size={18} />
+          <span>
+            <strong>Este livro parece estar duas vezes na estante</strong>
+            <small>
+              Também tem “{twin.title}”{twin.fileHash && !book.fileHash ? ", com o arquivo" : ""}. Junte os dois para manter tudo num lugar só.
+            </small>
+          </span>
+          <Button variant="secondary" onClick={() => setMerging("sugestao")}>
+            Juntar
+          </Button>
+        </div>
+      )}
+
       <div className="detail-footer">
+        <Button variant="ghost" onClick={() => setMerging("escolher")}>
+          <Icon name="library" size={16} /> Juntar com outro livro
+        </Button>
         <Button variant="ghost" onClick={() => setEditing(true)}>
           <Icon name="pencil" size={16} /> Editar informações
         </Button>
@@ -237,6 +262,13 @@ function DetailBody({ book, readings }: { book: Book; readings: Reading[] }) {
 
       <ReadingSheet draft={draft} onClose={() => setDraft(null)} />
       <EditBookSheet book={book} open={editing} onClose={() => setEditing(false)} />
+      <MergeSheet
+        book={book}
+        other={merging === "sugestao" ? twin : null}
+        open={!!merging}
+        onClose={() => setMerging(null)}
+        onMerged={(kept) => kept !== book.id && openBook(kept)}
+      />
       <CoverSearchSheet
         book={book}
         open={coverSearch}
