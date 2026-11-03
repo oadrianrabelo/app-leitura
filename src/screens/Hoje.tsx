@@ -217,7 +217,7 @@ export function Hoje({ onOpenLibrary }: { onOpenLibrary: () => void }) {
         <Section>
           {trecho ? (
             <motion.figure className="trecho" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
-              <span className="trecho-label">Um trecho que você marcou</span>
+              <span className="trecho-label">{trecho.highlighted ? "Um trecho que você destacou" : "Um trecho que você marcou"}</span>
               <blockquote>“{trecho.text}”</blockquote>
               <figcaption>
                 {trecho.book}
@@ -227,7 +227,7 @@ export function Hoje({ onOpenLibrary }: { onOpenLibrary: () => void }) {
           ) : (
             <div className="trecho is-empty">
               <span className="trecho-label">Seus trechos favoritos</span>
-              <p>Enquanto lê, toque no marcador numa página que te tocou. Ela aparece aqui, um trecho por dia.</p>
+              <p>Enquanto lê, segure o dedo num trecho que te tocou e escolha uma cor para destacar. Ele aparece aqui, um por dia.</p>
             </div>
           )}
         </Section>

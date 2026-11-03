@@ -6,6 +6,8 @@ export interface Trecho {
   text: string;
   book: string;
   chapter: string | null;
+  /** Veio de um trecho que ela destacou (e não de uma página marcada) */
+  highlighted?: boolean;
 }
 
 /**
@@ -26,17 +28,23 @@ export function cleanExcerpt(raw: string): string | null {
   return end > 80 ? cut.slice(0, end + 1) : `${cut.slice(0, cut.lastIndexOf(" "))}…`;
 }
 
-/** Um trecho marcado por dia, sempre o mesmo durante o dia */
+/** Um trecho por dia, sempre o mesmo durante o dia: dos destaques dela, ou das páginas marcadas */
 export function useTrecho(): Trecho | null | undefined {
   return useLiveQuery(async () => {
+    let h = 0;
+    for (const c of dayKey(Date.now())) h = (h * 31 + c.charCodeAt(0)) | 0;
+    const highlights = (await db.highlights.toArray()).filter((x) => !x.deletedAt && x.text.trim().length >= 12);
+    if (highlights.length) {
+      const pick = highlights[Math.abs(h) % highlights.length];
+      const book = await db.books.get(pick.bookId);
+      if (book && !book.deletedAt) return { text: pick.text.trim(), book: book.title, chapter: pick.chapter, highlighted: true };
+    }
     const marks = (await db.bookmarks.toArray()).filter((b) => !b.deletedAt && b.excerpt);
     const usable = marks.flatMap((m) => {
       const text = cleanExcerpt(m.excerpt);
       return text ? [{ m, text }] : [];
     });
     if (!usable.length) return null;
-    let h = 0;
-    for (const c of dayKey(Date.now())) h = (h * 31 + c.charCodeAt(0)) | 0;
     const pick = usable[Math.abs(h) % usable.length];
     const book = await db.books.get(pick.m.bookId);
     if (!book || book.deletedAt) return null;

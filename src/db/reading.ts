@@ -1,7 +1,7 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { db, now, uuid } from "./db";
 import { addReading, updateReading } from "./books";
-import type { Bookmark, Session } from "./types";
+import type { Bookmark, Highlight, Session } from "./types";
 
 import { computeStreak, dayKey } from "./streak";
 
@@ -107,3 +107,25 @@ export function useRhythm(): RhythmStats | undefined {
   }, []);
 }
 
+
+export function useHighlights(bookId: string | null) {
+  return useLiveQuery(async () => {
+    if (!bookId) return [];
+    const list = await db.highlights.where("bookId").equals(bookId).filter((h) => h.deletedAt === null).toArray();
+    return list.sort((a, b) => a.fraction - b.fraction);
+  }, [bookId]);
+}
+
+export async function addHighlight(data: Pick<Highlight, "bookId" | "cfi" | "text" | "color" | "chapter" | "fraction">) {
+  const t = Date.now();
+  await db.highlights.add({ ...data, id: uuid(), createdAt: t, updatedAt: t, deletedAt: null });
+}
+
+export async function updateHighlight(id: string, changes: Partial<Highlight>) {
+  await db.highlights.update(id, { ...changes, updatedAt: Date.now() });
+}
+
+export async function removeHighlight(id: string) {
+  const t = Date.now();
+  await db.highlights.update(id, { deletedAt: t, updatedAt: t });
+}

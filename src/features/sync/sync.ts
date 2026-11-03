@@ -115,11 +115,12 @@ async function runSync(device: string, syncFiles: boolean, progress: (d: string)
     sessions: await db.sessions.toArray(),
     positions: await db.positions.toArray(),
     visits: await db.visits.toArray(),
+    highlights: await db.highlights.toArray(),
   };
   const localBooks = new Map(local.books.map((b) => [b.id, b]));
   applyingRemote = true;
   try {
-    await db.transaction("rw", [db.books, db.readings, db.bookmarks, db.sessions, db.positions, db.visits], async () => {
+    await db.transaction("rw", [db.books, db.readings, db.bookmarks, db.sessions, db.positions, db.visits, db.highlights], async () => {
       const books = newerRemote(local.books as Omit<Book, "fileId">[], remote.books, byId).map((b) => {
         const mine = localBooks.get(b.id);
         // Arquivo e capa são locais: só "tem capa" quando a capa já chegou aqui
@@ -131,6 +132,7 @@ async function runSync(device: string, syncFiles: boolean, progress: (d: string)
       await db.sessions.bulkPut(newerRemote(local.sessions, remote.sessions, byId));
       await db.positions.bulkPut(newerRemote(local.positions, remote.positions, byBook));
       await db.visits.bulkPut(newerRemote(local.visits, remote.visits ?? [], byDay));
+      await db.highlights.bulkPut(newerRemote(local.highlights, remote.highlights ?? [], byId));
     });
   } finally {
     applyingRemote = false;
@@ -144,6 +146,7 @@ async function runSync(device: string, syncFiles: boolean, progress: (d: string)
     sessions: await db.sessions.toArray(),
     positions: await db.positions.toArray(),
     visits: await db.visits.toArray(),
+    highlights: await db.highlights.toArray(),
   };
   const needsUpload =
     !snapshotFile ||
@@ -152,7 +155,8 @@ async function runSync(device: string, syncFiles: boolean, progress: (d: string)
     hasNewerLocal(merged.bookmarks, remote.bookmarks, byId) ||
     hasNewerLocal(merged.sessions, remote.sessions, byId) ||
     hasNewerLocal(merged.positions, remote.positions, byBook) ||
-    hasNewerLocal(merged.visits, remote.visits ?? [], byDay);
+    hasNewerLocal(merged.visits, remote.visits ?? [], byDay) ||
+    hasNewerLocal(merged.highlights, remote.highlights ?? [], byId);
   if (needsUpload) {
     progress("Salvando no Drive…");
     const snapshot: Snapshot = { version: SNAPSHOT_VERSION, exportedAt: Date.now(), device, ...merged };
@@ -239,7 +243,7 @@ function markDirty() {
   dirtyTimer = window.setTimeout(() => useSync.getState().syncNow({ quiet: true }), 60_000);
 }
 
-for (const table of [db.books, db.readings, db.bookmarks, db.sessions, db.positions, db.covers, db.visits]) {
+for (const table of [db.books, db.readings, db.bookmarks, db.sessions, db.positions, db.covers, db.visits, db.highlights]) {
   table.hook("creating", markDirty);
   table.hook("updating", markDirty);
   table.hook("deleting", markDirty);

@@ -107,3 +107,17 @@
   color: var(--ink-faint);
   padding: var(--space-3);
 }
+
+.highlight-swatch {
+  flex-shrink: 0;
+  width: 6px;
+  align-self: stretch;
+  border-radius: 3px;
+  margin-top: 2px;
+}
+
+.highlight-text {
+  font-family: var(--font-reading);
+  font-style: italic;
+  -webkit-line-clamp: 4;
+}

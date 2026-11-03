@@ -1,5 +1,5 @@
 import { useSettings } from "../../lib/settings";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { startTransition, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import type { TocItem } from "foliate-js/view.js";
 import { db } from "../../db/db";
@@ -11,6 +11,10 @@ import {
   removeBookmark,
   savePosition,
   setReadingProgress,
+  useHighlights,
+  addHighlight,
+  updateHighlight,
+  removeHighlight,
   useBookmarks,
 } from "../../db/reading";
 import type { Book } from "../../db/types";
@@ -21,12 +25,13 @@ import { PageTurnFx, type PageTurnFxHandle } from "./PageTurnFx";
 import { ComfortLayer } from "./ComfortLayer";
 import { ReaderSettingsSheet } from "./ReaderSettingsSheet";
 import { TocSheet } from "./TocSheet";
+import { HighlightBar } from "./HighlightBar";
 import { FinishSheet } from "./FinishSheet";
 import { SessionTracker } from "./session";
 import { resolvePaper, useReaderSettings } from "./settings";
 import { useReaderUi } from "./state";
 import { useBackLayer } from "../../lib/backStack";
-import type { LocationInfo, ReaderEngine, TapZone } from "./engine";
+import type { LocationInfo, ReaderEngine, TapZone, TextSelection } from "./engine";
 import { compareLocations } from "./locations";
 import "../conquistas/ribbons.css";
 import "./Reader.css";
@@ -34,6 +39,7 @@ import "./Reader.css";
 interface Loaded {
   file: File;
   initialLocation: string | null;
+  initialFraction: number | null;
   readingId: string;
 }
 
@@ -78,6 +84,28 @@ function ReaderBody({ book }: { book: Book }) {
   const finishShown = useRef(false);
   const saveTimer = useRef<number | undefined>(undefined);
   const latestFraction = useRef<number | null>(null);
+  const locTimer = useRef<number | undefined>(undefined);
+  /** Quando ela pediu um salto (sumário, barra): aí ir para o começo vale */
+  const navAt = useRef(0);
+  const stage = useRef<HTMLDivElement>(null);
+  /** A página de verdade agora (a tela atualiza um pouco depois, para não engasgar) */
+  const locNow = useRef<LocationInfo | null>(null);
+  const highlights = useHighlights(book.id);
+  const [selection, setSelection] = useState<TextSelection | null>(null);
+  const [tappedCfi, setTappedCfi] = useState<string | null>(null);
+  const tapped = highlights?.find((h) => h.cfi === tappedCfi) ?? null;
+
+  const highlightSelection = useCallback(
+    async (color: string) => {
+      if (!selection) return;
+      const here = locNow.current;
+      await addHighlight({ bookId: book.id, cfi: selection.cfi, text: selection.text, color, chapter: here?.chapter ?? null, fraction: here?.fraction ?? 0 });
+      engine.current?.clearSelection?.();
+      setSelection(null);
+      navigator.vibrate?.(10);
+    },
+    [selection, book.id],
+  );
 
   useWakeLock(true);
 
@@ -111,6 +139,7 @@ function ReaderBody({ book }: { book: Book }) {
       setLoaded({
         file: new File([record.blob], record.name, { type: record.type }),
         initialLocation: position?.location ?? null,
+        initialFraction: position?.fraction ?? null,
         readingId,
       });
     })();
@@ -148,11 +177,23 @@ function ReaderBody({ book }: { book: Book }) {
 
   const onRelocate = useCallback(
     (info: LocationInfo) => {
-      setLoc(info);
+      // Posição inválida (o motor às vezes manda no meio de uma troca) nunca é gravada
+      if (!Number.isFinite(info.fraction)) return;
+      // Redesenhar a tela do leitor no meio da animação da página dava engasgo: a barra,
+      // o rodapé e o marcador esperam a página assentar
+      locNow.current = info;
+      window.clearTimeout(locTimer.current);
+      locTimer.current = window.setTimeout(() => startTransition(() => setLoc(info)), 280);
       tracker.current?.onPage(info.page, info.fraction);
-      window.clearTimeout(saveTimer.current);
-      saveTimer.current = window.setTimeout(() => savePosition(book.id, info.resume, info.fraction), 500);
-      latestFraction.current = info.fraction;
+      // Proteção: um salto para o começo que ela não pediu (motor reiniciando, travamento)
+      // não pode apagar onde ela estava
+      const prev = latestFraction.current;
+      const jumpedToStart = prev !== null && prev > 0.03 && info.fraction < 0.005 && Date.now() - navAt.current > 3000;
+      if (!jumpedToStart) {
+        window.clearTimeout(saveTimer.current);
+        saveTimer.current = window.setTimeout(() => savePosition(book.id, info.resume, info.fraction), 500);
+        latestFraction.current = info.fraction;
+      }
       if (info.atEnd && !finishShown.current) {
         finishShown.current = true;
         setTimeout(() => setFinishOpen(true), 400);
@@ -176,18 +217,20 @@ function ReaderBody({ book }: { book: Book }) {
   }, [loc, bookmarks]);
 
   const toggleBookmark = useCallback(async () => {
-    if (!loc) return;
-    if (currentBookmark) await removeBookmark(currentBookmark.id);
+    const here = locNow.current ?? loc;
+    if (!here) return;
+    const marked = bookmarks?.find((b) => compareLocations(b.location, here.location, here.endLocation));
+    if (marked) await removeBookmark(marked.id);
     else
       await addBookmark({
         bookId: book.id,
-        location: loc.location,
-        fraction: loc.fraction,
-        excerpt: loc.excerpt,
-        chapter: loc.chapter,
+        location: here.location,
+        fraction: here.fraction,
+        excerpt: here.excerpt,
+        chapter: here.chapter,
       }, useSettings.getState().bookmarkStyle);
     navigator.vibrate?.(12);
-  }, [loc, currentBookmark, book.id]);
+  }, [loc, bookmarks, book.id]);
 
   const onTap = useCallback(
     (zone: TapZone) => {
@@ -215,6 +258,7 @@ function ReaderBody({ book }: { book: Book }) {
   const engineProps = loaded && {
     file: loaded.file,
     initialLocation: loaded.initialLocation,
+    initialFraction: loaded.initialFraction,
     settings,
     paper,
     onReady: setToc,
@@ -222,6 +266,15 @@ function ReaderBody({ book }: { book: Book }) {
     onTap,
     onActivity,
     onError: setError,
+    highlights: highlights ?? [],
+    onSelect: (sel: TextSelection | null) => {
+      setSelection(sel);
+      if (sel) setTappedCfi(null);
+    },
+    onHighlightTap: (cfi: string) => {
+      setSelection(null);
+      setTappedCfi(cfi);
+    },
   };
 
   return (
@@ -229,7 +282,7 @@ function ReaderBody({ book }: { book: Book }) {
       className={`reader${paper.dark ? " is-dark" : ""}`}
       style={{ ["--paper" as string]: paper.bg, ["--ink" as string]: paper.ink, ["--muted" as string]: paper.muted }}
     >
-      <div className="reader-stage">
+      <div className="reader-stage" ref={stage}>
         {error ? (
           <div className="reader-error">
             <Icon name="info" size={28} />
@@ -248,7 +301,12 @@ function ReaderBody({ book }: { book: Book }) {
             {downloading && <p>Trazendo o livro do Google Drive…</p>}
           </div>
         )}
-        <PageTurnFx ref={fx} animation={settings.animation} paper={paper} />
+        <PageTurnFx
+          ref={fx}
+          animation={settings.animation}
+          paper={paper}
+          target={() => stage.current?.querySelector<HTMLElement>(".epub-host, .pdf-host") ?? null}
+        />
         {currentBookmark && (
           <motion.span
             className={`reader-ribbon ribbon ribbon-${currentBookmark.style}`}
@@ -263,10 +321,27 @@ function ReaderBody({ book }: { book: Book }) {
       {/* Espaço fixo: se o rodapé aparecesse e sumisse, o livro seria repaginado */}
       <div className="reader-footer" aria-hidden style={{ visibility: settings.showProgress && loc && !chrome ? "visible" : "hidden" }}>
         <span>{loc?.chapter ?? ""}</span>
-        <span>{loc ? `${Math.round(loc.fraction * 100)}%` : ""}</span>
+        <span>{loc && Number.isFinite(loc.fraction) ? `${Math.round(loc.fraction * 100)}%` : ""}</span>
       </div>
 
       <ComfortLayer settings={settings} />
+
+      <HighlightBar
+        mode={selection ? "nova" : tapped ? "existente" : null}
+        current={tapped?.color ?? null}
+        onColor={(color) => (selection ? highlightSelection(color) : tapped && updateHighlight(tapped.id, { color }).then(() => setTappedCfi(null)))}
+        onCopy={() => {
+          if (selection) navigator.clipboard?.writeText(selection.text).catch(() => {});
+          engine.current?.clearSelection?.();
+          setSelection(null);
+        }}
+        onRemove={() => tapped && removeHighlight(tapped.id).then(() => setTappedCfi(null))}
+        onDismiss={() => {
+          engine.current?.clearSelection?.();
+          setSelection(null);
+          setTappedCfi(null);
+        }}
+      />
 
       <AnimatePresence>
         {chrome && (
@@ -305,11 +380,17 @@ function ReaderBody({ book }: { book: Book }) {
                   value={Math.round(fractionShown * 1000)}
                   onChange={(e) => setScrub(Number(e.target.value) / 1000)}
                   onPointerUp={() => {
-                    if (scrub !== null) engine.current?.goToFraction(scrub);
+                    if (scrub !== null) {
+                      navAt.current = Date.now();
+                      engine.current?.goToFraction(scrub);
+                    }
                     setScrub(null);
                   }}
                   onKeyUp={() => {
-                    if (scrub !== null) engine.current?.goToFraction(scrub);
+                    if (scrub !== null) {
+                      navAt.current = Date.now();
+                      engine.current?.goToFraction(scrub);
+                    }
                     setScrub(null);
                   }}
                   aria-label="Posição no livro"
@@ -345,10 +426,12 @@ function ReaderBody({ book }: { book: Book }) {
         onClose={() => setPanel(null)}
         toc={toc}
         bookmarks={bookmarks ?? []}
+        highlights={highlights ?? []}
         currentChapter={loc?.chapter ?? null}
         onGo={(target) => {
           setPanel(null);
           setChrome(false);
+          navAt.current = Date.now();
           engine.current?.goTo(target);
         }}
         onRemoveBookmark={removeBookmark}

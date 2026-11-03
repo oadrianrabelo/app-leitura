@@ -1,5 +1,5 @@
 import Dexie, { type EntityTable } from "dexie";
-import type { Book, BookFile, Bookmark, Cover, Position, Reading, Session, Visit } from "./types";
+import type { Book, BookFile, Bookmark, Cover, Highlight, Position, Reading, Session, Visit } from "./types";
 
 export class SepiaDB extends Dexie {
   books!: EntityTable<Book, "id">;
@@ -10,6 +10,7 @@ export class SepiaDB extends Dexie {
   bookmarks!: EntityTable<Bookmark, "id">;
   sessions!: EntityTable<Session, "id">;
   visits!: EntityTable<Visit, "day">;
+  highlights!: EntityTable<Highlight, "id">;
 
   constructor() {
     super("sepia");
@@ -26,6 +27,9 @@ export class SepiaDB extends Dexie {
     });
     this.version(3).stores({
       visits: "day, updatedAt",
+    });
+    this.version(4).stores({
+      highlights: "id, bookId, updatedAt, deletedAt",
     });
   }
 }

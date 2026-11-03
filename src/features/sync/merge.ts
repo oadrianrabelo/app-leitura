@@ -1,4 +1,4 @@
-import type { Book, Bookmark, Position, Reading, Session, Visit } from "../../db/types";
+import type { Book, Bookmark, Highlight, Position, Reading, Session, Visit } from "../../db/types";
 
 export const SNAPSHOT_VERSION = 1;
 
@@ -14,6 +14,7 @@ export interface Snapshot {
   positions: Position[];
   /** Opcional: snapshots de versões antigas não têm */
   visits?: Visit[];
+  highlights?: Highlight[];
 }
 
 interface Stamped {

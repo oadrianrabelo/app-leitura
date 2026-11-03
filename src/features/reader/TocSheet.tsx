@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { TocItem } from "foliate-js/view.js";
 import { Sheet } from "../../components/Sheet";
 import { Icon } from "../../components/Icon";
-import type { Bookmark } from "../../db/types";
+import type { Bookmark, Highlight } from "../../db/types";
 import "../conquistas/ribbons.css";
 import "./TocSheet.css";
 
@@ -11,6 +11,7 @@ interface Props {
   onClose: () => void;
   toc: TocItem[];
   bookmarks: Bookmark[];
+  highlights: Highlight[];
   currentChapter: string | null;
   onGo: (target: string) => void;
   onRemoveBookmark: (id: string) => void;
@@ -35,8 +36,8 @@ function TocList({ items, depth, current, onGo }: { items: TocItem[]; depth: num
   );
 }
 
-export function TocSheet({ open, onClose, toc, bookmarks, currentChapter, onGo, onRemoveBookmark }: Props) {
-  const [tab, setTab] = useState<"sumario" | "marcadores">("sumario");
+export function TocSheet({ open, onClose, toc, bookmarks, highlights, currentChapter, onGo, onRemoveBookmark }: Props) {
+  const [tab, setTab] = useState<"sumario" | "marcadores" | "trechos">("sumario");
 
   return (
     <Sheet open={open} onClose={onClose} label="Sumário e marcadores" tall>
@@ -47,9 +48,35 @@ export function TocSheet({ open, onClose, toc, bookmarks, currentChapter, onGo, 
         <button className={tab === "marcadores" ? "is-active" : ""} onClick={() => setTab("marcadores")}>
           Marcadores {bookmarks.length > 0 && <span className="toc-count">{bookmarks.length}</span>}
         </button>
+        <button className={tab === "trechos" ? "is-active" : ""} onClick={() => setTab("trechos")}>
+          Trechos {highlights.length > 0 && <span className="toc-count">{highlights.length}</span>}
+        </button>
       </div>
 
-      {tab === "sumario" ? (
+      {tab === "trechos" ? (
+        highlights.length > 0 ? (
+          <ul className="bookmark-list">
+            {highlights.map((h) => (
+              <li key={h.id}>
+                <button className="bookmark-item" onClick={() => onGo(h.cfi)}>
+                  <span className="highlight-swatch" style={{ background: h.color }} aria-hidden />
+                  <span className="bookmark-body">
+                    <span className="bookmark-meta">
+                      {h.chapter ?? "Trecho"} · {Math.round(h.fraction * 100)}%
+                    </span>
+                    <span className="bookmark-excerpt highlight-text">“{h.text}”</span>
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="toc-empty">
+            <p>Nenhum trecho destacado ainda.</p>
+            <p>Segure o dedo numa palavra e arraste para selecionar um trecho. Aí é só escolher a cor do destaque.</p>
+          </div>
+        )
+      ) : tab === "sumario" ? (
         toc.length > 0 ? (
           <TocList items={toc} depth={0} current={currentChapter} onGo={onGo} />
         ) : (

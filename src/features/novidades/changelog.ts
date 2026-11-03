@@ -8,6 +8,28 @@ export interface ChangelogEntry {
 /** Mais recente primeiro. Cada release adiciona uma entrada aqui. */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.12.0",
+    date: "2026-11-04",
+    title: "Um leitor mais caprichado",
+    highlights: [
+      {
+        icon: "pencil",
+        title: "Destaque seus trechos",
+        text: "Segure o dedo numa palavra, arraste para selecionar e escolha uma cor. Os destaques ficam na aba Trechos do sumário e aparecem na tela Hoje, um por dia.",
+      },
+      {
+        icon: "book",
+        title: "Texto arrumado",
+        text: "Livros convertidos de PDF, com linhas quebradas no meio, palavras partidas ou o “fi” sumindo, agora aparecem com parágrafos normais.",
+      },
+      {
+        icon: "sparkles",
+        title: "Folhear e esmaecer de verdade",
+        text: "As animações de página foram refeitas: mais leves, sem engasgo e sem travar. E o livro nunca mais volta sozinho para o começo.",
+      },
+    ],
+  },
+  {
     version: "0.11.1",
     date: "2026-11-04",
     title: "Capas pela internet, do jeito fácil",

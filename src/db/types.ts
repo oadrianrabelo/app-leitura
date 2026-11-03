@@ -92,6 +92,18 @@ export interface Bookmark extends Synced {
   style: string;
 }
 
+/** Um trecho destacado no livro (seleção de texto pintada com uma cor). */
+export interface Highlight extends Synced {
+  bookId: string;
+  /** CFI do intervalo destacado */
+  cfi: string;
+  text: string;
+  color: string;
+  chapter: string | null;
+  /** Posição no livro (0 a 1), para ordenar */
+  fraction: number;
+}
+
 /** Um período contínuo de leitura. Alimenta páginas por dia, sequência e conquistas. */
 export interface Session extends Synced {
   bookId: string;

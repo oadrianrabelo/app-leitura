@@ -35,6 +35,7 @@ export async function buildBackup(withFiles: boolean): Promise<{ name: string; b
     sessions: await db.sessions.toArray(),
     positions: await db.positions.toArray(),
     visits: await db.visits.toArray(),
+    highlights: await db.highlights.toArray(),
   };
   const zip: Zippable = { "dados.json": strToU8(JSON.stringify(snapshot)) };
   for (const cover of await db.covers.toArray()) {
@@ -95,19 +96,21 @@ export async function restoreBackup(data: Uint8Array): Promise<RestoreResult> {
     sessions: await db.sessions.toArray(),
     positions: await db.positions.toArray(),
     visits: await db.visits.toArray(),
+    highlights: await db.highlights.toArray(),
   };
   const mine = new Map(local.books.map((b) => [b.id, b]));
   const books = newerRemote(local.books as Omit<Book, "fileId">[], snap.books, byId).map(
     (b) => ({ ...b, fileId: mine.get(b.id)?.fileId ?? null, hasCover: mine.get(b.id)?.hasCover ?? false }) as Book,
   );
   const readings = newerRemote(local.readings, snap.readings, byId);
-  await db.transaction("rw", [db.books, db.readings, db.bookmarks, db.sessions, db.positions, db.visits], async () => {
+  await db.transaction("rw", [db.books, db.readings, db.bookmarks, db.sessions, db.positions, db.visits, db.highlights], async () => {
     await db.books.bulkPut(books);
     await db.readings.bulkPut(readings);
     await db.bookmarks.bulkPut(newerRemote(local.bookmarks, snap.bookmarks ?? [], byId));
     await db.sessions.bulkPut(newerRemote(local.sessions, snap.sessions ?? [], byId));
     await db.positions.bulkPut(newerRemote(local.positions, snap.positions ?? [], byBook));
     await db.visits.bulkPut(newerRemote(local.visits, snap.visits ?? [], byDay));
+    await db.highlights.bulkPut(newerRemote(local.highlights, snap.highlights ?? [], byId));
   });
 
   // Capas e arquivos que faltam aqui

@@ -20,7 +20,15 @@ export interface LocationInfo {
   excerpt: string;
 }
 
+/** Texto selecionado no livro, pronto para virar destaque */
+export interface TextSelection {
+  cfi: string;
+  text: string;
+}
+
 export interface ReaderEngine {
+  /** Some com a seleção de texto (depois de destacar ou copiar) */
+  clearSelection?(): void;
   next(): Promise<void> | void;
   prev(): Promise<void> | void;
   goTo(location: string): Promise<void> | void;
@@ -35,6 +43,10 @@ export interface EngineCallbacks {
   onTap: (zone: TapZone) => void;
   onActivity: () => void;
   onError: (message: string) => void;
+  /** Seleção de texto mudou (null quando some) */
+  onSelect?: (selection: TextSelection | null) => void;
+  /** Tocou num trecho destacado */
+  onHighlightTap?: (cfi: string) => void;
 }
 
 /** Converte um toque (em px da tela) em zona: bordas viram página, meio abre o menu. */

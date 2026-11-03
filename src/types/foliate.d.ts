@@ -40,6 +40,16 @@ declare module "foliate-js/view.js" {
     prev(): Promise<void>;
     goLeft(): Promise<void>;
     goRight(): Promise<void>;
+    addAnnotation(annotation: { value: string; color?: string }, remove?: boolean): Promise<unknown>;
+    deleteAnnotation(annotation: { value: string }): Promise<unknown>;
+    getCFI(index: number, range?: Range): string;
+  }
+}
+
+declare module "foliate-js/overlayer.js" {
+  export class Overlayer {
+    static highlight(rects: unknown, options?: { color?: string; padding?: number }): SVGElement;
+    static underline(rects: unknown, options?: { color?: string }): SVGElement;
   }
 }
 

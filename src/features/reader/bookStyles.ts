@@ -1,5 +1,6 @@
 import { FONTS, type Paper, type ReaderSettings } from "./settings";
 import { fontFaces } from "./fonts";
+import { REFLOW_CSS } from "./textfix";
 
 /** CSS injetado no documento do livro. Respeita o livro onde dá, força onde precisa. */
 export function bookCss(s: ReaderSettings, paper: Paper): string {
@@ -47,6 +48,7 @@ p, li, blockquote, dd {
 a:any-link { color: ${paper.link} !important; text-decoration-thickness: 0.06em; }
 img, svg, video { max-width: 100%; height: auto; }
 pre { white-space: pre-wrap !important; }
+${REFLOW_CSS}
 ::selection { background: color-mix(in srgb, ${paper.link} 28%, transparent); }
 aside[epub|type~="endnote"], aside[epub|type~="footnote"], aside[epub|type~="note"], aside[epub|type~="rearnote"] {
   display: none;
