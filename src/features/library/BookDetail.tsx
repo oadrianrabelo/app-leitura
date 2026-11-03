@@ -110,7 +110,9 @@ function DetailBody({ book, readings }: { book: Book; readings: Reading[] }) {
     <div className="detail">
       <div className="detail-hero" style={{ ["--tint" as string]: book.tint ?? "var(--accent)" }}>
         <div className="detail-cover-wrap">
-          <BookCover book={book} width={128} className="detail-cover" />
+          <button className="detail-cover-button" onClick={() => setCoverSearch(true)} aria-label="Trocar a capa">
+            <BookCover book={book} width={128} className="detail-cover" />
+          </button>
           {!book.hasCover && (
             <button className="detail-find-cover" onClick={() => setCoverSearch(true)}>
               Buscar capa

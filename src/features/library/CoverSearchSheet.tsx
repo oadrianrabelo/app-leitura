@@ -4,7 +4,8 @@ import { Button } from "../../components/Button";
 import { setCover } from "../../db/books";
 import type { Book } from "../../db/types";
 import { processCover } from "../import/image";
-import { findCovers, type FoundCover } from "../physical/lookup";
+import { coverFromPasted, findCovers, imageSearchUrl, type FoundCover } from "../physical/lookup";
+import { openExternal } from "../../lib/open";
 import "./CoverSearchSheet.css";
 
 interface Props {
@@ -20,6 +21,8 @@ export function CoverSearchSheet({ book, open, onClose, onPickFile }: Props) {
   const [found, setFound] = useState<(FoundCover & { src: string })[]>([]);
   const [searching, setSearching] = useState(false);
   const [saving, setSaving] = useState<string | null>(null);
+  const [pasted, setPasted] = useState("");
+  const [pasteError, setPasteError] = useState<string | null>(null);
   const run = useRef(0);
 
   useEffect(() => {
@@ -42,6 +45,18 @@ export function CoverSearchSheet({ book, open, onClose, onPickFile }: Props) {
     found.forEach((f) => URL.revokeObjectURL(f.src));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
+
+  const usePasted = async () => {
+    setPasteError(null);
+    setSaving("colado");
+    const blob = await coverFromPasted(pasted);
+    if (!blob) {
+      setSaving(null);
+      setPasteError("Não consegui abrir essa imagem. No Google Imagens, abra a imagem, segure o dedo nela e escolha “Copiar endereço da imagem”.");
+      return;
+    }
+    await choose({ url: pasted, blob });
+  };
 
   const choose = async (c: FoundCover) => {
     setSaving(c.url);
@@ -70,6 +85,26 @@ export function CoverSearchSheet({ book, open, onClose, onPickFile }: Props) {
           </button>
         ))}
         {searching && Array.from({ length: Math.max(0, 3 - found.length) }, (_, i) => <span key={i} className="cover-search-skeleton" />)}
+      </div>
+      <div className="cover-web">
+        <p className="cover-web-title">Não achou? Procure na internet</p>
+        <Button variant="secondary" onClick={() => openExternal(imageSearchUrl(book))}>
+          Procurar no Google Imagens
+        </Button>
+        <p className="cover-web-hint">Segure o dedo na capa certa, toque em “Copiar endereço da imagem” e cole aqui:</p>
+        <div className="cover-web-paste">
+          <input
+            type="url"
+            inputMode="url"
+            placeholder="Cole o endereço da imagem"
+            value={pasted}
+            onChange={(e) => setPasted(e.target.value)}
+          />
+          <Button onClick={usePasted} disabled={!pasted.trim() || !!saving}>
+            {saving === "colado" ? "…" : "Usar"}
+          </Button>
+        </div>
+        {pasteError && <p className="cover-web-error">{pasteError}</p>}
       </div>
       <div className="reading-form-actions">
         <Button

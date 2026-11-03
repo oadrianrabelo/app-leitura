@@ -8,6 +8,33 @@ export interface ChangelogEntry {
 /** Mais recente primeiro. Cada release adiciona uma entrada aqui. */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.11.0",
+    date: "2026-11-03",
+    title: "Um Hoje mais vivo",
+    highlights: [
+      {
+        icon: "book",
+        title: "Lendo agora em destaque",
+        text: "O livro do momento ganha um cartão na cor da capa, com a página onde você parou e um empurrãozinho para continuar.",
+      },
+      {
+        icon: "sparkles",
+        title: "Sua semana é um canteiro",
+        text: "Cada dia lido vira uma florzinha em aquarela, cada uma de uma cor. Dia só de visita vira broto.",
+      },
+      {
+        icon: "bookmark",
+        title: "Um trecho por dia",
+        text: "As páginas que você marcou voltam como citação na tela Hoje, uma por dia.",
+      },
+      {
+        icon: "search",
+        title: "Capas e livros difíceis",
+        text: "Toque na capa para trocar; procure no Google Imagens e cole o endereço. Livro que não aparece na busca? Cole o link dele na Amazon, no Skoob ou no site da editora.",
+      },
+    ],
+  },
+  {
     version: "0.10.1",
     date: "2026-11-03",
     title: "Um livro, um lugar",

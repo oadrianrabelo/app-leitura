@@ -370,4 +370,67 @@ function livingGarden(g, W, H, opts = {}) {
   }
 }
 
-export const Arte = { livingGarden, shelfGarland, climb, climbTwined, cornerBig, garland, corner, sprig, wisteria, compoundLeaf, leaf, branch, PALETTES };
+/** Cores das florzinhas da semana: um dia de cada cor */
+const BLOSSOMS = [
+  [[228, 214, 246], [178, 150, 226], [118, 86, 178]], // lilás
+  [[248, 214, 226], [232, 150, 182], [176, 80, 124]], // rosa
+  [[214, 226, 248], [140, 172, 228], [72, 104, 178]], // azul
+  [[250, 222, 206], [238, 160, 128], [188, 96, 70]], // coral
+  [[250, 236, 196], [236, 196, 108], [178, 132, 40]], // dourado
+  [[236, 214, 244], [204, 150, 214], [140, 80, 150]], // malva
+  [[246, 220, 236], [222, 156, 196], [160, 86, 136]], // orquídea
+];
+
+/** Florzinha de cinco pétalas vista de cima, para marcar um dia lido */
+function blossomIcon(g, W, H, opts = {}) {
+  const { seed = 1, color = 0 } = opts;
+  A.setSeed(seed * 7907 + color * 31);
+  const [light, mid, dark] = BLOSSOMS[color % BLOSSOMS.length];
+  const cx = W / 2, cy = H / 2, R = W * 0.4;
+  const turn = rnd() * Math.PI;
+  for (let k = 0; k < 5; k++) {
+    const a = turn + (k * 2 * Math.PI) / 5 + gauss() * 0.08;
+    const pts = [];
+    for (let i = 0; i < 14; i++) {
+      const t = (i / 14) * Math.PI * 2;
+      // pétala em gota: estreita no centro, larga e arredondada na ponta
+      const rx = R * 0.5 * (1 + 0.06 * Math.sin(t * 3 + k));
+      const ry = R * 0.34 * (0.75 + 0.25 * Math.cos(t));
+      const px = Math.cos(t) * rx + R * 0.5, py = Math.sin(t) * ry;
+      pts.push([cx + px * Math.cos(a) - py * Math.sin(a), cy + px * Math.sin(a) + py * Math.cos(a)]);
+    }
+    wash(g, pts, mix(light, mid, 0.35 + rnd() * 0.3), { layers: 16, alpha: 0.08, spread: 0.05, edge: 1.5 });
+    // veio de cor mais forte perto do miolo
+    const inner = pts.map(([x, y]) => [cx + (x - cx) * 0.55, cy + (y - cy) * 0.55]);
+    wash(g, inner, mid, { layers: 8, alpha: 0.07, spread: 0.06, edge: 0.4 });
+  }
+  const core = [];
+  for (let i = 0; i < 10; i++) { const t = (i / 10) * Math.PI * 2; core.push([cx + Math.cos(t) * R * 0.17, cy + Math.sin(t) * R * 0.17]); }
+  wash(g, core, [236, 190, 96], { layers: 10, alpha: 0.14, spread: 0.08, edge: 1.2 });
+  for (let i = 0; i < 7; i++) {
+    const t = (i / 7) * Math.PI * 2 + rnd();
+    const d = R * (0.06 + rnd() * 0.08);
+    const dot = [];
+    for (let q = 0; q < 6; q++) { const u = (q / 6) * Math.PI * 2; dot.push([cx + Math.cos(t) * d + Math.cos(u) * R * 0.035, cy + Math.sin(t) * d + Math.sin(u) * R * 0.035]); }
+    wash(g, dot, dark, { layers: 4, alpha: 0.18, spread: 0.05, edge: 0 });
+  }
+}
+
+/** Broto: o dia em que ela passou por aqui, mas ainda não leu */
+function budIcon(g, W, H, opts = {}) {
+  A.setSeed((opts.seed ?? 3) * 104723);
+  const cx = W / 2;
+  stroke(g, spline([[cx, H * 0.95], [cx - W * 0.03, H * 0.7], [cx, H * 0.5]], 20), (t) => 4 * (1 - t) + 1.5, [110, 140, 90], { layers: 8, alpha: 0.1 });
+  leaf(g, cx, H * 0.72, -2.4, W * 0.34, W * 0.16, 0.2);
+  leaf(g, cx, H * 0.66, -0.7, W * 0.3, W * 0.14, 0.5);
+  const tip = [];
+  for (let i = 0; i < 12; i++) {
+    const t = (i / 12) * Math.PI * 2;
+    tip.push([cx + Math.cos(t) * W * 0.1, H * 0.38 + Math.sin(t) * W * 0.15 * (Math.sin(t) < 0 ? 1.15 : 0.8)]);
+  }
+  wash(g, tip, [214, 196, 236], { layers: 14, alpha: 0.09, spread: 0.06, edge: 1.4 });
+  leaf(g, cx, H * 0.5, -1.25, W * 0.16, W * 0.08, 0.3);
+  leaf(g, cx, H * 0.5, -1.9, W * 0.16, W * 0.08, 0.6);
+}
+
+export const Arte = { blossomIcon, budIcon, livingGarden, shelfGarland, climb, climbTwined, cornerBig, garland, corner, sprig, wisteria, compoundLeaf, leaf, branch, PALETTES };

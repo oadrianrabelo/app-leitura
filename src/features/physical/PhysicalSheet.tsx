@@ -8,7 +8,7 @@ import { platform } from "../../lib/platform";
 import { processCover } from "../import/image";
 import { normalizeIsbn } from "../import/metadata";
 import { useLibraryUi } from "../library/state";
-import { downloadCover, findCovers, searchBooks, type BookCandidate } from "./lookup";
+import { bookFromLink, downloadCover, findCovers, searchBooks, type BookCandidate } from "./lookup";
 import "./PhysicalSheet.css";
 
 const STATUS: { id: BookStatus; label: string }[] = [
@@ -78,6 +78,14 @@ export function PhysicalSheet() {
     setLoading(true);
     setError(null);
     try {
+      // Colou o link da página do livro (Amazon, Skoob, editora…): lê direto de lá
+      if (/^https?:\/\//i.test(text.trim())) {
+        const found = await bookFromLink(text.trim());
+        if (id !== searchId.current) return;
+        setResults([found]);
+        setPicked(found);
+        return;
+      }
       const list = await searchBooks(text);
       if (id !== searchId.current) return;
       setResults(list);
@@ -167,7 +175,7 @@ export function PhysicalSheet() {
             <input
               type="search"
               enterKeyHint="search"
-              placeholder="Título, autor ou ISBN"
+              placeholder="Título, autor, ISBN ou link"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               autoFocus={platform !== "android"}
@@ -202,6 +210,9 @@ export function PhysicalSheet() {
             </ul>
           )}
 
+          <p className="physical-tip">
+            Livro difícil de achar? Cole aqui o link dele na Amazon, no Skoob ou no site da editora.
+          </p>
           <button className="physical-manual" onClick={() => setPicked({ ...blank(), title: normalizeIsbn(query) ? "" : query })}>
             Não achou? <strong>Cadastrar à mão</strong>
           </button>

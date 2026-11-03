@@ -262,3 +262,121 @@ export async function findCovers(
   const score = (u: string) => (u.includes("books.google.com/books/content") ? 1e6 : rank.indexOf(u));
   return found.sort((a, b) => score(a.url) - score(b.url));
 }
+
+const BROWSER_UA =
+  "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Mobile Safari/537.36";
+
+const decodeHtml = (s: string) =>
+  s
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&apos;/g, "'")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
+    .replace(/\s+/g, " ")
+    .trim();
+
+/**
+ * Lê um livro a partir do link da página dele (Amazon, Skoob, site da editora…):
+ * título, autor, capa, ISBN e páginas, pelas etiquetas que esses sites publicam.
+ */
+export async function bookFromLink(url: string): Promise<BookCandidate> {
+  const res = await httpFetch(url, { headers: { "User-Agent": BROWSER_UA, "Accept-Language": "pt-BR,pt;q=0.9" }, signal: AbortSignal.timeout(15000) });
+  if (!res.ok) throw new Error(`A página respondeu ${res.status}. Confira o link.`);
+  const html = await res.text();
+  if (/captcha|validateCaptcha|Robot Check/i.test(html) && !/productTitle/.test(html)) {
+    throw new Error("A Amazon pediu uma verificação. Tente de novo daqui a pouco, ou use o link do Skoob.");
+  }
+  return parseBookPage(html, url);
+}
+
+/** Extrai o livro do HTML de uma página (separado para poder testar sem internet) */
+export function parseBookPage(html: string, url: string): BookCandidate {
+  const meta = (name: string) => {
+    const re = new RegExp(`<meta[^>]+(?:property|name)=["']${name}["'][^>]*content=["']([^"']+)["']|<meta[^>]+content=["']([^"']+)["'][^>]*(?:property|name)=["']${name}["']`, "i");
+    const m = html.match(re);
+    return m ? decodeHtml(m[1] ?? m[2]) : null;
+  };
+  const pick = (...re: RegExp[]) => {
+    for (const r of re) {
+      const m = html.match(r);
+      if (m?.[1]) return decodeHtml(m[1]);
+    }
+    return null;
+  };
+
+  let title =
+    pick(/id=["']productTitle["'][^>]*>([^<]+)</i, /id=["']ebooksProductTitle["'][^>]*>([^<]+)</i) ??
+    meta("og:title") ??
+    pick(/<title[^>]*>([^<]+)</i) ??
+    "";
+  // "Amazon.com.br: Livro X | eBooks Kindle" e afins
+  title = title.replace(/^Amazon\.com(\.br)?\s*:\s*/i, "").split(/\s+[|–-]\s+(Amazon|Skoob|eBooks|Livros)/i)[0].split(" : ")[0].trim();
+  if (!title) throw new Error("Não encontrei um livro nessa página.");
+
+  const authorRaw =
+    meta("book:author") ??
+    meta("author") ??
+    pick(/class=["'][^"']*\bauthor\b[^"']*["'][^>]*>\s*<a[^>]*>([^<]+)</i, /"author"\s*:\s*\{[^}]*"name"\s*:\s*"([^"]+)"/i, /"author"\s*:\s*"([^"]+)"/i);
+  const cover =
+    pick(/data-old-hires=["']([^"']+)["']/i, /"hiRes"\s*:\s*"(https:[^"]+)"/i, /id=["'](?:imgBlkFront|ebooksImgBlkFront|landingImage)["'][^>]*src=["']([^"']+)["']/i) ??
+    meta("og:image") ??
+    meta("twitter:image");
+  const text = html.replace(/<[^>]+>/g, " ");
+  // a Amazon põe caracteres invisíveis entre o rótulo e o valor
+  const isbns = [...text.matchAll(/ISBN(?:[-‑]1[03])?[^0-9A-Za-z]{0,12}(\d[\d\-‑ ]{8,16}[\dXx])/g)].map((m) => normalizeIsbn(m[1].replace(/[^\dXx]/g, "")));
+  const isbn = isbns.find((i) => i?.length === 13) ?? isbns.find(Boolean) ?? null;
+  const pages = Number(text.match(/(\d{2,4})\s*p[áa]ginas/i)?.[1] ?? text.match(/p[áa]ginas[^0-9]{0,6}(\d{2,4})/i)?.[1]) || null;
+  const publisher =
+    pick(/Editora[^<]{0,12}<\/span>\s*<span[^>]*>([^<;(]+)/i, /"publisher"\s*:\s*\{[^}]*"name"\s*:\s*"([^"]+)"/i) ??
+    text.match(/Editora\s*[:：]\s*([A-ZÀ-Ú][\wÀ-ú.&' -]{1,40}?)(?=\s{2,}|\s+(?:ISBN|Ano|P[áa]ginas|Edi[çc][ãa]o|Idioma)|$)/)?.[1]?.trim() ??
+    null;
+
+  const authors = authorRaw ? authorRaw.split(/\s*[,;&]\s*|\s+e\s+/).map((a) => a.replace(/\(.*?\)/g, "").trim()).filter(Boolean) : [];
+  // "Título - Autora" (Skoob e outros): tira o nome repetido
+  for (const a of authors) title = title.replace(new RegExp(`\\s+[-–]\\s+${a.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i"), "");
+  return {
+    key: `link:${url}`,
+    source: "google",
+    title,
+    authors,
+    publisher: publisher?.trim() || null,
+    year: Number(text.match(/(?:Edição|Publicação|publicado)[^0-9]{0,40}((?:19|20)\d{2})/i)?.[1]) || null,
+    pageCount: pages,
+    isbn,
+    description: meta("og:description"),
+    subjects: [],
+    language: null,
+    coverUrl: cover?.startsWith("//") ? `https:${cover}` : cover,
+  };
+}
+
+/** Link da busca de imagens do Google para a capa deste livro */
+export function imageSearchUrl(book: { title: string; authors: string[]; publisher?: string | null }) {
+  const q = [book.title, book.authors[0], book.publisher, "capa livro"].filter(Boolean).join(" ");
+  return `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(q)}`;
+}
+
+/** Imagem a partir do que ela colou: endereço da imagem (http) ou a própria imagem (data:) */
+export async function coverFromPasted(text: string): Promise<Blob | null> {
+  const s = text.trim();
+  if (s.startsWith("data:image/")) {
+    const res = await fetch(s);
+    return res.blob();
+  }
+  if (!/^https?:\/\//i.test(s)) return null;
+  try {
+    const res = await httpFetch(s, { headers: { "User-Agent": BROWSER_UA }, signal: AbortSignal.timeout(15000) });
+    if (!res.ok) return null;
+    const blob = await res.blob();
+    if (blob.size < 1500) return null;
+    if (blob.type.startsWith("image/")) return blob;
+    // link de uma página (não da imagem): tenta a imagem principal dela
+    const html = await blob.text();
+    const og = html.match(/<meta[^>]+property=["']og:image["'][^>]*content=["']([^"']+)["']/i)?.[1];
+    return og ? downloadCover(decodeHtml(og)) : null;
+  } catch {
+    return null;
+  }
+}

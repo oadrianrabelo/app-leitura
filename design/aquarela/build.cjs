@@ -42,6 +42,11 @@ const PIECES = {
   canto: ["cornerBig", 1100, 1500, { seed: 7 }, { l: 0, r: 0, t: 0, b: 0 }],
   raminho: ["sprig", 700, 700, { seed: 5 }, { l: 120, r: 120, t: 120, b: 120 }],
 };
+// Peças com cor própria (não mudam com o tema): as florzinhas e o broto da semana
+const FIXED = {
+  ...Object.fromEntries(Array.from({ length: 7 }, (_, i) => [`flor-${i + 1}`, ["blossomIcon", 200, 200, { seed: i + 1, color: i }, { l: 0, r: 0, t: 0, b: 0 }]])),
+  broto: ["budIcon", 200, 200, { seed: 3 }, { l: 0, r: 0, t: 0, b: 0 }],
+};
 const PALETTES = ["lilas", "azul", "rosa", "coral", "mista"];
 
 (async () => {
@@ -51,10 +56,11 @@ const PALETTES = ["lilas", "azul", "rosa", "coral", "mista"];
   const b = await chromium.launch();
   const jobs = [];
   for (const [name, [fn, W, H, opts, pad]] of Object.entries(PIECES))
-    for (const palette of PALETTES) jobs.push({ name, fn, W, H, pad, opts: { ...opts, palette } });
+    for (const palette of PALETTES) jobs.push({ name, fn, W, H, pad, file: `${name}-${palette}`, opts: { ...opts, palette } });
+  for (const [name, [fn, W, H, opts, pad]] of Object.entries(FIXED)) jobs.push({ name, fn, W, H, pad, file: name, opts });
   // algumas abas em paralelo
   const run = async (job) => {
-    if (process.env.ONLY_MISSING && fs.existsSync(path.join(OUT, `${job.name}-${job.opts.palette}.webp`))) return;
+    if (process.env.ONLY_MISSING && fs.existsSync(path.join(OUT, `${job.file}.webp`))) return;
     const p = await b.newPage();
     await p.goto(URL);
     await p.waitForFunction(() => window.ready);
@@ -68,7 +74,7 @@ const PALETTES = ["lilas", "azul", "rosa", "coral", "mista"];
       window.Aquarela.granulate(g, c.width, c.height, 0.16);
       return c.toDataURL("image/webp", 0.7).split(",")[1];
     }, job);
-    const file = path.join(OUT, `${job.name}-${job.opts.palette}.webp`);
+    const file = path.join(OUT, `${job.file}.webp`);
     fs.writeFileSync(file, Buffer.from(data, "base64"));
     console.log(path.basename(file), (fs.statSync(file).size / 1024).toFixed(0) + "KB");
     await p.close();
