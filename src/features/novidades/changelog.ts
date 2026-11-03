@@ -17,6 +17,11 @@ export const CHANGELOG: ChangelogEntry[] = [
         title: "Arraste para organizar",
         text: "Segure um livro na biblioteca e arraste para onde quiser. A estante passa para \u201cMinha ordem\u201d e a arrumação sincroniza com seus outros aparelhos.",
       },
+      {
+        icon: "search",
+        title: "Buscar capa",
+        text: "Livro sem capa? Toque em \u201cBuscar capa\u201d: o Sépia procura na Amazon, Google Books, Open Library e catálogos brasileiros e mostra as opções para você escolher.",
+      },
     ],
   },
   {

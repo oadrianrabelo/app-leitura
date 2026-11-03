@@ -8,7 +8,7 @@ import { platform } from "../../lib/platform";
 import { processCover } from "../import/image";
 import { normalizeIsbn } from "../import/metadata";
 import { useLibraryUi } from "../library/state";
-import { downloadCover, searchBooks, type BookCandidate } from "./lookup";
+import { downloadCover, findCovers, searchBooks, type BookCandidate } from "./lookup";
 import "./PhysicalSheet.css";
 
 const STATUS: { id: BookStatus; label: string }[] = [
@@ -105,7 +105,9 @@ export function PhysicalSheet() {
   const save = async () => {
     if (!picked || !picked.title.trim()) return;
     setSaving(true);
-    const raw = picked.coverUrl ? await downloadCover(picked.coverUrl) : null;
+    // Sem capa no resultado escolhido: tenta os outros catálogos antes de desistir
+    let raw = picked.coverUrl ? await downloadCover(picked.coverUrl) : null;
+    if (!raw) raw = (await findCovers(picked).catch(() => []))[0]?.blob ?? null;
     const cover = raw ? await processCover(raw) : null;
     const book = await addBook(
       {

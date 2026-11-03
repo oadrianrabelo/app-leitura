@@ -5,6 +5,7 @@ import { setCover, updateBook } from "../../db/books";
 import type { Book } from "../../db/types";
 import { processCover } from "../import/image";
 import { BookCover } from "./BookCover";
+import { CoverSearchSheet } from "./CoverSearchSheet";
 
 export function EditBookSheet({ book, open, onClose }: { book: Book; open: boolean; onClose: () => void }) {
   const [title, setTitle] = useState(book.title);
@@ -12,6 +13,7 @@ export function EditBookSheet({ book, open, onClose }: { book: Book; open: boole
   const [pages, setPages] = useState(book.pageCount ? String(book.pageCount) : "");
   const [year, setYear] = useState(book.year ? String(book.year) : "");
   const [publisher, setPublisher] = useState(book.publisher ?? "");
+  const [searchCover, setSearchCover] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -54,9 +56,14 @@ export function EditBookSheet({ book, open, onClose }: { book: Book; open: boole
         <p className="reading-form-eyebrow">Editar informações</p>
         <div className="edit-cover">
           <BookCover book={book} width={72} />
-          <Button variant="secondary" onClick={pickCover}>
-            Trocar capa
-          </Button>
+          <div className="edit-cover-actions">
+            <Button variant="secondary" onClick={() => setSearchCover(true)}>
+              Buscar capa
+            </Button>
+            <Button variant="secondary" onClick={pickCover}>
+              Usar uma foto
+            </Button>
+          </div>
         </div>
         <label className="field">
           <span className="field-label">Título</span>
@@ -86,6 +93,7 @@ export function EditBookSheet({ book, open, onClose }: { book: Book; open: boole
           </Button>
         </div>
       </div>
+      <CoverSearchSheet book={book} open={searchCover} onClose={() => setSearchCover(false)} onPickFile={pickCover} />
     </Sheet>
   );
 }

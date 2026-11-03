@@ -2,10 +2,12 @@ import { useMemo, useState } from "react";
 import { Sheet } from "../../components/Sheet";
 import { Button } from "../../components/Button";
 import { Icon } from "../../components/Icon";
-import { addReading, deleteBook, updateBook } from "../../db/books";
+import { addReading, deleteBook, setCover, updateBook } from "../../db/books";
 import { useBook, useReadings } from "../../db/hooks";
 import type { Book, Reading } from "../../db/types";
 import { BookCover } from "./BookCover";
+import { CoverSearchSheet } from "./CoverSearchSheet";
+import { processCover } from "../import/image";
 import { EditBookSheet } from "./EditBookSheet";
 import { ReadingSheet, type ReadingDraft } from "./ReadingSheet";
 import { Stars } from "./Stars";
@@ -56,6 +58,7 @@ function DetailBody({ book, readings }: { book: Book; readings: Reading[] }) {
   const [editing, setEditing] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [showFull, setShowFull] = useState(false);
+  const [coverSearch, setCoverSearch] = useState(false);
 
   // Ordem cronológica para numerar (1ª, 2ª...), exibida da mais recente para a mais antiga
   const numbered = useMemo(() => {
@@ -99,7 +102,14 @@ function DetailBody({ book, readings }: { book: Book; readings: Reading[] }) {
   return (
     <div className="detail">
       <div className="detail-hero" style={{ ["--tint" as string]: book.tint ?? "var(--accent)" }}>
-        <BookCover book={book} width={128} className="detail-cover" />
+        <div className="detail-cover-wrap">
+          <BookCover book={book} width={128} className="detail-cover" />
+          {!book.hasCover && (
+            <button className="detail-find-cover" onClick={() => setCoverSearch(true)}>
+              Buscar capa
+            </button>
+          )}
+        </div>
         <div className="detail-heading">
           <h2 className="detail-title">{book.title}</h2>
           <p className="detail-authors">{book.authors.join(", ") || "Autor desconhecido"}</p>
@@ -227,6 +237,22 @@ function DetailBody({ book, readings }: { book: Book; readings: Reading[] }) {
 
       <ReadingSheet draft={draft} onClose={() => setDraft(null)} />
       <EditBookSheet book={book} open={editing} onClose={() => setEditing(false)} />
+      <CoverSearchSheet
+        book={book}
+        open={coverSearch}
+        onClose={() => setCoverSearch(false)}
+        onPickFile={() => {
+          const input = document.createElement("input");
+          input.type = "file";
+          input.accept = "image/*";
+          input.onchange = async () => {
+            const file = input.files?.[0];
+            const processed = file && (await processCover(file));
+            if (processed) await setCover(book.id, processed.blob, processed.tint);
+          };
+          input.click();
+        }}
+      />
     </div>
   );
 }

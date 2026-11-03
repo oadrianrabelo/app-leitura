@@ -189,7 +189,7 @@ export async function searchBooks(input: string): Promise<BookCandidate[]> {
 
 export async function downloadCover(url: string): Promise<Blob | null> {
   try {
-    const res = await httpFetch(url);
+    const res = await httpFetch(url, { signal: AbortSignal.timeout(15000) });
     if (!res.ok) return null;
     const blob = await res.blob();
     // Capas "vazias" de 1x1 que alguns catálogos devolvem
@@ -197,4 +197,68 @@ export async function downloadCover(url: string): Promise<Blob | null> {
   } catch {
     return null;
   }
+}
+
+/** ISBN-13 (978…) → ISBN-10, que é o código que a Amazon usa nas imagens de livros físicos */
+export function isbn10(isbn: string): string | null {
+  if (isbn.length === 10) return isbn;
+  if (isbn.length !== 13 || !isbn.startsWith("978")) return null;
+  const core = isbn.slice(3, 12);
+  const sum = core.split("").reduce((acc, d, i) => acc + (10 - i) * Number(d), 0);
+  const check = (11 - (sum % 11)) % 11;
+  return core + (check === 10 ? "X" : String(check));
+}
+
+/** Endereços de capa que dependem só do ISBN (alguns devolvem imagem vazia quando não têm) */
+function directCovers(isbn: string): string[] {
+  const out: string[] = [];
+  const ten = isbn10(isbn);
+  if (ten) {
+    out.push(`https://images-na.ssl-images-amazon.com/images/P/${ten}.01.LZZZZZZZ.jpg`);
+    out.push(`https://m.media-amazon.com/images/P/${ten}.01._SCLZZZZZZZ_.jpg`);
+  }
+  out.push(`https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg?default=false`);
+  if (ten) out.push(`https://covers.openlibrary.org/b/isbn/${ten}-L.jpg?default=false`);
+  out.push(`https://books.google.com/books/content?vid=ISBN${isbn}&printsec=frontcover&img=1&zoom=1`);
+  return out;
+}
+
+export interface FoundCover {
+  url: string;
+  blob: Blob;
+}
+
+/**
+ * Procura capas em todos os catálogos (pelo ISBN e pelo título e autor) e devolve só as
+ * que de fato baixaram como imagem, sem repetir. `onFound` avisa cada uma assim que chega.
+ */
+export async function findCovers(
+  book: { isbn: string | null; title: string; authors: string[] },
+  onFound?: (c: FoundCover) => void,
+): Promise<FoundCover[]> {
+  const urls = new Set<string>();
+  const isbn = normalizeIsbn(book.isbn);
+  if (isbn) directCovers(isbn).forEach((u) => urls.add(u));
+  const queries = [isbn, [book.title, book.authors[0]].filter(Boolean).join(" ")].filter(Boolean) as string[];
+  const results = await Promise.allSettled(queries.map((q) => searchBooks(q)));
+  for (const r of results) if (r.status === "fulfilled") r.value.slice(0, 8).forEach((c) => c.coverUrl && urls.add(c.coverUrl));
+
+  const found: FoundCover[] = [];
+  const sizes = new Set<number>();
+  await Promise.all(
+    [...urls].map(async (url) => {
+      const blob = await downloadCover(url);
+      // mesma imagem por dois caminhos: mostra uma vez só
+      if (!blob || !blob.type.startsWith("image/") || sizes.has(blob.size)) return;
+      sizes.add(blob.size);
+      const c = { url, blob };
+      found.push(c);
+      onFound?.(c);
+    }),
+  );
+  // na ordem de confiança: Amazon e Open Library primeiro; a do Google (que às vezes é um aviso
+  // de "sem imagem") por último
+  const rank = [...urls];
+  const score = (u: string) => (u.includes("books.google.com/books/content") ? 1e6 : rank.indexOf(u));
+  return found.sort((a, b) => score(a.url) - score(b.url));
 }
