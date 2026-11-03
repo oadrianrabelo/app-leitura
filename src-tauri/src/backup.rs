@@ -62,11 +62,9 @@ pub async fn backup_save<R: Runtime>(app: tauri::AppHandle<R>, path: String, nam
     #[cfg(target_os = "android")]
     {
         let handle = app.state::<Saver<R>>().0.clone();
+        let args = serde_json::json!({ "path": path, "name": name.clone(), "mime": "application/zip" });
         let result = tauri::async_runtime::spawn_blocking(move || {
-            handle.run_mobile_plugin::<Saved>(
-                "save",
-                serde_json::json!({ "path": path, "name": name, "mime": "application/zip" }),
-            )
+            handle.run_mobile_plugin::<Saved>("save", args)
         })
         .await
         .map_err(|e| e.to_string())?;
