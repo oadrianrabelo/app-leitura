@@ -10,6 +10,7 @@ import { useNovidades } from "../features/novidades/novidades";
 import { SyncSection } from "../features/sync/SyncSection";
 import { JardimSection } from "../features/flora/JardimSection";
 import { DataSection } from "../features/backup/DataSection";
+import { ReminderSection } from "../features/lembrete/ReminderSection";
 import { Botanical } from "../components/Botanical";
 import "./Ajustes.css";
 
@@ -109,6 +110,8 @@ export function Ajustes() {
           Nenhum tema usa branco ou preto puros. O contraste é suficiente para ler bem, sem ofuscar.
         </p>
       </Section>
+
+      <ReminderSection />
 
       <JardimSection />
 

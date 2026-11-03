@@ -206,3 +206,14 @@ label.row:active {
 .data-message.is-error {
   color: var(--hue-rosa);
 }
+
+.reminder-time {
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-text);
+  font-weight: 600;
+  background: var(--accent-soft);
+  border: 0;
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+}

@@ -36,6 +36,10 @@ interface SettingsState {
   /** Níveis de conquista já comemorados neste aparelho; null = ainda não comparou nenhum */
   seenAchievements: string[] | null;
   setBookmarkStyle: (style: string) => void;
+  /** Lembrete diário de leitura (notificação no horário escolhido, "HH:MM") */
+  reminderEnabled: boolean;
+  reminderTime: string;
+  setReminder: (enabled: boolean, time?: string) => void;
   /** Último backup manual feito neste aparelho */
   lastBackupAt: number | null;
   setLastBackupAt: (t: number) => void;
@@ -70,6 +74,9 @@ export const useSettings = create<SettingsState>()(
       yearGoal: null,
       seenAchievements: null,
       setBookmarkStyle: (bookmarkStyle) => set({ bookmarkStyle }),
+      reminderEnabled: false,
+      reminderTime: "20:30",
+      setReminder: (reminderEnabled, time) => set((s) => ({ reminderEnabled, reminderTime: time ?? s.reminderTime })),
       lastBackupAt: null,
       setLastBackupAt: (lastBackupAt) => set({ lastBackupAt }),
       setYearGoal: (yearGoal) => set({ yearGoal }),

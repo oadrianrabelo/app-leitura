@@ -8,6 +8,28 @@ export interface ChangelogEntry {
 /** Mais recente primeiro. Cada release adiciona uma entrada aqui. */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.10.0",
+    date: "2026-11-03",
+    title: "Sua história de leitura, inteira",
+    highlights: [
+      {
+        icon: "upload",
+        title: "Importar de outros apps",
+        text: "Traga sua estante do Goodreads, do StoryGraph ou de uma planilha: livros, datas, notas e resenhas, sem duplicar o que já está aqui.",
+      },
+      {
+        icon: "download",
+        title: "Backup em um toque",
+        text: "Em Ajustes → Seus dados, salve um arquivo com tudo onde quiser (Downloads, Drive, WhatsApp…) e restaure quando precisar.",
+      },
+      {
+        icon: "calendar",
+        title: "Lembrete de leitura",
+        text: "Um aviso por dia, no horário que você escolher, com o livro e a página onde parou. Se já leu no dia, ele fica quietinho.",
+      },
+    ],
+  },
+  {
     version: "0.9.1",
     date: "2026-11-03",
     title: "A estante do seu jeito",

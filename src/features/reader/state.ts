@@ -13,5 +13,9 @@ export const useReaderUi = create<ReaderUi>()((set, get) => ({
     if (get().bookId) return;
     set({ bookId });
   },
-  close: () => set({ bookId: null }),
+  close: () => {
+    set({ bookId: null });
+    // a sessão termina de gravar logo depois: aí o lembrete de hoje sabe que ela leu
+    setTimeout(() => import("../lembrete/reminder").then((m) => m.rescheduleReminders()), 1500);
+  },
 }));

@@ -19,10 +19,16 @@ import { useApplyTheme } from "./lib/theme";
 import { useSettings } from "./lib/settings";
 import { startAutoSync } from "./features/sync/sync";
 import { recordVisit } from "./db/week";
+import { rescheduleReminders } from "./features/lembrete/reminder";
 
 startAutoSync();
 recordVisit();
-document.addEventListener("visibilitychange", () => document.visibilityState === "visible" && recordVisit());
+rescheduleReminders();
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") recordVisit();
+  // ao sair do app (ou voltar), o lembrete passa a refletir o que foi lido
+  rescheduleReminders();
+});
 import "./App.css";
 
 /**
