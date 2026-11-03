@@ -6,7 +6,7 @@ import { useLibraryUi } from "./state";
 import "./AddSheet.css";
 
 export function AddSheet() {
-  const { addOpen, setAddOpen, setPhysicalOpen } = useLibraryUi();
+  const { addOpen, setAddOpen, setPhysicalOpen, setImportOpen } = useLibraryUi();
   const close = () => setAddOpen(false);
 
   const options: { icon: IconName; title: string; text: string; run: () => void; hidden?: boolean }[] = [
@@ -28,6 +28,12 @@ export function AddSheet() {
       title: "Livro físico",
       text: platform === "android" ? "Código de barras, busca ou cadastro à mão." : "Busca por título, autor ou ISBN.",
       run: () => setTimeout(() => setPhysicalOpen(true), 280),
+    },
+    {
+      icon: "upload",
+      title: "De outro app ou planilha",
+      text: "Goodreads, StoryGraph ou uma planilha sua (CSV). Traz livros, datas e notas.",
+      run: () => setTimeout(() => setImportOpen(true), 280),
     },
   ];
 

@@ -1,0 +1,80 @@
+.import-steps {
+  margin: var(--space-3) 0 0;
+  padding-left: 1.2em;
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.import-steps em {
+  font-style: normal;
+  color: var(--ink);
+}
+
+.import-error {
+  margin-top: var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--hue-rosa);
+}
+
+.import-source {
+  font-size: var(--text-sm);
+  color: var(--ink-faint);
+}
+
+.import-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.import-summary span {
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  background: var(--bg-sunken);
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+}
+
+.import-summary strong {
+  color: var(--ink);
+  font-weight: 650;
+}
+
+.import-note {
+  margin-top: var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--ink-faint);
+}
+
+.import-covers {
+  margin-top: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--bg-sunken);
+}
+
+.import-again {
+  color: var(--ink-faint);
+  font-size: var(--text-sm);
+  padding: var(--space-2);
+}
+
+.import-bar {
+  height: 8px;
+  margin-top: var(--space-5);
+  border-radius: var(--radius-full);
+  background: var(--bg-sunken);
+  overflow: hidden;
+}
+
+.import-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  transition: width 300ms var(--ease-out);
+}

@@ -12,6 +12,7 @@ import { ImportSheet } from "./features/import/ImportSheet";
 import { AddSheet } from "./features/library/AddSheet";
 import { BookDetail } from "./features/library/BookDetail";
 import { PhysicalSheet } from "./features/physical/PhysicalSheet";
+import { ImportOtherSheet } from "./features/importar/ImportOtherSheet";
 import { Reader } from "./features/reader/Reader";
 import { useUpdates } from "./features/updates/updates";
 import { useApplyTheme } from "./lib/theme";
@@ -92,6 +93,7 @@ export default function App() {
         <AddSheet />
         <ImportSheet />
         <PhysicalSheet />
+        <ImportOtherSheet />
         <UpdateSheet />
         <NovidadesSheet />
         <Celebration />
