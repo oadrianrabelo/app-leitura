@@ -49,13 +49,13 @@ export function CoverSearchSheet({ book, open, onClose, onPickFile }: Props) {
   const usePasted = async () => {
     setPasteError(null);
     setSaving("colado");
-    const blob = await coverFromPasted(pasted);
-    if (!blob) {
+    try {
+      const blob = await coverFromPasted(pasted);
+      await choose({ url: pasted, blob });
+    } catch (e) {
       setSaving(null);
-      setPasteError("Não consegui abrir essa imagem. No Google Imagens, abra a imagem, segure o dedo nela e escolha “Copiar endereço da imagem”.");
-      return;
+      setPasteError(`${e instanceof Error ? e.message : String(e)} Se não der, baixe a imagem e use “Escolher imagem do celular”.`);
     }
-    await choose({ url: pasted, blob });
   };
 
   const choose = async (c: FoundCover) => {
@@ -75,7 +75,7 @@ export function CoverSearchSheet({ book, open, onClose, onPickFile }: Props) {
           ? "Procurando na Amazon, Google Books, Open Library e catálogos brasileiros…"
           : found.length
             ? "Toque na capa certa."
-            : "Não achei nenhuma capa para este livro. Você pode usar uma foto."}
+            : "Não achei nenhuma capa para este livro nos catálogos."}
       </p>
       <div className="cover-search-grid">
         {found.map((c) => (
@@ -88,15 +88,33 @@ export function CoverSearchSheet({ book, open, onClose, onPickFile }: Props) {
       </div>
       <div className="cover-web">
         <p className="cover-web-title">Não achou? Procure na internet</p>
-        <Button variant="secondary" onClick={() => openExternal(imageSearchUrl(book))}>
-          Procurar no Google Imagens
-        </Button>
-        <p className="cover-web-hint">Segure o dedo na capa certa, toque em “Copiar endereço da imagem” e cole aqui:</p>
+        <ol className="cover-web-steps">
+          <li>
+            <Button variant="secondary" onClick={() => openExternal(imageSearchUrl(book))}>
+              1. Procurar no Google Imagens
+            </Button>
+          </li>
+          <li>
+            <span>2. Abra a capa certa, segure o dedo nela e toque em <b>Baixar imagem</b>.</span>
+          </li>
+          <li>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                onClose();
+                onPickFile();
+              }}
+            >
+              3. Escolher imagem do celular
+            </Button>
+          </li>
+        </ol>
+        <p className="cover-web-hint">Ou cole aqui um link da imagem ou da página do livro (Amazon, Mercado Livre, Skoob…):</p>
         <div className="cover-web-paste">
           <input
             type="url"
             inputMode="url"
-            placeholder="Cole o endereço da imagem"
+            placeholder="Cole o link aqui"
             value={pasted}
             onChange={(e) => setPasted(e.target.value)}
           />
@@ -105,17 +123,6 @@ export function CoverSearchSheet({ book, open, onClose, onPickFile }: Props) {
           </Button>
         </div>
         {pasteError && <p className="cover-web-error">{pasteError}</p>}
-      </div>
-      <div className="reading-form-actions">
-        <Button
-          variant="secondary"
-          onClick={() => {
-            onClose();
-            onPickFile();
-          }}
-        >
-          Usar uma foto ou imagem do celular
-        </Button>
       </div>
     </Sheet>
   );

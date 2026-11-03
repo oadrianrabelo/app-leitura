@@ -8,6 +8,18 @@ export interface ChangelogEntry {
 /** Mais recente primeiro. Cada release adiciona uma entrada aqui. */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.11.1",
+    date: "2026-11-04",
+    title: "Capas pela internet, do jeito fácil",
+    highlights: [
+      {
+        icon: "search",
+        title: "Baixe e escolha",
+        text: "No Google Imagens, baixe a capa e toque em “Escolher imagem do celular”. Links compartilhados (Amazon, Mercado Livre, Google) também funcionam, mesmo com texto junto.",
+      },
+    ],
+  },
+  {
     version: "0.11.0",
     date: "2026-11-03",
     title: "Um Hoje mais vivo",

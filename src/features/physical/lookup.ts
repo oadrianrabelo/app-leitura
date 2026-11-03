@@ -282,7 +282,12 @@ const decodeHtml = (s: string) =>
  * título, autor, capa, ISBN e páginas, pelas etiquetas que esses sites publicam.
  */
 export async function bookFromLink(url: string): Promise<BookCandidate> {
-  const res = await httpFetch(url, { headers: { "User-Agent": BROWSER_UA, "Accept-Language": "pt-BR,pt;q=0.9" }, signal: AbortSignal.timeout(15000) });
+  let res: Response;
+  try {
+    res = await httpFetch(url, { headers: { "User-Agent": BROWSER_UA, "Accept-Language": "pt-BR,pt;q=0.9" }, signal: AbortSignal.timeout(20000) });
+  } catch (e) {
+    throw new Error(`Não consegui abrir o link (${e instanceof Error ? e.message : String(e)}).`);
+  }
   if (!res.ok) throw new Error(`A página respondeu ${res.status}. Confira o link.`);
   const html = await res.text();
   if (/captcha|validateCaptcha|Robot Check/i.test(html) && !/productTitle/.test(html)) {
@@ -358,25 +363,47 @@ export function imageSearchUrl(book: { title: string; authors: string[]; publish
   return `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(q)}`;
 }
 
-/** Imagem a partir do que ela colou: endereço da imagem (http) ou a própria imagem (data:) */
-export async function coverFromPasted(text: string): Promise<Blob | null> {
+/** O primeiro link dentro do texto colado ("Confira este produto… https://a.co/d/…") */
+export function extractUrl(text: string): string | null {
+  const m = text.match(/https?:\/\/[^\s"'<>]+/i);
+  return m ? m[0].replace(/[).,;!?]+$/, "") : null;
+}
+
+/**
+ * Imagem a partir do que ela colou: a própria imagem (data:), o endereço da imagem, ou o
+ * link de uma página (produto, resultado de busca) — aí usa a imagem principal da página.
+ * Lança um erro com o motivo, para a mensagem ajudar.
+ */
+export async function coverFromPasted(text: string): Promise<Blob> {
   const s = text.trim();
-  if (s.startsWith("data:image/")) {
-    const res = await fetch(s);
-    return res.blob();
-  }
-  if (!/^https?:\/\//i.test(s)) return null;
+  if (s.startsWith("data:image/")) return (await fetch(s)).blob();
+  const url = extractUrl(s);
+  if (!url) throw new Error("Não encontrei um link no que foi colado.");
+  // Google Imagens às vezes cola o resultado (…imgres?imgurl=<a imagem>)
+  const direct = new URL(url).searchParams.get("imgurl");
+  let res: Response;
   try {
-    const res = await httpFetch(s, { headers: { "User-Agent": BROWSER_UA }, signal: AbortSignal.timeout(15000) });
-    if (!res.ok) return null;
-    const blob = await res.blob();
-    if (blob.size < 1500) return null;
-    if (blob.type.startsWith("image/")) return blob;
-    // link de uma página (não da imagem): tenta a imagem principal dela
-    const html = await blob.text();
-    const og = html.match(/<meta[^>]+property=["']og:image["'][^>]*content=["']([^"']+)["']/i)?.[1];
-    return og ? downloadCover(decodeHtml(og)) : null;
-  } catch {
-    return null;
+    res = await httpFetch(direct ?? url, { headers: { "User-Agent": BROWSER_UA }, signal: AbortSignal.timeout(20000) });
+  } catch (e) {
+    throw new Error(`Não consegui abrir o link (${e instanceof Error ? e.message : String(e)}).`);
   }
+  if (!res.ok) throw new Error(`O site respondeu ${res.status}.`);
+  const blob = await res.blob();
+  const type = blob.type || res.headers.get("content-type") || "";
+  if (type.startsWith("image/") || /\.(jpe?g|png|webp|gif)(\?|$)/i.test(direct ?? url)) {
+    if (blob.size < 1500) throw new Error("A imagem veio vazia.");
+    return type.startsWith("image/") ? blob : new Blob([blob], { type: "image/jpeg" });
+  }
+  // É uma página: procura a imagem principal dela
+  const html = await blob.text();
+  const found =
+    html.match(/<meta[^>]+(?:property|name)=["'](?:og:image|twitter:image)["'][^>]*content=["']([^"']+)["']/i)?.[1] ??
+    html.match(/<meta[^>]+content=["']([^"']+)["'][^>]*(?:property|name)=["'](?:og:image|twitter:image)["']/i)?.[1] ??
+    html.match(/data-old-hires=["']([^"']+)["']/i)?.[1] ??
+    html.match(/"hiRes"\s*:\s*"(https:[^"]+)"/i)?.[1] ??
+    html.match(/[?&]imgurl=([^&"']+)/i)?.[1];
+  if (!found) throw new Error("Essa página não tem uma imagem que eu reconheça.");
+  const img = await downloadCover(decodeHtml(decodeURIComponent(found)));
+  if (!img) throw new Error("Achei a imagem da página, mas não consegui baixá-la.");
+  return img;
 }

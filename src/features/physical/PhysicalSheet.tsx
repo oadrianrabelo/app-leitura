@@ -8,7 +8,7 @@ import { platform } from "../../lib/platform";
 import { processCover } from "../import/image";
 import { normalizeIsbn } from "../import/metadata";
 import { useLibraryUi } from "../library/state";
-import { bookFromLink, downloadCover, findCovers, searchBooks, type BookCandidate } from "./lookup";
+import { bookFromLink, downloadCover, extractUrl, findCovers, searchBooks, type BookCandidate } from "./lookup";
 import "./PhysicalSheet.css";
 
 const STATUS: { id: BookStatus; label: string }[] = [
@@ -79,8 +79,9 @@ export function PhysicalSheet() {
     setError(null);
     try {
       // Colou o link da página do livro (Amazon, Skoob, editora…): lê direto de lá
-      if (/^https?:\/\//i.test(text.trim())) {
-        const found = await bookFromLink(text.trim());
+      const link = extractUrl(text);
+      if (link) {
+        const found = await bookFromLink(link);
         if (id !== searchId.current) return;
         setResults([found]);
         setPicked(found);
