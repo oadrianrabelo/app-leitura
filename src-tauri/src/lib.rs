@@ -1,3 +1,4 @@
+mod backup;
 mod google;
 mod scanner;
 mod updates;
@@ -11,7 +12,8 @@ pub fn run() {
         .plugin(tauri_plugin_http::init())
         .plugin(updates::init())
         .plugin(google::init())
-        .plugin(scanner::init());
+        .plugin(scanner::init())
+        .plugin(backup::init());
 
     #[cfg(desktop)]
     let builder = builder.plugin(tauri_plugin_updater::Builder::new().build());
@@ -23,7 +25,9 @@ pub fn run() {
             google::google_forget,
             google::oauth_listen,
             google::oauth_wait,
-            scanner::scan_barcode
+            scanner::scan_barcode,
+            backup::backup_stage,
+            backup::backup_save
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

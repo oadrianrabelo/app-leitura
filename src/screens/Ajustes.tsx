@@ -9,6 +9,7 @@ import { useUpdates } from "../features/updates/updates";
 import { useNovidades } from "../features/novidades/novidades";
 import { SyncSection } from "../features/sync/SyncSection";
 import { JardimSection } from "../features/flora/JardimSection";
+import { DataSection } from "../features/backup/DataSection";
 import { Botanical } from "../components/Botanical";
 import "./Ajustes.css";
 
@@ -112,6 +113,8 @@ export function Ajustes() {
       <JardimSection />
 
       <SyncSection />
+
+      <DataSection />
 
       {canUpdate && (
         <Section title="Atualizações">

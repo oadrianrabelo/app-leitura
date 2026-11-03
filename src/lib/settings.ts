@@ -36,6 +36,9 @@ interface SettingsState {
   /** Níveis de conquista já comemorados neste aparelho; null = ainda não comparou nenhum */
   seenAchievements: string[] | null;
   setBookmarkStyle: (style: string) => void;
+  /** Último backup manual feito neste aparelho */
+  lastBackupAt: number | null;
+  setLastBackupAt: (t: number) => void;
   setYearGoal: (goal: number | null) => void;
   setSeenAchievements: (keys: string[]) => void;
   setShelfView: (view: ShelfView) => void;
@@ -67,6 +70,8 @@ export const useSettings = create<SettingsState>()(
       yearGoal: null,
       seenAchievements: null,
       setBookmarkStyle: (bookmarkStyle) => set({ bookmarkStyle }),
+      lastBackupAt: null,
+      setLastBackupAt: (lastBackupAt) => set({ lastBackupAt }),
       setYearGoal: (yearGoal) => set({ yearGoal }),
       setSeenAchievements: (seenAchievements) => set({ seenAchievements }),
       setShelfView: (shelfView) => set({ shelfView }),

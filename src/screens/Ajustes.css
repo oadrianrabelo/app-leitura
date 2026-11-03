@@ -196,3 +196,13 @@ label.row:active {
   background: color-mix(in srgb, var(--hue-rosa) 15%, transparent);
   color: var(--hue-rosa);
 }
+
+.data-message {
+  margin: var(--space-3) var(--space-1) 0;
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+}
+
+.data-message.is-error {
+  color: var(--hue-rosa);
+}
