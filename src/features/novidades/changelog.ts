@@ -8,6 +8,28 @@ export interface ChangelogEntry {
 /** Mais recente primeiro. Cada release adiciona uma entrada aqui. */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.13.0",
+    date: "2026-11-04",
+    title: "Ler no celular, mais à vontade",
+    highlights: [
+      {
+        icon: "book",
+        title: "Volume vira a página",
+        text: "Com um livro aberto, diminuir o volume avança e aumentar volta. Dá para desligar em Aparência.",
+      },
+      {
+        icon: "sun",
+        title: "Tela cheia",
+        text: "As barras do celular somem enquanto você lê (deslize da borda para vê-las). A hora fica discreta no rodapé.",
+      },
+      {
+        icon: "heart",
+        title: "Nada se perde",
+        text: "A página em que você parou é gravada na hora, mesmo se o celular fechar o app. E o app abre mais rápido.",
+      },
+    ],
+  },
+  {
     version: "0.12.0",
     date: "2026-11-04",
     title: "Um leitor mais caprichado",
