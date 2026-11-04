@@ -30,8 +30,14 @@ export async function ensureActiveReading(bookId: string): Promise<string> {
   return (await addReading(bookId, { state: "lendo", medium: "digital" })).id;
 }
 
-export async function setReadingProgress(readingId: string, progress: number) {
-  await db.readings.update(readingId, { progress, updatedAt: now() });
+export interface StopPoint {
+  page: number | null;
+  pageOf: number | null;
+  chapter: string | null;
+}
+
+export async function setReadingProgress(readingId: string, progress: number, where?: StopPoint) {
+  await db.readings.update(readingId, { progress, ...(where ?? {}), updatedAt: now() });
 }
 
 export async function finishReading(readingId: string, rating: number | null, notes: string) {

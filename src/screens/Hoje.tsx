@@ -74,8 +74,8 @@ function heroStyle(tint: string | null): CSSProperties {
 }
 
 /** Uma frase de incentivo conforme o que falta */
-function nudge(book: Book, progress: number, pagesToday: number): string {
-  if (!book.pageCount || !readable(book)) return "Conte para o Sépia até onde você leu.";
+function nudge(book: Book, progress: number, pagesToday: number, noted: boolean): string {
+  if (!book.pageCount || (!readable(book) && !noted)) return "Conte para o Sépia em que página você está.";
   const left = Math.max(0, Math.round(book.pageCount * (1 - progress)));
   if (left === 0) return "Última página à vista!";
   if (left <= 30) return `Faltam só ${left} páginas. Dá para terminar hoje!`;
@@ -132,7 +132,14 @@ export function Hoje({ onOpenLibrary, onOpenSettings }: { onOpenLibrary: () => v
   const openReader = useReaderUi((s) => s.open);
   const rhythm = useRhythm();
   const readings = useReadings();
-  const progressOf = (bookId: string) => readings?.find((r) => r.bookId === bookId && r.state === "lendo")?.progress ?? 0;
+  const activeOf = (bookId: string) => readings?.find((r) => r.bookId === bookId && r.state === "lendo");
+  const progressOf = (bookId: string) => activeOf(bookId)?.progress ?? 0;
+  /** "Página 123 de 320": a anotada (no leitor ou à mão), senão a estimada pelo progresso */
+  const pageText = (book: Book) => {
+    const r = activeOf(book.id);
+    if (r?.page) return r.pageOf && r.pageOf >= r.page ? `Página ${r.page} de ${r.pageOf}` : `Página ${r.page}`;
+    return book.pageCount ? `Página ${Math.max(1, Math.round(book.pageCount * progressOf(book.id)))} de ${book.pageCount}` : "Em andamento";
+  };
 
   // o livro em andamento lido mais recentemente vai para o destaque
   const current = useMemo(() => {
@@ -169,16 +176,16 @@ export function Hoje({ onOpenLibrary, onOpenSettings }: { onOpenLibrary: () => v
               <p className="hero-eyebrow">Lendo agora</p>
               <h2 className="hero-title">{hero.title}</h2>
               <p className="hero-author">{hero.authors.join(", ") || "Autor desconhecido"}</p>
-              <p className="hero-nudge">{nudge(hero, progressOf(hero.id), rhythm?.pagesToday ?? 0)}</p>
+              <p className="hero-nudge">{nudge(hero, progressOf(hero.id), rhythm?.pagesToday ?? 0, !!activeOf(hero.id)?.page)}</p>
             </div>
           </div>
-          {readable(hero) && (
+          {(readable(hero) || !!activeOf(hero.id)?.page) && (
             <>
               <div className="hero-bar">
                 <span style={{ transform: `scaleX(${Math.max(0.02, progressOf(hero.id))})` }} />
               </div>
               <div className="hero-bar-label">
-                <span>{hero.pageCount ? `Página ${Math.max(1, Math.round(hero.pageCount * progressOf(hero.id)))} de ${hero.pageCount}` : "Em andamento"}</span>
+                <span>{pageText(hero)}</span>
                 <span>{Math.round(progressOf(hero.id) * 100)}%</span>
               </div>
             </>

@@ -54,6 +54,12 @@ export interface Reading extends Synced {
   medium: "digital" | "fisico";
   /** 0 a 1; vem do leitor na fase 2 */
   progress: number;
+  /** Página em que parou (o leitor preenche nos digitais; ela anota nos físicos) */
+  page?: number | null;
+  /** Total de páginas que acompanha `page`, quando conhecido */
+  pageOf?: number | null;
+  /** Capítulo em que parou (só nos digitais) */
+  chapter?: string | null;
 }
 
 /** Arquivo do livro (EPUB, PDF, MOBI). Não sincroniza por padrão. */

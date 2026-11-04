@@ -13,6 +13,8 @@ export interface ReadingDraft {
   /** Valores iniciais para uma leitura nova */
   preset?: Partial<Pick<Reading, "state" | "approximate" | "medium">>;
   title: string;
+  /** Páginas do livro, para a página em que parou virar progresso */
+  pageCount?: number | null;
 }
 
 const STATES: { id: ReadingState; label: string }[] = [
@@ -33,6 +35,7 @@ export function ReadingSheet({ draft, onClose }: { draft: ReadingDraft | null; o
   const [year, setYear] = useState<number | "">("");
   const [rating, setRating] = useState<number | null>(null);
   const [notes, setNotes] = useState("");
+  const [page, setPage] = useState("");
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   useEffect(() => {
@@ -47,13 +50,31 @@ export function ReadingSheet({ draft, onClose }: { draft: ReadingDraft | null; o
     setYear(approx && r?.finishedAt ? new Date(r.finishedAt).getFullYear() : "");
     setRating(r?.rating ?? null);
     setNotes(r?.notes ?? "");
+    setPage(r?.page ? String(r.page) : "");
     setConfirmDelete(false);
   }, [draft]);
 
   const save = async () => {
     if (!draft) return;
     const finished = state === "lendo" ? null : onlyYear ? (year ? new Date(year, 6, 1).getTime() : null) : fromInputDate(finishedAt);
+    // Página em que parou (lendo ou abandonada): vira o progresso quando o livro tem páginas
+    const typed = state === "concluida" ? null : Number.parseInt(page, 10);
+    const pageNum = typed && typed > 0 ? typed : null;
+    const pageOf = draft.pageCount ?? draft.reading?.pageOf ?? null;
+    const stop =
+      state === "concluida"
+        ? {}
+        : pageNum !== (draft.reading?.page ?? null)
+          ? {
+              page: pageNum,
+              pageOf: pageNum ? pageOf : null,
+              // a página mudou à mão: o capítulo anotado pelo leitor já não vale
+              chapter: null,
+              ...(pageNum && pageOf ? { progress: Math.min(1, pageNum / pageOf) } : {}),
+            }
+          : {};
     const data = {
+      ...stop,
       state,
       medium,
       startedAt: fromInputDate(startedAt),
@@ -131,6 +152,25 @@ export function ReadingSheet({ draft, onClose }: { draft: ReadingDraft | null; o
             <label className="toggle-line">
               <input type="checkbox" className="switch" checked={onlyYear} onChange={(e) => setOnlyYear(e.target.checked)} />
               Só lembro o ano
+            </label>
+          )}
+
+          {state !== "concluida" && (
+            <label className="field">
+              <span className="field-label">{state === "abandonada" ? "Parei na página" : "Estou na página"}</span>
+              <span className="page-field">
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  min={1}
+                  max={draft.pageCount ?? undefined}
+                  placeholder="—"
+                  value={page}
+                  onChange={(e) => setPage(e.target.value.replace(/\D/g, ""))}
+                />
+                {draft.pageCount ? <span>de {draft.pageCount}</span> : null}
+              </span>
+              {medium === "digital" && <small className="field-hint">Nos livros que você lê no app, a página é anotada sozinha.</small>}
             </label>
           )}
 

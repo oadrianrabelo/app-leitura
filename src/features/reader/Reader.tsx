@@ -16,6 +16,7 @@ import {
   updateHighlight,
   removeHighlight,
   useBookmarks,
+  type StopPoint,
 } from "../../db/reading";
 import type { Book } from "../../db/types";
 import { Icon } from "../../components/Icon";
@@ -95,6 +96,19 @@ function useVolumeKeys(active: boolean, turn: (dir: 1 | -1) => void) {
   }, [active]);
 }
 
+/**
+ * A página "de livro" onde ela está: a numeração impressa (quando o EPUB traz), senão a
+ * proporção das páginas da edição (como a tela Hoje mostra), senão as páginas do leitor.
+ */
+function stopPoint(info: LocationInfo, book: Book): StopPoint {
+  const chapter = info.chapter ?? null;
+  if (book.format === "pdf") return { page: info.page, pageOf: info.total, chapter };
+  const printed = info.printedPage && /^\d+$/.test(info.printedPage.trim()) ? Number(info.printedPage) : null;
+  if (printed) return { page: printed, pageOf: book.pageCount ?? null, chapter };
+  if (book.pageCount) return { page: Math.min(book.pageCount, Math.max(1, Math.round(info.fraction * book.pageCount))), pageOf: book.pageCount, chapter };
+  return { page: info.page, pageOf: info.total, chapter };
+}
+
 const clockFmt = new Intl.DateTimeFormat("pt-BR", { hour: "2-digit", minute: "2-digit" });
 
 /** A hora (atualizada na virada de cada minuto), para quando a barra do celular está escondida */
@@ -164,6 +178,8 @@ function ReaderBody({ book }: { book: Book }) {
   /** Posição que ainda espera para ir ao banco (gravada já se o app sair de cena) */
   const pendingSave = useRef<(() => void) | null>(null);
   const latestFraction = useRef<number | null>(null);
+  /** Página e capítulo onde ela está, para "onde parou" no livro */
+  const latestStop = useRef<StopPoint | undefined>(undefined);
   const locTimer = useRef<number | undefined>(undefined);
   /** Quando ela pediu um salto (sumário, barra): aí ir para o começo vale */
   const navAt = useRef(0);
@@ -239,7 +255,7 @@ function ReaderBody({ book }: { book: Book }) {
   useEffect(() => {
     if (!loaded) return;
     const flush = () => {
-      if (latestFraction.current !== null) setReadingProgress(loaded.readingId, latestFraction.current);
+      if (latestFraction.current !== null) setReadingProgress(loaded.readingId, latestFraction.current, latestStop.current);
     };
     const timer = window.setInterval(flush, 30_000);
     const onHide = () => document.visibilityState === "hidden" && flush();
@@ -295,6 +311,7 @@ function ReaderBody({ book }: { book: Book }) {
         pendingSave.current = save;
         saveTimer.current = window.setTimeout(save, 500);
         latestFraction.current = info.fraction;
+        latestStop.current = stopPoint(info, book);
       }
       if (info.atEnd && !finishShown.current) {
         finishShown.current = true;

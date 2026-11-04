@@ -8,6 +8,23 @@ export interface ChangelogEntry {
 /** Mais recente primeiro. Cada release adiciona uma entrada aqui. */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.13.1",
+    date: "2026-11-04",
+    title: "Onde você parou",
+    highlights: [
+      {
+        icon: "bookmark",
+        title: "A página em que você parou",
+        text: "Na página do livro aparece onde você parou: a página, o capítulo e quando leu pela última vez. Nos digitais, o app anota sozinho.",
+      },
+      {
+        icon: "pencil",
+        title: "Livros físicos também",
+        text: "Toque em “Onde você parou” e anote a página. Se abandonar um livro, a página fica guardada para quando quiser voltar.",
+      },
+    ],
+  },
+  {
     version: "0.13.0",
     date: "2026-11-04",
     title: "Ler no celular, mais à vontade",

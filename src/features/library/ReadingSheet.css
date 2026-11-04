@@ -91,3 +91,25 @@
 [data-theme="noite"] .btn.is-danger {
   color: #f2b8b5;
 }
+
+/* "Estou na página [ 123 ] de 320" */
+.page-field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.page-field input {
+  width: 7.5rem;
+}
+
+.page-field > span {
+  white-space: nowrap;
+  color: var(--ink-soft);
+}
+
+.field-hint {
+  font-size: var(--text-xs);
+  color: var(--ink-faint);
+  margin-top: 4px;
+}

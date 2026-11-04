@@ -14,7 +14,7 @@ import { processCover } from "../import/image";
 import { EditBookSheet } from "./EditBookSheet";
 import { ReadingSheet, type ReadingDraft } from "./ReadingSheet";
 import { Stars } from "./Stars";
-import { formatDate, ordinal } from "./dates";
+import { formatDate, ordinal, pageLabel, sinceLabel } from "./dates";
 import { useLibraryUi } from "./state";
 import { useReaderUi } from "../reader/state";
 import { db } from "../../db/db";
@@ -45,11 +45,44 @@ function ReadingCard({ reading, index, onEdit }: { reading: Reading; index: numb
         </span>
         <span className="reading-card-when">
           {when} · {reading.medium === "fisico" ? "físico" : "digital"}
+          {reading.state !== "concluida" && reading.page ? ` · parou na pág. ${reading.page}` : ""}
         </span>
         {reading.rating && <Stars value={reading.rating} size={14} />}
         {reading.notes && <span className="reading-card-notes">“{reading.notes}”</span>}
       </span>
       <Icon name="chevron" size={16} className="reading-card-chevron" />
+    </button>
+  );
+}
+
+/**
+ * Onde ela parou: página (e capítulo, nos digitais) da leitura em andamento ou da
+ * última abandonada. Tocar abre a leitura para anotar a página (nos físicos).
+ */
+function StopLine({ reading, fraction, lastAt, onEdit }: { reading: Reading; fraction: number | null; lastAt: number; onEdit: () => void }) {
+  const abandoned = reading.state === "abandonada";
+  const where = reading.page
+    ? pageLabel(reading.page, reading.pageOf)
+    : fraction !== null && fraction > 0
+      ? `${Math.round(fraction * 100)}% do livro`
+      : null;
+  const physical = reading.medium === "fisico";
+  return (
+    <button className={`detail-stop${abandoned ? " is-abandoned" : ""}`} onClick={onEdit}>
+      <Icon name="bookmark" size={18} />
+      <span>
+        <small>{abandoned ? "Você parou aqui quando abandonou" : "Onde você parou"}</small>
+        {where ? (
+          <strong>
+            {where.charAt(0).toUpperCase() + where.slice(1)}
+            {reading.chapter ? ` · ${reading.chapter}` : ""}
+          </strong>
+        ) : (
+          <strong className="is-empty">{physical ? "Anote a página em que parou" : "Ainda não abriu este livro"}</strong>
+        )}
+        {where && <small>Última leitura {sinceLabel(lastAt)}</small>}
+      </span>
+      {physical && <Icon name="pencil" size={16} className="detail-stop-edit" />}
     </button>
   );
 }
@@ -77,6 +110,8 @@ function DetailBody({ book, readings }: { book: Book; readings: Reading[] }) {
 
   const timesRead = readings.filter((r) => r.state === "concluida").length;
   const active = readings.find((r) => r.state === "lendo");
+  // Em andamento; senão, se a leitura mais recente foi abandonada, onde ela parou nela
+  const stopReading = active ?? (readings[0]?.state === "abandonada" ? readings[0] : undefined);
   const physical = book.format === "fisico";
   const medium: Reading["medium"] = physical ? "fisico" : "digital";
   const syncConnected = useSync((s) => s.connected);
@@ -91,7 +126,7 @@ function DetailBody({ book, readings }: { book: Book; readings: Reading[] }) {
     await addReading(book.id, { state: "lendo", medium: "digital" });
     openReader();
   };
-  const newReading = (preset: ReadingDraft["preset"]) => setDraft({ bookId: book.id, title: book.title, preset: { medium, ...preset } });
+  const newReading = (preset: ReadingDraft["preset"]) => setDraft({ bookId: book.id, title: book.title, pageCount: book.pageCount, preset: { medium, ...preset } });
 
   const meta = [
     FORMAT_LABEL[book.format],
@@ -151,11 +186,11 @@ function DetailBody({ book, readings }: { book: Book; readings: Reading[] }) {
         {active ? (
           <>
             {!readable && (
-              <Button size="lg" onClick={() => setDraft({ bookId: book.id, title: book.title, reading: { ...active, state: "concluida" } })}>
+              <Button size="lg" onClick={() => setDraft({ bookId: book.id, title: book.title, pageCount: book.pageCount, reading: { ...active, state: "concluida" } })}>
                 <Icon name="check" size={18} /> Terminei
               </Button>
             )}
-            <Button size="lg" variant="secondary" onClick={() => setDraft({ bookId: book.id, title: book.title, reading: readable ? { ...active, state: "concluida" } : active })}>
+            <Button size="lg" variant="secondary" onClick={() => setDraft({ bookId: book.id, title: book.title, pageCount: book.pageCount, reading: readable ? { ...active, state: "concluida" } : active })}>
               {readable ? "Marcar como terminado" : "Editar leitura"}
             </Button>
           </>
@@ -179,6 +214,15 @@ function DetailBody({ book, readings }: { book: Book; readings: Reading[] }) {
         )}
       </div>
 
+      {stopReading && (
+        <StopLine
+          reading={stopReading}
+          fraction={stopReading.state === "lendo" && !physical ? (position?.fraction ?? null) : null}
+          lastAt={stopReading.medium === "digital" && position ? Math.max(position.updatedAt, stopReading.updatedAt) : stopReading.updatedAt}
+          onEdit={() => setDraft({ bookId: book.id, title: book.title, pageCount: book.pageCount, reading: stopReading })}
+        />
+      )}
+
       <section className="detail-section">
         <div className="detail-section-head">
           <h3>Leituras</h3>
@@ -191,7 +235,7 @@ function DetailBody({ book, readings }: { book: Book; readings: Reading[] }) {
         ) : (
           <div className="reading-list">
             {numbered.map(({ reading, index }) => (
-              <ReadingCard key={reading.id} reading={reading} index={index} onEdit={() => setDraft({ bookId: book.id, title: book.title, reading })} />
+              <ReadingCard key={reading.id} reading={reading} index={index} onEdit={() => setDraft({ bookId: book.id, title: book.title, pageCount: book.pageCount, reading })} />
             ))}
           </div>
         )}

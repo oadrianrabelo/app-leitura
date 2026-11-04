@@ -25,3 +25,21 @@ export function fromInputDate(value: string): number | null {
 }
 
 export const ordinal = (n: number) => `${n}ª`;
+
+/** "hoje", "ontem", "há 5 dias", ou a data (para quando ela leu pela última vez) */
+export function sinceLabel(ts: number, now = Date.now()): string {
+  const day = (t: number) => {
+    const d = new Date(t);
+    return Math.floor(new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() / 86400000);
+  };
+  const diff = day(now) - day(ts);
+  if (diff <= 0) return "hoje";
+  if (diff === 1) return "ontem";
+  if (diff < 30) return `há ${diff} dias`;
+  return `em ${formatDate(ts)}`;
+}
+
+/** "página 123 de 320", "página 123" */
+export function pageLabel(page: number, of?: number | null): string {
+  return of && of >= page ? `página ${page} de ${of}` : `página ${page}`;
+}
