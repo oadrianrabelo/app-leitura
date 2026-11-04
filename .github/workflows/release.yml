@@ -123,4 +123,10 @@ jobs:
           VERSION="${TAG#v}"
           APK=$(find src-tauri/gen/android/app/build/outputs/apk -name "*release*.apk" | head -n 1)
           cp "$APK" "Sepia_${VERSION}_android.apk"
-          gh release upload "$TAG" "Sepia_${VERSION}_android.apk" --clobber
+          # O envio ao GitHub às vezes falha por instabilidade deles (404/500): tenta de novo
+          for i in 1 2 3 4 5; do
+            gh release upload "$TAG" "Sepia_${VERSION}_android.apk" --clobber && exit 0
+            echo "Envio falhou (tentativa $i); tentando de novo em $((i * 20)) s"
+            sleep $((i * 20))
+          done
+          exit 1

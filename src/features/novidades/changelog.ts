@@ -8,7 +8,7 @@ export interface ChangelogEntry {
 /** Mais recente primeiro. Cada release adiciona uma entrada aqui. */
 export const CHANGELOG: ChangelogEntry[] = [
   {
-    version: "0.13.1",
+    version: "0.13.2",
     date: "2026-11-04",
     title: "Onde você parou",
     highlights: [
