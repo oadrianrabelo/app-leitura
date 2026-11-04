@@ -94,6 +94,9 @@ jobs:
   android:
     name: Android
     needs: [notes, desktop]
+    # Roda mesmo se um dos computadores falhar (instabilidade no envio ao GitHub):
+    # o celular não deve ficar sem atualização por causa do macOS, por exemplo
+    if: ${{ !cancelled() && needs.notes.result == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
