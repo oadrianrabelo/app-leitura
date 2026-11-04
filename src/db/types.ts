@@ -4,7 +4,8 @@
  * mescla por registro, e exclusões viram marcações em vez de sumir.
  */
 
-export type BookFormat = "epub" | "pdf" | "mobi" | "fisico";
+/** "ebook": digital sem arquivo aqui (lido no Kindle, por exemplo, ou corrigido de físico) */
+export type BookFormat = "epub" | "pdf" | "mobi" | "ebook" | "fisico";
 export type BookStatus = "quero-ler" | "lendo" | "lido" | "abandonado";
 
 export interface Synced {

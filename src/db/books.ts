@@ -28,6 +28,33 @@ export async function updateBook(id: string, changes: Partial<Book>) {
   await db.books.update(id, { ...changes, updatedAt: now() });
 }
 
+/**
+ * Corrige o tipo do livro (adicionado como físico sendo digital, ou o contrário).
+ * Muda de estante e as leituras dele passam a ser do tipo certo, porque o engano
+ * foi no cadastro. Um livro com arquivo volta ao formato do arquivo.
+ */
+export async function setBookKind(bookId: string, kind: "fisico" | "digital") {
+  const book = await db.books.get(bookId);
+  if (!book) return;
+  let format: Book["format"] = "fisico";
+  if (kind === "digital") {
+    const file = book.fileId ? await db.files.get(book.fileId) : undefined;
+    const ext = file?.name.split(".").pop()?.toLowerCase();
+    format = ext === "pdf" || file?.type === "application/pdf" ? "pdf" : ext === "mobi" || ext === "azw3" ? "mobi" : file || book.fileHash ? "epub" : "ebook";
+  }
+  if (format === book.format) return;
+  const t = now();
+  const medium = kind === "fisico" ? "fisico" : "digital";
+  await db.transaction("rw", db.books, db.readings, async () => {
+    await db.books.update(bookId, { format, updatedAt: t });
+    await db.readings
+      .where("bookId")
+      .equals(bookId)
+      .filter((r) => r.deletedAt === null && r.medium !== medium)
+      .modify({ medium, updatedAt: t });
+  });
+}
+
 export async function setCover(bookId: string, blob: Blob, tint: string | null) {
   const t = now();
   invalidateCover(bookId);

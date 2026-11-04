@@ -22,7 +22,7 @@ import { usePosition } from "../../db/reading";
 import { useSync } from "../sync/sync";
 import "./BookDetail.css";
 
-const FORMAT_LABEL: Record<Book["format"], string> = { epub: "EPUB", pdf: "PDF", mobi: "MOBI", fisico: "Livro físico" };
+const FORMAT_LABEL: Record<Book["format"], string> = { epub: "EPUB", pdf: "PDF", mobi: "MOBI", ebook: "Digital", fisico: "Livro físico" };
 const STATUS_LABEL: Record<Book["status"], string> = { "quero-ler": "Quero ler", lendo: "Lendo", lido: "Lido", abandonado: "Abandonado" };
 const STATE_LABEL: Record<Reading["state"], string> = { lendo: "Em andamento", concluida: "Concluída", abandonada: "Abandonada" };
 

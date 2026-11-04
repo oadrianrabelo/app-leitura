@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Sheet } from "../../components/Sheet";
 import { Button } from "../../components/Button";
-import { setCover, updateBook } from "../../db/books";
+import { setBookKind, setCover, updateBook } from "../../db/books";
 import type { Book } from "../../db/types";
 import { processCover } from "../import/image";
 import { BookCover } from "./BookCover";
@@ -14,6 +14,7 @@ export function EditBookSheet({ book, open, onClose }: { book: Book; open: boole
   const [year, setYear] = useState(book.year ? String(book.year) : "");
   const [publisher, setPublisher] = useState(book.publisher ?? "");
   const [searchCover, setSearchCover] = useState(false);
+  const [kind, setKind] = useState<"fisico" | "digital">(book.format === "fisico" ? "fisico" : "digital");
 
   useEffect(() => {
     if (!open) return;
@@ -22,6 +23,7 @@ export function EditBookSheet({ book, open, onClose }: { book: Book; open: boole
     setPages(book.pageCount ? String(book.pageCount) : "");
     setYear(book.year ? String(book.year) : "");
     setPublisher(book.publisher ?? "");
+    setKind(book.format === "fisico" ? "fisico" : "digital");
   }, [open, book]);
 
   const pickCover = () => {
@@ -47,6 +49,7 @@ export function EditBookSheet({ book, open, onClose }: { book: Book; open: boole
       year: parseInt(year, 10) || null,
       publisher: publisher.trim() || null,
     });
+    if (kind !== (book.format === "fisico" ? "fisico" : "digital")) await setBookKind(book.id, kind);
     onClose();
   };
 
@@ -64,6 +67,23 @@ export function EditBookSheet({ book, open, onClose }: { book: Book; open: boole
               Usar uma foto
             </Button>
           </div>
+        </div>
+        <div className="field">
+          <span className="field-label">Tipo do livro</span>
+          <div className="segmented">
+            <button className={kind === "fisico" ? "is-active" : ""} onClick={() => setKind("fisico")}>
+              Livro físico
+            </button>
+            <button className={kind === "digital" ? "is-active" : ""} onClick={() => setKind("digital")}>
+              Digital
+            </button>
+          </div>
+          {kind !== (book.format === "fisico" ? "fisico" : "digital") && (
+            <small className="field-hint">
+              O livro muda para a estante de {kind === "fisico" ? "físicos" : "digitais"}, e as leituras dele passam a ser{" "}
+              {kind === "fisico" ? "de livro físico" : "digitais"}.
+            </small>
+          )}
         </div>
         <label className="field">
           <span className="field-label">Título</span>

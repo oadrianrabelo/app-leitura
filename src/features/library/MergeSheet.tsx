@@ -10,7 +10,7 @@ import type { Book } from "../../db/types";
 import { BookCover } from "./BookCover";
 import "./MergeSheet.css";
 
-const FORMAT: Record<Book["format"], string> = { epub: "EPUB", pdf: "PDF", mobi: "MOBI", fisico: "Físico" };
+const FORMAT: Record<Book["format"], string> = { epub: "EPUB", pdf: "PDF", mobi: "MOBI", ebook: "Digital", fisico: "Físico" };
 const strip = (s: string) => s.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
 
 interface Props {

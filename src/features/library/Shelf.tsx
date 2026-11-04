@@ -17,7 +17,8 @@ interface ShelfProps {
   onReorder?: (order: string[], movedId: string) => void;
 }
 
-const HOLD_MS = 380;
+// Segurar este tanto (sem mexer) pega o livro para arrastar; um toque mais demorado ainda abre
+const HOLD_MS = 480;
 
 interface Drag {
   id: string;
@@ -148,6 +149,9 @@ export function Shelf({ books, timesRead, onOpen, view = "capas", onReorder }: S
   }, [drag]);
 
   const onPointerDown = (e: ReactPointerEvent<HTMLElement>, book: Book, node: ReactNode) => {
+    // Um toque novo nunca herda o "ignorar" de um arrasto anterior: no Android, segurar
+    // e soltar sem mexer pode não gerar clique, e o toque seguinte era engolido
+    suppressClick.current = false;
     if (!onReorder || (e.pointerType === "mouse" && e.button !== 0)) return;
     const el = e.currentTarget;
     const { clientX: x, clientY: y, pointerId } = e;

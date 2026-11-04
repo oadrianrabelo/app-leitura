@@ -8,6 +8,23 @@ export interface ChangelogEntry {
 /** Mais recente primeiro. Cada release adiciona uma entrada aqui. */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.13.3",
+    date: "2026-11-04",
+    title: "Físico ou digital, do jeito certo",
+    highlights: [
+      {
+        icon: "pencil",
+        title: "Corrija o tipo do livro",
+        text: "Adicionou um digital como físico (ou o contrário)? Em Editar informações, escolha o tipo certo: o livro muda de estante e as leituras dele acompanham.",
+      },
+      {
+        icon: "library",
+        title: "Um toque basta",
+        text: "Tocar num livro da estante abre na primeira vez, mesmo depois de segurar um livro para arrastar.",
+      },
+    ],
+  },
+  {
     version: "0.13.2",
     date: "2026-11-04",
     title: "Onde você parou",
