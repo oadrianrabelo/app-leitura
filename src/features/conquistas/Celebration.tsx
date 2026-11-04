@@ -19,9 +19,9 @@ const SPARKS = Array.from({ length: 14 }, (_, i) => i);
  * novidades da versão saírem da frente, para não atropelar nada.
  */
 export function Celebration() {
+  const readerOpen = useReaderUi((s) => !!s.bookId);
   const summary = useConquistas();
   const { seenAchievements, setSeenAchievements, setBookmarkStyle } = useSettings();
-  const readerOpen = useReaderUi((s) => !!s.bookId);
   const novidadesOpen = useNovidades((s) => s.open);
   const [fresh, setFresh] = useState<string[] | null>(null);
 

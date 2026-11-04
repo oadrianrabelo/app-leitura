@@ -66,7 +66,7 @@ function useWakeLock(active: boolean) {
 declare global {
   interface Window {
     /** Ponte do app Android (MainActivity): liga os botões de volume para virar página */
-    SepiaNative?: { setVolumePaging(on: boolean): void };
+    SepiaNative?: { setVolumePaging(on: boolean): void; setImmersive?(on: boolean): void };
   }
 }
 
@@ -90,6 +90,33 @@ function useVolumeKeys(active: boolean, turn: (dir: 1 | -1) => void) {
         native.setVolumePaging(false);
       } catch {
         /* idem */
+      }
+    };
+  }, [active]);
+}
+
+/** Android: tela cheia enquanto o livro está aberto */
+function useImmersive(active: boolean) {
+  useEffect(() => {
+    const native = window.SepiaNative;
+    if (!active || !native?.setImmersive) return;
+    const enter = () => {
+      try {
+        native.setImmersive?.(true);
+      } catch {
+        /* app antigo sem a ponte */
+      }
+    };
+    enter();
+    // voltar de outro app pode trazer as barras de volta
+    const onVisible = () => document.visibilityState === "visible" && enter();
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisible);
+      try {
+        native.setImmersive?.(false);
+      } catch {
+        /* nada a fazer */
       }
     };
   }, [active]);
@@ -143,6 +170,7 @@ function ReaderBody({ book }: { book: Book }) {
   );
 
   useWakeLock(true);
+  useImmersive(settings.immersive);
 
   // Carrega o arquivo, a posição salva e a leitura em andamento
   useEffect(() => {

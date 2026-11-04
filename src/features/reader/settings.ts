@@ -63,6 +63,8 @@ export interface ReaderSettings {
   showProgress: boolean;
   /** Android: botões de volume viram a página (só com um livro aberto) */
   volumeKeys: boolean;
+  /** Android: esconde as barras do sistema enquanto lê */
+  immersive: boolean;
 }
 
 interface ReaderSettingsState extends ReaderSettings {
@@ -86,6 +88,7 @@ const DEFAULTS: ReaderSettings = {
   breakReminder: false,
   showProgress: true,
   volumeKeys: true,
+  immersive: true,
 };
 
 export const useReaderSettings = create<ReaderSettingsState>()(

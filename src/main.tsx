@@ -8,9 +8,10 @@ import "./styles/tokens.css";
 import "./styles/base.css";
 import App from "./App";
 
-// Se a interface recarregou com um livro aberto, os botões de volume voltam ao normal
+// Se a interface recarregou com um livro aberto, volume e barras do sistema voltam ao normal
 try {
   window.SepiaNative?.setVolumePaging(false);
+  window.SepiaNative?.setImmersive?.(false);
 } catch {
   /* fora do Android */
 }

@@ -213,6 +213,15 @@ export function ReaderSettingsSheet({ open, onClose, isPdf }: { open: boolean; o
           {platform === "android" && (
             <label>
               <span>
+                Tela cheia
+                <small>esconde as barras do celular; deslize da borda para vê-las</small>
+              </span>
+              <input type="checkbox" className="switch" checked={s.immersive} onChange={(e) => set({ immersive: e.target.checked })} />
+            </label>
+          )}
+          {platform === "android" && (
+            <label>
+              <span>
                 Virar página com o volume
                 <small>aumentar volta, diminuir avança</small>
               </span>

@@ -6,7 +6,9 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import androidx.activity.enableEdgeToEdge
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 
 class MainActivity : TauriActivity() {
   private var webView: WebView? = null
@@ -14,11 +16,25 @@ class MainActivity : TauriActivity() {
   /** Ligado pelo leitor (livro aberto + opção ativa): volume vira a página */
   @Volatile private var volumePaging = false
 
-  /** Ponte mínima para a interface: só liga/desliga os botões de volume */
+  /** Ponte mínima para a interface do leitor: botões de volume e tela cheia */
   inner class SepiaNative {
     @JavascriptInterface
     fun setVolumePaging(on: Boolean) {
       volumePaging = on
+    }
+
+    /** Esconde as barras do sistema (deslizar da borda mostra por um instante) */
+    @JavascriptInterface
+    fun setImmersive(on: Boolean) {
+      runOnUiThread {
+        val controller = WindowCompat.getInsetsController(window, window.decorView)
+        if (on) {
+          controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+          controller.hide(WindowInsetsCompat.Type.systemBars())
+        } else {
+          controller.show(WindowInsetsCompat.Type.systemBars())
+        }
+      }
     }
   }
 
