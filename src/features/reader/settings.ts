@@ -61,6 +61,8 @@ export interface ReaderSettings {
   dim: number;
   breakReminder: boolean;
   showProgress: boolean;
+  /** Android: botões de volume viram a página (só com um livro aberto) */
+  volumeKeys: boolean;
 }
 
 interface ReaderSettingsState extends ReaderSettings {
@@ -83,6 +85,7 @@ const DEFAULTS: ReaderSettings = {
   dim: 0,
   breakReminder: false,
   showProgress: true,
+  volumeKeys: true,
 };
 
 export const useReaderSettings = create<ReaderSettingsState>()(

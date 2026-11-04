@@ -1,3 +1,4 @@
+import { platform } from "../../lib/platform";
 import { useEffect } from "react";
 import { Sheet } from "../../components/Sheet";
 import { fontFaces } from "./fonts";
@@ -209,6 +210,15 @@ export function ReaderSettingsSheet({ open, onClose, isPdf }: { open: boolean; o
             <span>Mostrar progresso no rodapé</span>
             <input type="checkbox" className="switch" checked={s.showProgress} onChange={(e) => set({ showProgress: e.target.checked })} />
           </label>
+          {platform === "android" && (
+            <label>
+              <span>
+                Virar página com o volume
+                <small>aumentar volta, diminuir avança</small>
+              </span>
+              <input type="checkbox" className="switch" checked={s.volumeKeys} onChange={(e) => set({ volumeKeys: e.target.checked })} />
+            </label>
+          )}
         </section>
 
         <button className="rs-reset" onClick={s.reset}>

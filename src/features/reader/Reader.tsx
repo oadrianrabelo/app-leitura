@@ -1,5 +1,5 @@
 import { useSettings } from "../../lib/settings";
-import { startTransition, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { lazy, startTransition, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import type { TocItem } from "foliate-js/view.js";
 import { db } from "../../db/db";
@@ -20,7 +20,8 @@ import {
 import type { Book } from "../../db/types";
 import { Icon } from "../../components/Icon";
 import { EpubView } from "./EpubView";
-import { PdfView } from "./PdfView";
+// O leitor de PDF (pdf.js, ~450 kB) só carrega quando um PDF é aberto: o app abre mais rápido
+const PdfView = lazy(() => import("./PdfView").then((m) => ({ default: m.PdfView })));
 import { PageTurnFx, type PageTurnFxHandle } from "./PageTurnFx";
 import { ComfortLayer } from "./ComfortLayer";
 import { ReaderSettingsSheet } from "./ReaderSettingsSheet";
@@ -62,6 +63,38 @@ function useWakeLock(active: boolean) {
   }, [active]);
 }
 
+declare global {
+  interface Window {
+    /** Ponte do app Android (MainActivity): liga os botões de volume para virar página */
+    SepiaNative?: { setVolumePaging(on: boolean): void };
+  }
+}
+
+/** Android: enquanto ligado, os botões de volume viram a página em vez de mudar o som */
+function useVolumeKeys(active: boolean, turn: (dir: 1 | -1) => void) {
+  const turnRef = useRef(turn);
+  turnRef.current = turn;
+  useEffect(() => {
+    const native = window.SepiaNative;
+    if (!active || !native) return;
+    const onKey = (e: Event) => turnRef.current((e as CustomEvent<number>).detail === -1 ? -1 : 1);
+    window.addEventListener("sepia-volume", onKey);
+    try {
+      native.setVolumePaging(true);
+    } catch {
+      /* app antigo sem a ponte */
+    }
+    return () => {
+      window.removeEventListener("sepia-volume", onKey);
+      try {
+        native.setVolumePaging(false);
+      } catch {
+        /* idem */
+      }
+    };
+  }, [active]);
+}
+
 function ReaderBody({ book }: { book: Book }) {
   const close = useReaderUi((s) => s.close);
   const settings = useReaderSettings();
@@ -83,6 +116,8 @@ function ReaderBody({ book }: { book: Book }) {
   const tracker = useRef<SessionTracker | null>(null);
   const finishShown = useRef(false);
   const saveTimer = useRef<number | undefined>(undefined);
+  /** Posição que ainda espera para ir ao banco (gravada já se o app sair de cena) */
+  const pendingSave = useRef<(() => void) | null>(null);
   const latestFraction = useRef<number | null>(null);
   const locTimer = useRef<number | undefined>(undefined);
   /** Quando ela pediu um salto (sumário, barra): aí ir para o começo vale */
@@ -168,11 +203,24 @@ function ReaderBody({ book }: { book: Book }) {
     };
   }, [loaded]);
 
-  // Salva a sessão quando o app vai para segundo plano
+  // Ao ir para segundo plano (o Android pode fechar o app a qualquer momento depois disso),
+  // grava na hora a página e a sessão; o tempo fora do app não conta como leitura
   useEffect(() => {
-    const onHide = () => document.visibilityState === "hidden" && tracker.current?.flush();
-    document.addEventListener("visibilitychange", onHide);
-    return () => document.removeEventListener("visibilitychange", onHide);
+    const onVis = () => {
+      if (document.visibilityState === "hidden") {
+        pendingSave.current?.();
+        tracker.current?.pause();
+      } else tracker.current?.resume();
+    };
+    const onLeave = () => pendingSave.current?.();
+    document.addEventListener("visibilitychange", onVis);
+    window.addEventListener("pagehide", onLeave);
+    return () => {
+      document.removeEventListener("visibilitychange", onVis);
+      window.removeEventListener("pagehide", onLeave);
+      // fechar o livro logo depois de virar a página também grava
+      pendingSave.current?.();
+    };
   }, []);
 
   const onRelocate = useCallback(
@@ -191,7 +239,13 @@ function ReaderBody({ book }: { book: Book }) {
       const jumpedToStart = prev !== null && prev > 0.03 && info.fraction < 0.005 && Date.now() - navAt.current > 3000;
       if (!jumpedToStart) {
         window.clearTimeout(saveTimer.current);
-        saveTimer.current = window.setTimeout(() => savePosition(book.id, info.resume, info.fraction), 500);
+        const save = () => {
+          pendingSave.current = null;
+          window.clearTimeout(saveTimer.current);
+          savePosition(book.id, info.resume, info.fraction);
+        };
+        pendingSave.current = save;
+        saveTimer.current = window.setTimeout(save, 500);
         latestFraction.current = info.fraction;
       }
       if (info.atEnd && !finishShown.current) {
@@ -210,6 +264,8 @@ function ReaderBody({ book }: { book: Book }) {
     },
     [],
   );
+
+  useVolumeKeys(settings.volumeKeys && !panel && !finishOpen, turn);
 
   const currentBookmark = useMemo(() => {
     if (!loc || !bookmarks) return undefined;
@@ -291,7 +347,9 @@ function ReaderBody({ book }: { book: Book }) {
           </div>
         ) : engineProps ? (
           book.format === "pdf" ? (
-            <PdfView ref={engine} {...engineProps} />
+            <Suspense fallback={<div className="reader-loading"><span /></div>}>
+              <PdfView ref={engine} {...engineProps} />
+            </Suspense>
           ) : (
             <EpubView ref={engine} {...engineProps} />
           )

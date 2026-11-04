@@ -8,6 +8,13 @@ import "./styles/tokens.css";
 import "./styles/base.css";
 import App from "./App";
 
+// Se a interface recarregou com um livro aberto, os botões de volume voltam ao normal
+try {
+  window.SepiaNative?.setVolumePaging(false);
+} catch {
+  /* fora do Android */
+}
+
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <App />

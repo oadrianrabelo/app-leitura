@@ -12,6 +12,7 @@ export class SessionTracker {
   private lastTick = Date.now();
   private lastPage: number | null = null;
   private dirty = false;
+  private paused = false;
   private timer: number | undefined;
 
   constructor(bookId: string, readingId: string | null, fraction: number) {
@@ -39,6 +40,7 @@ export class SessionTracker {
 
   /** Qualquer interação mantém a sessão "acordada". */
   tick() {
+    if (this.paused) return;
     const now = Date.now();
     const delta = Math.round((now - this.lastTick) / 1000);
     if (delta > 0) this.session.seconds += Math.min(delta, IDLE_LIMIT);
@@ -46,6 +48,18 @@ export class SessionTracker {
     this.session.endedAt = now;
     this.session.updatedAt = now;
     this.dirty = true;
+  }
+
+  /** App em segundo plano: conta até aqui e grava; o tempo fora não entra na sessão */
+  pause() {
+    this.tick();
+    this.paused = true;
+    void this.flush();
+  }
+
+  resume() {
+    this.paused = false;
+    this.lastTick = Date.now();
   }
 
   get pages() {
