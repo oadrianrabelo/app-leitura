@@ -81,7 +81,7 @@ export default function App() {
         <Sidebar active={tab} onChange={changeTab} />
         <main className="app-main">
           <TabPanel active={tab === "hoje"} panelRef={panelRef("hoje")}>
-            <Hoje onOpenLibrary={() => changeTab("biblioteca")} />
+            <Hoje onOpenLibrary={() => changeTab("biblioteca")} onOpenSettings={() => changeTab("ajustes")} />
           </TabPanel>
           <TabPanel active={tab === "biblioteca"} panelRef={panelRef("biblioteca")}>
             <Biblioteca />

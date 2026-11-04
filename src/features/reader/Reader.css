@@ -70,6 +70,12 @@
   white-space: nowrap;
 }
 
+/* Em tela cheia a hora do celular some: fica aqui, discreta, antes da porcentagem */
+.reader-clock {
+  margin-right: 10px;
+  opacity: 0.85;
+}
+
 .reader-loading,
 .reader-error {
   position: absolute;

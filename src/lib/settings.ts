@@ -43,6 +43,9 @@ interface SettingsState {
   /** Último backup manual feito neste aparelho */
   lastBackupAt: number | null;
   setLastBackupAt: (t: number) => void;
+  /** Quando ela dispensou o aviso de "seus dados só estão aqui" */
+  backupNudgeDismissedAt: number | null;
+  dismissBackupNudge: () => void;
   setYearGoal: (goal: number | null) => void;
   setSeenAchievements: (keys: string[]) => void;
   setShelfView: (view: ShelfView) => void;
@@ -78,6 +81,8 @@ export const useSettings = create<SettingsState>()(
       reminderTime: "20:30",
       setReminder: (reminderEnabled, time) => set((s) => ({ reminderEnabled, reminderTime: time ?? s.reminderTime })),
       lastBackupAt: null,
+      backupNudgeDismissedAt: null,
+      dismissBackupNudge: () => set({ backupNudgeDismissedAt: Date.now() }),
       setLastBackupAt: (lastBackupAt) => set({ lastBackupAt }),
       setYearGoal: (yearGoal) => set({ yearGoal }),
       setSeenAchievements: (seenAchievements) => set({ seenAchievements }),

@@ -16,6 +16,7 @@ import { useSettings } from "../lib/settings";
 import { useState } from "react";
 import type { Book } from "../db/types";
 import { useTrecho } from "../features/hoje/trecho";
+import { useSync } from "../features/sync/sync";
 import "./Hoje.css";
 
 /** Uma frase pessoal embaixo da saudação, conforme a hora e o que está lendo. */
@@ -85,7 +86,44 @@ function nudge(book: Book, progress: number, pagesToday: number): string {
 
 const weekday = new Intl.DateTimeFormat("pt-BR", { weekday: "long", day: "numeric", month: "long" });
 
-export function Hoje({ onOpenLibrary }: { onOpenLibrary: () => void }) {
+const MONTH = 30 * 24 * 3600 * 1000;
+
+/**
+ * Sem Google Drive e sem backup recente, tudo (anos de leitura) mora só neste celular.
+ * Um aviso discreto, no máximo uma vez por mês, até ela se proteger.
+ */
+function BackupNudge({ books, onOpenSettings }: { books: number; onOpenSettings: () => void }) {
+  const connected = useSync((s) => s.connected);
+  const { lastBackupAt, backupNudgeDismissedAt, dismissBackupNudge } = useSettings();
+  const t = Date.now();
+  const stale = !lastBackupAt || t - lastBackupAt > MONTH;
+  const snoozed = backupNudgeDismissedAt !== null && t - backupNudgeDismissedAt < MONTH;
+  if (connected || books < 3 || !stale || snoozed) return null;
+  return (
+    <Section>
+      <div className="backup-nudge">
+        <Icon name="info" size={18} />
+        <div>
+          <strong>Suas leituras só estão neste celular</strong>
+          <p>
+            {lastBackupAt ? "Faz mais de um mês do último backup. " : ""}
+            Conecte o Google Drive ou faça um backup em Ajustes para não perder nada se trocar de aparelho.
+          </p>
+          <div className="backup-nudge-actions">
+            <Button onClick={onOpenSettings}>
+              Proteger agora
+            </Button>
+            <button className="backup-nudge-later" onClick={dismissBackupNudge}>
+              Depois
+            </button>
+          </div>
+        </div>
+      </div>
+    </Section>
+  );
+}
+
+export function Hoje({ onOpenLibrary, onOpenSettings }: { onOpenLibrary: () => void; onOpenSettings: () => void }) {
   const now = new Date();
   const name = useSettings((s) => s.name);
   const books = useBooks();
@@ -232,6 +270,8 @@ export function Hoje({ onOpenLibrary }: { onOpenLibrary: () => void }) {
           )}
         </Section>
       )}
+
+      <BackupNudge books={books?.length ?? 0} onOpenSettings={onOpenSettings} />
     </Page>
   );
 }

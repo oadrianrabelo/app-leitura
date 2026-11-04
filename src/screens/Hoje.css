@@ -492,3 +492,47 @@
   font-size: var(--text-sm);
   color: var(--ink-soft);
 }
+
+/* Aviso de backup: discreto, no tom do app */
+.backup-nudge {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg, 18px);
+  background: color-mix(in srgb, var(--accent, #7c5cc4) 9%, var(--surface, transparent));
+  border: 1px solid color-mix(in srgb, var(--accent, #7c5cc4) 22%, transparent);
+  color: var(--ink);
+}
+
+.backup-nudge > svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--accent, #7c5cc4);
+}
+
+.backup-nudge strong {
+  display: block;
+  font-size: var(--text-md, 15px);
+}
+
+.backup-nudge p {
+  margin: 4px 0 var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--ink-soft, var(--ink-faint));
+}
+
+.backup-nudge-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.backup-nudge-later {
+  background: none;
+  border: 0;
+  padding: 6px 8px;
+  font: inherit;
+  font-size: var(--text-sm);
+  color: var(--ink-faint);
+  cursor: pointer;
+}

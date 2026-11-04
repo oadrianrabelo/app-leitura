@@ -95,6 +95,24 @@ function useVolumeKeys(active: boolean, turn: (dir: 1 | -1) => void) {
   }, [active]);
 }
 
+const clockFmt = new Intl.DateTimeFormat("pt-BR", { hour: "2-digit", minute: "2-digit" });
+
+/** A hora (atualizada na virada de cada minuto), para quando a barra do celular está escondida */
+function useClock(active: boolean) {
+  const [time, setTime] = useState(() => clockFmt.format(new Date()));
+  useEffect(() => {
+    if (!active) return;
+    let timer: number;
+    const tick = () => {
+      setTime(clockFmt.format(new Date()));
+      timer = window.setTimeout(tick, 60_000 - (Date.now() % 60_000) + 50);
+    };
+    tick();
+    return () => window.clearTimeout(timer);
+  }, [active]);
+  return active ? time : null;
+}
+
 /** Android: tela cheia enquanto o livro está aberto */
 function useImmersive(active: boolean) {
   useEffect(() => {
@@ -170,7 +188,9 @@ function ReaderBody({ book }: { book: Book }) {
   );
 
   useWakeLock(true);
-  useImmersive(settings.immersive);
+  const immersive = settings.immersive && !!window.SepiaNative?.setImmersive;
+  useImmersive(immersive);
+  const clock = useClock(immersive && settings.showProgress);
 
   // Carrega o arquivo, a posição salva e a leitura em andamento
   useEffect(() => {
@@ -407,7 +427,10 @@ function ReaderBody({ book }: { book: Book }) {
       {/* Espaço fixo: se o rodapé aparecesse e sumisse, o livro seria repaginado */}
       <div className="reader-footer" aria-hidden style={{ visibility: settings.showProgress && loc && !chrome ? "visible" : "hidden" }}>
         <span>{loc?.chapter ?? ""}</span>
-        <span>{loc && Number.isFinite(loc.fraction) ? `${Math.round(loc.fraction * 100)}%` : ""}</span>
+        <span>
+          {clock && <span className="reader-clock">{clock}</span>}
+          {loc && Number.isFinite(loc.fraction) ? `${Math.round(loc.fraction * 100)}%` : ""}
+        </span>
       </div>
 
       <ComfortLayer settings={settings} />
